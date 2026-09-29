@@ -6,7 +6,7 @@
 | 状態 | すること | 抜ける条件 |
 |---|---|---|
 | MOVE | 8方向移動(向きは入力を45°単位に丸める) | 居合を押す → CHARGE |
-| CHARGE | 移動速度×`charge_move_ratio`、IaiCharge を進める | 離す → DASH |
+| CHARGE | 移動せず向きだけ更新、IaiCharge を進める | 離す → DASH |
 | DASH | 向きへ `distance/duration` で `move_and_collide`。DashHitbox 有効、無敵 | 距離到達 or 壁 → SHEATHE |
 | SHEATHE | 硬直。押された居合はバッファする | `sheathe_time` 経過 → MOVE(バッファがあれば即 CHARGE/抜き打ち) |
 | HURT | ノックバック | `knockback_time` 経過 → MOVE |

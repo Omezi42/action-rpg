@@ -5,7 +5,6 @@
 [resource]
 script = ExtResource("1_v1ocg")
 move_speed = 80.0
-charge_move_ratio = 0.3
 max_hp = 6
 invincible_time = 1.0
 knockback_distance = 24.0

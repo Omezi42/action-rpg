@@ -11,9 +11,23 @@ var _world: Node2D
 
 func run(tree: SceneTree, check: Callable) -> void:
 	_tree = tree
+	await _test_charge_roots_player(check)
 	await _test_ichi_damages_once(check)
 	await _test_issen_kills_on_sheathe(check)
 	await _test_contact_hurts_player(check)
+
+
+func _test_charge_roots_player(check: Callable) -> void:
+	var setup := _spawn(Vector2(300, 300))
+	var player: Player = setup[0]
+	Input.action_press("iai")
+	await _frames(0.05)
+	Input.action_press("move_down")
+	await _frames(0.2)
+	check.call(player.global_position == Vector2(100, 100), "構え中は移動しない")
+	check.call(player.facing.is_equal_approx(Vector2.DOWN), "構え中も向きは変えられる")
+	Input.action_release("move_down")
+	_clear()
 
 
 func _test_ichi_damages_once(check: Callable) -> void:

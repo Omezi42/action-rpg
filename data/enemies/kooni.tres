@@ -6,11 +6,11 @@
 script = ExtResource("1_btko1")
 max_hp = 3
 contact_damage = 1
-wander_speed = 30.0
+wander_speed = 27.0
 wander_interval_min = 1.0
 wander_interval_max = 2.0
 wander_stop_chance = 0.5
-chase_speed = 55.0
+chase_speed = 50.0
 notice_range = 80.0
 lose_range = 120.0
 hurt_time = 0.3

@@ -75,21 +75,27 @@ func is_invincible() -> bool:
 
 
 func _move(speed: float) -> void:
+	var input := _read_move_input()
+	velocity = input * speed
+	move_and_slide()
+
+
+func _read_move_input() -> Vector2:
 	var input := Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	if input != Vector2.ZERO:
 		facing = Vector2.RIGHT.rotated(snappedf(input.angle(), PI / 4.0))
-	velocity = input * speed
-	move_and_slide()
+	return input
 
 
 func _start_charge() -> void:
 	state = State.CHARGE
 	_state_time = 0.0
+	velocity = Vector2.ZERO
 	charge.reset()
 
 
 func _process_charge(delta: float, iai_pressed: bool) -> void:
-	_move(data.move_speed * data.charge_move_ratio)
+	_read_move_input()
 	if charge.advance(delta):
 		flash_left = STAGE_FLASH_TIME
 	if not iai_pressed:
