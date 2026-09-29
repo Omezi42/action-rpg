@@ -1,18 +1,16 @@
 class_name Enemy
 extends CharacterBody2D
-## 敵(うろつき・追跡・被弾・撃破)。数値と色は EnemyData から読む(GameDesign.md 5章)。
+## 敵(追跡・被弾・撃破)。数値と色は EnemyData から読む(GameDesign.md 5章)。
 
 signal defeated
 
-enum State { WANDER, CHASE, HURT, DOOMED }
+enum State { CHASE, HURT, DOOMED }
 
 @export var data: EnemyData
 
-var state := State.WANDER
+var state := State.CHASE
 
 var _state_time := 0.0
-var _wander_dir := Vector2.ZERO
-var _wander_left := 0.0
 var _knockback := Vector2.ZERO
 
 @onready var health: Health = $Health
@@ -24,19 +22,16 @@ func _ready() -> void:
 	health.setup(data.max_hp)
 	hurtbox.hurt.connect(_on_hurt)
 	contact_hitbox.power = data.contact_damage
-	_pick_wander()
 
 
 func _physics_process(delta: float) -> void:
 	_state_time += delta
 	match state:
-		State.WANDER:
-			_wander(delta)
 		State.CHASE:
 			_chase()
 		State.HURT:
 			_process_hurt()
-	contact_hitbox.active = state == State.WANDER or state == State.CHASE
+	contact_hitbox.active = state == State.CHASE
 
 
 func is_doomed() -> bool:
@@ -48,24 +43,11 @@ func fall() -> void:
 	_defeat()
 
 
-func _wander(delta: float) -> void:
-	_wander_left -= delta
-	if _wander_left <= 0.0:
-		_pick_wander()
-	velocity = _wander_dir * data.wander_speed
-	move_and_slide()
-	var player := _player()
-	if player and global_position.distance_to(player.global_position) < data.notice_range:
-		state = State.CHASE
-
-
 func _chase() -> void:
 	var player := _player()
-	if not player or global_position.distance_to(player.global_position) > data.lose_range:
-		state = State.WANDER
-		_pick_wander()
-		return
-	velocity = global_position.direction_to(player.global_position) * data.chase_speed
+	velocity = Vector2.ZERO
+	if player:
+		velocity = global_position.direction_to(player.global_position) * data.chase_speed
 	move_and_slide()
 
 
@@ -73,16 +55,7 @@ func _process_hurt() -> void:
 	velocity = _knockback if _state_time < data.knockback_time else Vector2.ZERO
 	move_and_slide()
 	if _state_time >= data.hurt_time:
-		state = State.WANDER
-		_pick_wander()
-
-
-func _pick_wander() -> void:
-	_wander_left = randf_range(data.wander_interval_min, data.wander_interval_max)
-	if randf() < data.wander_stop_chance:
-		_wander_dir = Vector2.ZERO
-	else:
-		_wander_dir = Vector2.RIGHT.rotated(randf() * TAU)
+		state = State.CHASE
 
 
 func _player() -> Node2D:

@@ -1,9 +1,12 @@
 extends SceneTree
 ## 見た目確認用のスクリーンショット(logs/shot_*.png)。ウィンドウありで起動する。
-## 起動直後 → 右へ歩いて構え(弐まで溜め) → 一閃の受付中 → 踏み込み直後 の4枚。
+## 起動直後 → 群れを湧かせて寄ってきたところ → 右向きに構えて一閃の受付中 → 踏み込み直後
+## → 斬り抜けた後 → 残り時間を飛ばしてクリアの結果表示 の6枚。
 
 const SCALE := 3
 const PHYSICS_FPS := 60.0
+const CROWD := 24
+const ALMOST_CLEAR := 0.1
 
 
 func _initialize() -> void:
@@ -14,17 +17,25 @@ func _run() -> void:
 	change_scene_to_file(ProjectSettings.get_setting("application/run/main_scene"))
 	await _wait(0.5)
 	await _shot("1_start")
+	var arena := current_scene
+	for i in CROWD:
+		arena.spawn_enemy()
+	await _wait(1.8)
+	await _shot("2_crowd")
 	Input.action_press("move_right")
-	await _wait(0.4)
+	await _wait(0.05)
 	Input.action_press("iai")
-	await _wait(0.6)
+	await _wait(1.0)
 	Input.action_release("move_right")
-	await _shot("2_charge")
-	await _wait(0.45)
 	await _shot("3_issen_window")
 	Input.action_release("iai")
 	await _wait(0.12)
 	await _shot("4_slash")
+	await _wait(0.4)
+	await _shot("5_after")
+	arena.schedule.elapsed = arena.survival.clear_time - ALMOST_CLEAR
+	await _wait(0.3)
+	await _shot("6_result")
 	quit()
 
 

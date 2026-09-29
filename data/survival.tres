@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="SurvivalData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/survival_data.gd" id="1_surv"]
+
+[resource]
+script = ExtResource("1_surv")
+clear_time = 60.0
+spawn_interval_start = 2.0
+spawn_interval_end = 0.4
+max_enemies = 40
+spawn_margin = 24.0
+spawn_min_player_distance = 64.0

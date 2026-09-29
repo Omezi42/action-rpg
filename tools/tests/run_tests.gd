@@ -3,6 +3,7 @@ extends SceneTree
 
 const IaiTests = preload("res://tools/tests/iai_tests.gd")
 const CombatTests = preload("res://tools/tests/combat_tests.gd")
+const SurvivalTests = preload("res://tools/tests/survival_tests.gd")
 
 var _failures := 0
 var _checks := 0
@@ -15,6 +16,7 @@ func _initialize() -> void:
 func _run() -> void:
 	IaiTests.new().run(_assert_true)
 	await CombatTests.new().run(self, _assert_true)
+	await SurvivalTests.new().run(self, _assert_true)
 	if _failures == 0:
 		print("tests passed (%d checks)" % _checks)
 		quit(0)
