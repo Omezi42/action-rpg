@@ -2,11 +2,11 @@
 
 | 場所 | 中身 |
 |---|---|
-| `scenes/stage/arena.tscn` | メインシーン(試作場) |
+| `scenes/stage/arena.tscn` | メインシーン(アリーナ) |
 | `scenes/player/player.tscn` / `scenes/enemies/kooni.tscn` | 主人公・小鬼 |
 | `scripts/components/` | Health / Hitbox / Hurtbox |
-| `scripts/data/` | Resource 定義(PlayerData / IaiStage / IaiData / EnemyData) |
-| `data/` | 数値の実体(`player.tres` `iai.tres` `enemies/kooni.tres`) |
+| `scripts/data/` | Resource 定義(PlayerData / IaiStage / IaiData / EnemyData / SurvivalData) |
+| `data/` | 数値の実体(`player.tres` `iai.tres` `survival.tres` `enemies/kooni.tres`) |
 | `scripts/effects/` | 斬撃の軌跡・ヒット火花(コード描画、シーン無し) |
 | `scripts/ui/` | ハート・ゲームオーバー・ポーズ |
 

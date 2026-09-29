@@ -3,7 +3,7 @@
 
 - Godot: `C:\Users\omezi\Documents\Godot_v4.6.2-stable_win64_console.exe`
 - プロジェクトルート: `C:\Users\omezi\Documents\action-rpg`
-- ジャンル: アクションRPG(リアルタイム戦闘)
+- ジャンル: 居合サバイバー(見下ろし2Dアクション)
 
 ---
 
