@@ -1,0 +1,152 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/stage/arena.gd" id="1_xrn3w"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/kooni.tscn" id="2_7efwd"]
+[ext_resource type="Script" path="res://scripts/stage/obstacle_drawer.gd" id="3_l3o0w"]
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="4_mei7i"]
+[ext_resource type="Script" path="res://scripts/player/player.gd" id="5_x0var"]
+[ext_resource type="Resource" path="res://data/player.tres" id="6_fog2p"]
+[ext_resource type="Resource" path="res://data/iai.tres" id="7_d2d12"]
+[ext_resource type="Script" path="res://scripts/ui/hearts.gd" id="8_v0onh"]
+[ext_resource type="Script" path="res://scripts/ui/game_over.gd" id="9_kycj6"]
+[ext_resource type="Script" path="res://scripts/ui/pause_menu.gd" id="10_enxlh"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_gqh02"]
+size = Vector2(480, 16)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_qbl08"]
+size = Vector2(480, 16)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_lqi5c"]
+size = Vector2(16, 270)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_u87tm"]
+size = Vector2(16, 270)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_c2erv"]
+size = Vector2(32, 24)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_vdowa"]
+size = Vector2(24, 32)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ruun3"]
+size = Vector2(40, 22)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_aryjj"]
+size = Vector2(22, 22)
+
+[node name="Arena" type="Node2D" unique_id=383609430]
+script = ExtResource("1_xrn3w")
+enemy_scene = ExtResource("2_7efwd")
+
+[node name="Walls" type="StaticBody2D" parent="." unique_id=1454606303]
+collision_mask = 0
+script = ExtResource("3_l3o0w")
+
+[node name="Top" type="CollisionShape2D" parent="Walls" unique_id=543800268]
+position = Vector2(240, 8)
+shape = SubResource("RectangleShape2D_gqh02")
+
+[node name="Bottom" type="CollisionShape2D" parent="Walls" unique_id=898833961]
+position = Vector2(240, 262)
+shape = SubResource("RectangleShape2D_qbl08")
+
+[node name="Left" type="CollisionShape2D" parent="Walls" unique_id=1739242874]
+position = Vector2(8, 135)
+shape = SubResource("RectangleShape2D_lqi5c")
+
+[node name="Right" type="CollisionShape2D" parent="Walls" unique_id=1787290818]
+position = Vector2(472, 135)
+shape = SubResource("RectangleShape2D_u87tm")
+
+[node name="Rocks" type="StaticBody2D" parent="." unique_id=2020158706]
+collision_mask = 0
+script = ExtResource("3_l3o0w")
+color = Color(0.47843137, 0.43529412, 0.3882353, 1)
+top_color = Color(0.6, 0.5529412, 0.5019608, 1)
+
+[node name="Rock1" type="CollisionShape2D" parent="Rocks" unique_id=1261035237]
+position = Vector2(136, 92)
+shape = SubResource("RectangleShape2D_c2erv")
+
+[node name="Rock2" type="CollisionShape2D" parent="Rocks" unique_id=1134761472]
+position = Vector2(342, 86)
+shape = SubResource("RectangleShape2D_vdowa")
+
+[node name="Rock3" type="CollisionShape2D" parent="Rocks" unique_id=881860168]
+position = Vector2(240, 191)
+shape = SubResource("RectangleShape2D_ruun3")
+
+[node name="Rock4" type="CollisionShape2D" parent="Rocks" unique_id=1356924462]
+position = Vector2(101, 201)
+shape = SubResource("RectangleShape2D_aryjj")
+
+[node name="Entities" type="Node2D" parent="." unique_id=1709714205]
+y_sort_enabled = true
+
+[node name="Player" type="CharacterBody2D" parent="Entities" unique_id=157067499 instance=ExtResource("4_mei7i")]
+position = Vector2(240, 140)
+collision_layer = 2
+motion_mode = 1
+script = ExtResource("5_x0var")
+data = ExtResource("6_fog2p")
+iai = ExtResource("7_d2d12")
+
+[node name="Effects" type="Node2D" parent="." unique_id=1488292772]
+z_index = 1
+
+[node name="SpawnPoints" type="Node2D" parent="." unique_id=1727522612]
+
+[node name="Spawn1" type="Marker2D" parent="SpawnPoints" unique_id=2116464200]
+position = Vector2(70, 60)
+
+[node name="Spawn2" type="Marker2D" parent="SpawnPoints" unique_id=759257820]
+position = Vector2(410, 60)
+
+[node name="Spawn3" type="Marker2D" parent="SpawnPoints" unique_id=770900260]
+position = Vector2(400, 210)
+
+[node name="HUD" type="CanvasLayer" parent="." unique_id=1879900303]
+
+[node name="Hearts" type="Control" parent="HUD" unique_id=474749332]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 20.0
+offset_bottom = 20.0
+script = ExtResource("8_v0onh")
+
+[node name="GameOver" type="CanvasLayer" parent="." unique_id=1845001762]
+layer = 2
+script = ExtResource("9_kycj6")
+
+[node name="Dim" type="ColorRect" parent="GameOver" unique_id=334703705]
+offset_right = 480.0
+offset_bottom = 270.0
+color = Color(0, 0, 0, 0.55)
+
+[node name="Label" type="Label" parent="GameOver" unique_id=1899951938]
+offset_right = 480.0
+offset_bottom = 270.0
+text = "ゲームオーバー
+居合ボタンでやり直す"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Pause" type="CanvasLayer" parent="." unique_id=1467515624]
+process_mode = 3
+layer = 3
+script = ExtResource("10_enxlh")
+
+[node name="Dim" type="ColorRect" parent="Pause" unique_id=980955922]
+offset_right = 480.0
+offset_bottom = 270.0
+color = Color(0, 0, 0, 0.55)
+
+[node name="Label" type="Label" parent="Pause" unique_id=330812676]
+offset_right = 480.0
+offset_bottom = 270.0
+text = "ポーズ"
+horizontal_alignment = 1
+vertical_alignment = 1

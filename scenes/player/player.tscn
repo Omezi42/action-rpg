@@ -1,0 +1,60 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/player/player.gd" id="1_qek5x"]
+[ext_resource type="Resource" path="res://data/player.tres" id="2_5gtgg"]
+[ext_resource type="Resource" path="res://data/iai.tres" id="3_h17s1"]
+[ext_resource type="Script" path="res://scripts/player/player_visual.gd" id="4_je7p5"]
+[ext_resource type="Script" path="res://scripts/player/charge_gauge.gd" id="5_fm80t"]
+[ext_resource type="Script" path="res://scripts/components/health.gd" id="6_gx1jg"]
+[ext_resource type="Script" path="res://scripts/components/hurtbox.gd" id="7_ugbui"]
+[ext_resource type="Script" path="res://scripts/components/hitbox.gd" id="8_fcs02"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_myrg7"]
+radius = 5.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_kvlxm"]
+radius = 7.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_uf5tr"]
+
+[node name="Player" type="CharacterBody2D" unique_id=157067499]
+collision_layer = 2
+motion_mode = 1
+script = ExtResource("1_qek5x")
+data = ExtResource("2_5gtgg")
+iai = ExtResource("3_h17s1")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1177800582]
+position = Vector2(0, -4)
+shape = SubResource("CircleShape2D_myrg7")
+
+[node name="Visual" type="Node2D" parent="." unique_id=112877990]
+script = ExtResource("4_je7p5")
+
+[node name="ChargeGauge" type="Node2D" parent="." unique_id=424021129]
+position = Vector2(0, -32)
+script = ExtResource("5_fm80t")
+
+[node name="Health" type="Node" parent="." unique_id=1677269314]
+script = ExtResource("6_gx1jg")
+
+[node name="Hurtbox" type="Area2D" parent="." unique_id=693256395]
+collision_layer = 0
+collision_mask = 16
+monitorable = false
+script = ExtResource("7_ugbui")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox" unique_id=1751677412]
+position = Vector2(0, -10)
+shape = SubResource("CircleShape2D_kvlxm")
+
+[node name="DashHitbox" type="Area2D" parent="." unique_id=1056213937]
+collision_layer = 8
+collision_mask = 0
+monitoring = false
+script = ExtResource("8_fcs02")
+hit_once_per_activation = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DashHitbox" unique_id=887638516]
+position = Vector2(0, -10)
+shape = SubResource("CircleShape2D_uf5tr")

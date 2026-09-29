@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="PlayerData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/player_data.gd" id="1_v1ocg"]
+
+[resource]
+script = ExtResource("1_v1ocg")
+move_speed = 80.0
+charge_move_ratio = 0.3
+max_hp = 6
+invincible_time = 1.0
+knockback_distance = 24.0
+knockback_time = 0.15

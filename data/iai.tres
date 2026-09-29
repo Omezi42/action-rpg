@@ -1,0 +1,55 @@
+[gd_resource type="Resource" script_class="IaiData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/iai_stage.gd" id="1_qr2wu"]
+[ext_resource type="Script" path="res://scripts/data/iai_data.gd" id="2_153mr"]
+
+[sub_resource type="Resource" id="Resource_h7v04"]
+script = ExtResource("1_qr2wu")
+label = "一閃"
+hold_time = 1.0
+distance = 160.0
+duration = 0.22
+power = 8
+sheathe_time = 0.25
+
+[sub_resource type="Resource" id="Resource_xklur"]
+script = ExtResource("1_qr2wu")
+label = "抜き打ち"
+distance = 16.0
+duration = 0.08
+power = 1
+sheathe_time = 0.1
+
+[sub_resource type="Resource" id="Resource_oc3gf"]
+script = ExtResource("1_qr2wu")
+label = "壱"
+hold_time = 0.15
+distance = 48.0
+duration = 0.12
+power = 2
+sheathe_time = 0.25
+
+[sub_resource type="Resource" id="Resource_3a283"]
+script = ExtResource("1_qr2wu")
+label = "弐"
+hold_time = 0.55
+distance = 96.0
+duration = 0.16
+power = 3
+sheathe_time = 0.25
+
+[sub_resource type="Resource" id="Resource_qr8f7"]
+script = ExtResource("1_qr2wu")
+label = "参"
+hold_time = 1.0
+distance = 160.0
+duration = 0.22
+power = 4
+sheathe_time = 0.25
+
+[resource]
+script = ExtResource("2_153mr")
+stages = Array[ExtResource("1_qr2wu")]([SubResource("Resource_xklur"), SubResource("Resource_oc3gf"), SubResource("Resource_3a283"), SubResource("Resource_qr8f7")])
+issen = SubResource("Resource_h7v04")
+issen_window = 0.15
+hitstop_time = 0.04
