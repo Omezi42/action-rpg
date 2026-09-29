@@ -53,3 +53,4 @@ stages = Array[ExtResource("1_qr2wu")]([SubResource("Resource_xklur"), SubResour
 issen = SubResource("Resource_h7v04")
 issen_window = 0.15
 hitstop_time = 0.04
+aim_deadzone = 8.0

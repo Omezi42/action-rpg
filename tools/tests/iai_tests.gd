@@ -1,5 +1,5 @@
 extends RefCounted
-## IaiCharge の段階判定と一閃の受付(GameDesign.md 3章)。
+## IaiCharge の段階判定と一閃の受付、パチンコ式の狙い(GameDesign.md 2・3章)。
 
 const IAI := preload("res://data/iai.tres")
 
@@ -20,3 +20,8 @@ func run(check: Callable) -> void:
 	charge.reset()
 	check.call(charge.stage_index() == 0, "reset で抜き打ちへ戻る")
 	check.call(is_equal_approx(charge.fill_of(1), 0.0), "溜め始めのゲージは空")
+	var anchor := Vector2(100, 100)
+	var aim := Player.slingshot_direction(anchor, Vector2(70, 130), IAI.aim_deadzone)
+	check.call(aim.is_equal_approx(Vector2(1, -1).normalized()), "左下へ引くと右上へ踏み込む")
+	aim = Player.slingshot_direction(anchor, Vector2(96, 104), IAI.aim_deadzone)
+	check.call(aim == Vector2.ZERO, "引きが遊び未満なら向きを変えない")

@@ -1,12 +1,14 @@
 extends SceneTree
 ## 見た目確認用のスクリーンショット(logs/shot_*.png)。ウィンドウありで起動する。
-## 起動直後 → 群れを湧かせて寄ってきたところ → 右向きに構えて一閃の受付中 → 踏み込み直後
-## → 斬り抜けた後 → 残り時間を飛ばしてクリアの結果表示 の6枚。
+## 起動直後 → 群れを湧かせて寄ってきたところ → 斜めに構えて弐(予告線)→ 一閃の受付中 → 踏み込み直後
+## → 斬り抜けた後 → 残り時間を飛ばしてクリアの結果表示 の7枚。
+## マウスの狙いは実カーソルを動かさないよう facing を直接向ける。
 
 const SCALE := 3
 const PHYSICS_FPS := 60.0
 const CROWD := 24
 const ALMOST_CLEAR := 0.1
+const AIM := Vector2(1.0, -0.45)
 
 
 func _initialize() -> void:
@@ -25,9 +27,13 @@ func _run() -> void:
 	Input.action_press("move_right")
 	await _wait(0.05)
 	Input.action_press("iai")
-	await _wait(1.0)
+	await _wait(0.05)
 	Input.action_release("move_right")
-	await _shot("3_issen_window")
+	arena.get_node("Entities/Player").facing = AIM.normalized()
+	await _wait(0.55)
+	await _shot("3_charge_guide")
+	await _wait(0.4)
+	await _shot("3b_issen_window")
 	Input.action_release("iai")
 	await _wait(0.12)
 	await _shot("4_slash")

@@ -8,6 +8,8 @@
 [ext_resource type="Script" path="res://scripts/components/health.gd" id="6_gx1jg"]
 [ext_resource type="Script" path="res://scripts/components/hurtbox.gd" id="7_ugbui"]
 [ext_resource type="Script" path="res://scripts/components/hitbox.gd" id="8_fcs02"]
+[ext_resource type="PackedScene" path="res://scenes/player/aim_guide.tscn" id="9_h17s1"]
+[ext_resource type="Script" path="res://scripts/player/aim_guide.gd" id="10_je7p5"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_myrg7"]
 radius = 5.0
@@ -58,3 +60,7 @@ hit_once_per_activation = true
 [node name="CollisionShape2D" type="CollisionShape2D" parent="DashHitbox" unique_id=887638516]
 position = Vector2(0, -10)
 shape = SubResource("CircleShape2D_uf5tr")
+
+[node name="AimGuide" type="Node2D" parent="." unique_id=548387261 instance=ExtResource("9_h17s1")]
+show_behind_parent = true
+script = ExtResource("10_je7p5")

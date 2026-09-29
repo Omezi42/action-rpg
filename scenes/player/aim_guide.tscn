@@ -1,0 +1,7 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/player/aim_guide.gd" id="1_cfudt"]
+
+[node name="AimGuide" type="Node2D" unique_id=548387261]
+show_behind_parent = true
+script = ExtResource("1_cfudt")
