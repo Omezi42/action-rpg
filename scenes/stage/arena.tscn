@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" path="res://scenes/enemies/kooni.tscn" id="2_7efwd"]
 [ext_resource type="Script" path="res://scripts/stage/obstacle_drawer.gd" id="3_l3o0w"]
 [ext_resource type="Resource" path="res://data/survival.tres" id="3_mei7i"]
+[ext_resource type="Resource" path="res://data/growth.tres" id="4_gqh02"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="4_mei7i"]
 [ext_resource type="Script" path="res://scripts/player/player.gd" id="5_x0var"]
 [ext_resource type="Resource" path="res://data/player.tres" id="6_fog2p"]
@@ -11,8 +12,14 @@
 [ext_resource type="Script" path="res://scripts/ui/hearts.gd" id="8_v0onh"]
 [ext_resource type="Script" path="res://scripts/ui/game_over.gd" id="9_kycj6"]
 [ext_resource type="Script" path="res://scripts/ui/pause_menu.gd" id="10_enxlh"]
+[ext_resource type="PackedScene" path="res://scenes/pickups/soul_field.tscn" id="10_qbl08"]
 [ext_resource type="PackedScene" path="res://scenes/ui/run_status.tscn" id="10_x0var"]
 [ext_resource type="Script" path="res://scripts/ui/run_status.gd" id="11_fog2p"]
+[ext_resource type="Script" path="res://scripts/growth/soul_field.gd" id="11_lqi5c"]
+[ext_resource type="PackedScene" path="res://scenes/ui/exp_bar.tscn" id="15_u87tm"]
+[ext_resource type="Script" path="res://scripts/ui/exp_bar.gd" id="16_c2erv"]
+[ext_resource type="PackedScene" path="res://scenes/ui/level_up_menu.tscn" id="19_vdowa"]
+[ext_resource type="Script" path="res://scripts/ui/level_up_menu.gd" id="20_ruun3"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_gqh02"]
 size = Vector2(480, 16)
@@ -42,6 +49,7 @@ size = Vector2(22, 22)
 script = ExtResource("1_xrn3w")
 enemy_scene = ExtResource("2_7efwd")
 survival = ExtResource("3_mei7i")
+growth = ExtResource("4_gqh02")
 
 [node name="Walls" type="StaticBody2D" parent="." unique_id=1454606303]
 collision_mask = 0
@@ -96,6 +104,10 @@ script = ExtResource("5_x0var")
 data = ExtResource("6_fog2p")
 iai = ExtResource("7_d2d12")
 
+[node name="SoulField" type="Node2D" parent="Entities" unique_id=1677391780 instance=ExtResource("10_qbl08")]
+script = ExtResource("11_lqi5c")
+growth = ExtResource("4_gqh02")
+
 [node name="Effects" type="Node2D" parent="." unique_id=1488292772]
 z_index = 1
 
@@ -120,6 +132,16 @@ theme_override_colors/font_outline_color = Color(0.105882354, 0.105882354, 0.105
 theme_override_constants/outline_size = 4
 horizontal_alignment = 2
 script = ExtResource("11_fog2p")
+
+[node name="ExpBar" type="Control" parent="HUD" unique_id=1792896896 instance=ExtResource("15_u87tm")]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 20.0
+offset_top = 5.0
+offset_right = 460.0
+offset_bottom = 9.0
+mouse_filter = 2
+script = ExtResource("16_c2erv")
 
 [node name="GameOver" type="CanvasLayer" parent="." unique_id=1845001762]
 process_mode = 3
@@ -155,3 +177,9 @@ offset_bottom = 270.0
 text = "ポーズ"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="LevelUp" type="CanvasLayer" parent="." unique_id=1756907990 instance=ExtResource("19_vdowa")]
+process_mode = 3
+layer = 2
+script = ExtResource("20_ruun3")
+growth = ExtResource("4_gqh02")

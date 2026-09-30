@@ -5,10 +5,12 @@ extends RefCounted
 var hold_time := 0.0
 
 var _data: IaiData
+var _stats: PlayerStats
 
 
-func _init(data: IaiData) -> void:
+func _init(data: IaiData, stats: PlayerStats = PlayerStats.new()) -> void:
 	_data = data
+	_stats = stats
 
 
 func reset() -> void:
@@ -25,7 +27,7 @@ func advance(delta: float) -> bool:
 func stage_index() -> int:
 	var index := 0
 	for i in _data.stages.size():
-		if hold_time >= _data.stages[i].hold_time:
+		if hold_time >= _threshold(i):
 			index = i
 	return index
 
@@ -35,14 +37,15 @@ func top_stage_index() -> int:
 
 
 func is_issen_window() -> bool:
-	var top_time := _data.stages[top_stage_index()].hold_time
-	return hold_time >= top_time and hold_time < top_time + _data.issen_window
+	var top_time := _threshold(top_stage_index())
+	var window := _data.issen_window + _stats.issen_window_bonus
+	return hold_time >= top_time and hold_time < top_time + window
 
 
 ## 段階 index(1以上)へ向けた溜まり具合 0〜1
 func fill_of(index: int) -> float:
-	var from := _data.stages[index - 1].hold_time
-	var to := _data.stages[index].hold_time
+	var from := _threshold(index - 1)
+	var to := _threshold(index)
 	return clampf((hold_time - from) / (to - from), 0.0, 1.0)
 
 
@@ -50,3 +53,8 @@ func release() -> IaiStage:
 	if is_issen_window():
 		return _data.issen
 	return _data.stages[stage_index()]
+
+
+## 段階 index に届く押し時間(早抜きの強化を反映)
+func _threshold(index: int) -> float:
+	return _data.stages[index].hold_time * _stats.charge_time_scale

@@ -1,7 +1,8 @@
 extends SceneTree
 ## 見た目確認用のスクリーンショット(logs/shot_*.png)。ウィンドウありで起動する。
 ## 起動直後 → 群れを湧かせて寄ってきたところ → 斜めに構えて弐(予告線)→ 一閃の受付中 → 踏み込み直後
-## → 斬り抜けた後 → 残り時間を飛ばしてクリアの結果表示 の7枚。
+## → 斬り抜けた後(魂が落ちている)→ レベルアップ画面 → 残り時間を飛ばしてクリアの結果表示 の8枚。
+## 群れには大群(一列)も混ぜる。
 ## マウスの狙いは実カーソルを動かさないよう facing を直接向ける。
 
 const ALL_KINDS_TIME := 25.0
@@ -24,6 +25,7 @@ func _run() -> void:
 	arena.schedule.elapsed = ALL_KINDS_TIME
 	for i in CROWD:
 		arena.spawn_enemy()
+	arena.spawn_horde()
 	await _wait(1.8)
 	await _shot("2_crowd")
 	Input.action_press("move_right")
@@ -41,9 +43,13 @@ func _run() -> void:
 	await _shot("4_slash")
 	await _wait(0.4)
 	await _shot("5_after")
+	arena._on_soul_collected(arena.progression.exp_to_next())
+	await _wait(0.1)
+	await _shot("6_level_up")
+	arena.get_node("LevelUp").choose(0)
 	arena.schedule.elapsed = arena.survival.clear_time - ALMOST_CLEAR
 	await _wait(0.3)
-	await _shot("6_result")
+	await _shot("7_result")
 	quit()
 
 

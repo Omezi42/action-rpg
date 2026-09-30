@@ -11,3 +11,4 @@ hurt_time = 0.3
 knockback_distance = 4.0
 knockback_time = 0.15
 color = Color(0.3019608, 0.43529412, 0.7529412, 1)
+soul_value = 3

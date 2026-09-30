@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="UpgradeData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/upgrade_data.gd" id="1_upg"]
+
+[resource]
+script = ExtResource("1_upg")
+label = "見切り"
+description = "一閃の受付時間
++0.04秒"
+stat = 3
+amount = 0.04
+max_level = 5

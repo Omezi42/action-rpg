@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="GrowthData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/growth_data.gd" id="1_growth"]
+[ext_resource type="Script" path="res://scripts/data/upgrade_data.gd" id="2_upg"]
+[ext_resource type="Resource" path="res://data/upgrades/hayanuki.tres" id="3_hayanuki"]
+[ext_resource type="Resource" path="res://data/upgrades/fukabumi.tres" id="4_fukabumi"]
+[ext_resource type="Resource" path="res://data/upgrades/gouba.tres" id="5_gouba"]
+[ext_resource type="Resource" path="res://data/upgrades/mikiri.tres" id="6_mikiri"]
+[ext_resource type="Resource" path="res://data/upgrades/idaten.tres" id="7_idaten"]
+[ext_resource type="Resource" path="res://data/upgrades/ganken.tres" id="8_ganken"]
+[ext_resource type="Resource" path="res://data/upgrades/kaifuku.tres" id="9_kaifuku"]
+
+[resource]
+script = ExtResource("1_growth")
+pickup_radius = 24.0
+pull_speed = 240.0
+collect_distance = 4.0
+max_souls = 200
+exp_base = 5
+exp_step = 2
+choice_count = 3
+choose_lock_time = 0.3
+upgrades = Array[ExtResource("2_upg")]([ExtResource("3_hayanuki"), ExtResource("4_fukabumi"), ExtResource("5_gouba"), ExtResource("6_mikiri"), ExtResource("7_idaten"), ExtResource("8_ganken")])
+heal = ExtResource("9_kaifuku")

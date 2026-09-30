@@ -2,7 +2,7 @@ class_name Enemy
 extends CharacterBody2D
 ## 敵(追跡・被弾・撃破)。数値と色は EnemyData から読む(GameDesign.md 5章)。
 
-signal defeated
+signal defeated(enemy: Enemy)
 
 enum State { CHASE, HURT, DOOMED }
 
@@ -77,5 +77,5 @@ func _on_hurt(hitbox: Hitbox) -> void:
 
 func _defeat() -> void:
 	hurtbox.invincible = true
-	defeated.emit()
+	defeated.emit(self)
 	queue_free()

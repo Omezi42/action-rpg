@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="UpgradeData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/upgrade_data.gd" id="1_upg"]
+
+[resource]
+script = ExtResource("1_upg")
+label = "回復"
+description = "HP +2"
+stat = 6
+amount = 2.0
+max_level = 1

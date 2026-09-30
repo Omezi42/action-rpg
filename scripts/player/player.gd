@@ -16,6 +16,7 @@ const STAGE_FLASH_TIME := 0.12
 var state := State.MOVE
 var facing := Vector2.DOWN
 var charge: IaiCharge
+var stats := PlayerStats.new()
 var current_strike: IaiStage
 var flash_left := 0.0
 var invincible_left := 0.0
@@ -38,7 +39,7 @@ var _aim_anchor := Vector2.ZERO
 
 func _ready() -> void:
 	add_to_group("player")
-	charge = IaiCharge.new(iai)
+	charge = IaiCharge.new(iai, stats)
 	health.setup(data.max_hp)
 	health.died.connect(_on_died)
 	hurtbox.hurt.connect(_on_hurt)
@@ -56,7 +57,7 @@ func _physics_process(delta: float) -> void:
 	invincible_left = maxf(invincible_left - delta, 0.0)
 	match state:
 		State.MOVE:
-			_move(data.move_speed)
+			_move(data.move_speed * stats.move_speed_scale)
 			if iai_just_pressed:
 				_start_charge()
 		State.CHARGE:
@@ -74,6 +75,25 @@ func _physics_process(delta: float) -> void:
 
 func is_invincible() -> bool:
 	return state == State.DASH or state == State.DEAD or invincible_left > 0.0
+
+
+## レベルアップ画面を閉じたとき:構えを解き、居合ボタンは一度離すまで効かなくする
+func interrupt_input() -> void:
+	_iai_was_pressed = true
+	if state == State.CHARGE:
+		state = State.MOVE
+		_state_time = 0.0
+
+
+func strike_distance(strike: IaiStage) -> float:
+	return strike.distance * stats.distance_scale
+
+
+## 剛刃の強化は壱以上(一閃を含む)に乗る
+func strike_power(strike: IaiStage) -> int:
+	if strike == iai.stages[0]:
+		return strike.power
+	return strike.power + stats.power_bonus
 
 
 func _move(speed: float) -> void:
@@ -126,18 +146,19 @@ func _start_dash(strike: IaiStage) -> void:
 	_dash_traveled = 0.0
 	_doomed.clear()
 	velocity = Vector2.ZERO
-	dash_hitbox.power = strike.power
+	dash_hitbox.power = strike_power(strike)
 	dash_hitbox.direction = facing
 	dash_hitbox.delay_death = strike == iai.issen
 	dash_hitbox.activate()
 
 
 func _process_dash(delta: float) -> void:
-	var speed := current_strike.distance / current_strike.duration
-	var step := minf(speed * delta, current_strike.distance - _dash_traveled)
+	var distance := strike_distance(current_strike)
+	var speed := distance / current_strike.duration
+	var step := minf(speed * delta, distance - _dash_traveled)
 	_dash_traveled += step
 	var collision := move_and_collide(facing * step)
-	if collision or _dash_traveled >= current_strike.distance:
+	if collision or _dash_traveled >= distance:
 		_end_dash()
 
 

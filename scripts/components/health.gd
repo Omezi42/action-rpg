@@ -24,5 +24,18 @@ func damage(amount: int) -> void:
 		died.emit()
 
 
+func heal(amount: int) -> void:
+	if is_dead():
+		return
+	hp = mini(hp + amount, max_hp)
+	changed.emit(hp, max_hp)
+
+
+## 最大HPを増やし、増えた分だけ回復する
+func raise_max(amount: int) -> void:
+	max_hp += amount
+	heal(amount)
+
+
 func is_dead() -> bool:
 	return hp <= 0

@@ -9,3 +9,5 @@ extends Resource
 @export var knockback_distance := 0.0
 @export var knockback_time := 0.0
 @export var color := Color.WHITE
+## 倒したときに落とす魂の経験値(GameDesign.md 8章)
+@export var soul_value := 0

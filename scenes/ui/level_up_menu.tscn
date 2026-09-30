@@ -1,0 +1,10 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/level_up_menu.gd" id="1_ordj2"]
+[ext_resource type="Resource" path="res://data/growth.tres" id="2_2a3k4"]
+
+[node name="LevelUp" type="CanvasLayer" unique_id=1756907990]
+process_mode = 3
+layer = 2
+script = ExtResource("1_ordj2")
+growth = ExtResource("2_2a3k4")
