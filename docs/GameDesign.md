@@ -11,4 +11,5 @@
 | 5 | 敵 | `design/05_enemies.md` |
 | 6 | 画面・カメラ・UI | `design/06_screen.md` |
 | 7 | 絵の仕様(取り込み形式) | `design/07_art_format.md` |
+| 8 | 成長(魂・レベルアップ・強化) | `design/08_growth.md` |
 | 99 | 未定事項 | `design/99_undecided.md` |

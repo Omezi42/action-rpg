@@ -19,5 +19,10 @@
 - 踏み込みの予告線は子の `AimGuide`(`scenes/player/aim_guide.tscn`、`show_behind_parent`)。`charge.release()` の距離で描く
 - 演出は `slashed(from, to, is_issen)` / `hit_landed(at)` を出すだけで、生成は Arena が行う
 
+## 強化の反映
+- `Player.stats`(PlayerStats)が強化の倍率・加算を持つ。移動は `move_speed * stats.move_speed_scale`
+- 踏み込みの距離と威力は `strike_distance(strike)` / `strike_power(strike)` で出す(IaiStage は共有リソースなので書き換えない)。予告線もこれを使う
+- `interrupt_input()`:レベルアップ画面を閉じたときに呼ぶ。構え中なら MOVE へ戻し、居合ボタンを「押しっぱなし」扱いにして一度離すまで効かなくする
+
 ## IaiCharge(`scripts/player/iai_charge.gd`)
-押し時間 → 段階・一閃受付・ゲージの溜まり具合を返す純ロジック。数値は `data/iai.tres`(IaiData:`stages` は hold_time 昇順、`issen` は一閃用の IaiStage)。
+押し時間 → 段階・一閃受付・ゲージの溜まり具合を返す純ロジック。段階に届く時間は `stats.charge_time_scale` 倍、一閃の受付は `stats.issen_window_bonus` を足す。数値は `data/iai.tres`(IaiData:`stages` は hold_time 昇順、`issen` は一閃用の IaiStage)。
