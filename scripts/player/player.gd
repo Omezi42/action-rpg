@@ -1,6 +1,6 @@
 class_name Player
 extends CharacterBody2D
-## 主人公。移動と居合(構え → 踏み込み → 納刀)、被弾を受け持つ(GameDesign.md 2〜4章)。
+## 主人公。移動と居合(構え → 踏み込み → 納刀)、被弾、強化の反映を受け持つ(GameDesign.md 2〜4・8章)。
 
 signal died
 signal slashed(from: Vector2, to: Vector2, is_issen: bool)
@@ -16,6 +16,7 @@ const STAGE_FLASH_TIME := 0.12
 var state := State.MOVE
 var facing := Vector2.DOWN
 var charge: IaiCharge
+var stats := PlayerStats.new()
 var current_strike: IaiStage
 var flash_left := 0.0
 var invincible_left := 0.0
@@ -56,7 +57,7 @@ func _physics_process(delta: float) -> void:
 	invincible_left = maxf(invincible_left - delta, 0.0)
 	match state:
 		State.MOVE:
-			_move(data.move_speed)
+			_move(data.move_speed * stats.value(PlayerStats.MOVE_SPEED_SCALE))
 			if iai_just_pressed:
 				_start_charge()
 		State.CHARGE:
@@ -74,6 +75,33 @@ func _physics_process(delta: float) -> void:
 
 func is_invincible() -> bool:
 	return state == State.DASH or state == State.DEAD or invincible_left > 0.0
+
+
+## 強化を1段反映する。手当(heal)は回復だけ
+func apply_upgrade(upgrade: UpgradeData) -> void:
+	if upgrade.heal > 0:
+		health.heal(upgrade.heal)
+		return
+	stats.apply(upgrade)
+	charge.hold_scale = stats.value(PlayerStats.HOLD_SCALE)
+	charge.window_bonus = stats.value(PlayerStats.ISSEN_WINDOW_BONUS)
+
+
+func strike_distance(strike: IaiStage) -> float:
+	return strike.distance * stats.value(PlayerStats.DISTANCE_SCALE)
+
+
+func strike_power(strike: IaiStage) -> int:
+	return strike.power + roundi(stats.value(PlayerStats.POWER_BONUS))
+
+
+func pickup_radius() -> float:
+	return data.pickup_radius * stats.value(PlayerStats.PICKUP_SCALE)
+
+
+## ツリーが止まっていた間の押し下げを「押した瞬間」と取り違えないよう、今の押下を前フレームの値にする
+func resync_input() -> void:
+	_iai_was_pressed = Input.is_action_pressed("iai")
 
 
 func _move(speed: float) -> void:
@@ -126,18 +154,19 @@ func _start_dash(strike: IaiStage) -> void:
 	_dash_traveled = 0.0
 	_doomed.clear()
 	velocity = Vector2.ZERO
-	dash_hitbox.power = strike.power
+	dash_hitbox.power = strike_power(strike)
 	dash_hitbox.direction = facing
 	dash_hitbox.delay_death = strike == iai.issen
 	dash_hitbox.activate()
 
 
 func _process_dash(delta: float) -> void:
-	var speed := current_strike.distance / current_strike.duration
-	var step := minf(speed * delta, current_strike.distance - _dash_traveled)
+	var distance := strike_distance(current_strike)
+	var speed := distance / current_strike.duration
+	var step := minf(speed * delta, distance - _dash_traveled)
 	_dash_traveled += step
 	var collision := move_and_collide(facing * step)
-	if collision or _dash_traveled >= current_strike.distance:
+	if collision or _dash_traveled >= distance:
 		_end_dash()
 
 

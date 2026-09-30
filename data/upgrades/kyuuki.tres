@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="UpgradeData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/upgrade_data.gd" id="1_up"]
+
+[resource]
+script = ExtResource("1_up")
+title = "吸気"
+description = "玉の回収範囲 +50%"
+max_level = 2
+stat = &"pickup_scale"
+amount = 0.5

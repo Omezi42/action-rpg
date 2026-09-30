@@ -21,6 +21,7 @@ var _alive := 0
 @onready var _game_over = $GameOver
 @onready var _pause = $Pause
 @onready var _effects: Node2D = $Effects
+@onready var _growth: RunGrowth = $Growth
 
 
 func _ready() -> void:
@@ -31,6 +32,7 @@ func _ready() -> void:
 	_player.died.connect(_end.bind(false))
 	_player.slashed.connect(_on_player_slashed)
 	_player.hit_landed.connect(_on_player_hit_landed)
+	_growth.setup(_player, _entities, _effects, $HUD/UpgradeMenu, $HUD/XpBar, _pause)
 	_update_status()
 
 
@@ -74,9 +76,10 @@ func _end(cleared: bool) -> void:
 	_game_over.open(cleared, minf(schedule.elapsed, survival.clear_time), kills)
 
 
-func _on_enemy_defeated() -> void:
+func _on_enemy_defeated(enemy: Enemy) -> void:
 	_alive -= 1
 	kills += 1
+	_growth.drop_xp(enemy.global_position, enemy.data.xp_value)
 	_update_status()
 
 

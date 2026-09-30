@@ -1,0 +1,8 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/stage/run_growth.gd" id="1_rg"]
+[ext_resource type="Resource" path="res://data/growth.tres" id="2_gd"]
+
+[node name="Growth" type="Node"]
+script = ExtResource("1_rg")
+data = ExtResource("2_gd")

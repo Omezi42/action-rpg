@@ -7,3 +7,4 @@ extends Resource
 @export var invincible_time := 0.0
 @export var knockback_distance := 0.0
 @export var knockback_time := 0.0
+@export var pickup_radius := 0.0

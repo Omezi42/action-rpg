@@ -11,3 +11,4 @@ hurt_time = 0.3
 knockback_distance = 12.0
 knockback_time = 0.15
 color = Color(0.78431374, 0.627451, 0.3764706, 1)
+xp_value = 1

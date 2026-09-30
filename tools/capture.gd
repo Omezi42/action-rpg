@@ -1,7 +1,7 @@
 extends SceneTree
 ## 見た目確認用のスクリーンショット(logs/shot_*.png)。ウィンドウありで起動する。
 ## 起動直後 → 群れを湧かせて寄ってきたところ → 斜めに構えて弐(予告線)→ 一閃の受付中 → 踏み込み直後
-## → 斬り抜けた後 → 残り時間を飛ばしてクリアの結果表示 の7枚。
+## → 斬り抜けた後(斬痕と経験値の玉)→ レベルアップの3択 → 残り時間を飛ばしてクリアの結果表示 の8枚。
 ## マウスの狙いは実カーソルを動かさないよう facing を直接向ける。
 
 const ALL_KINDS_TIME := 25.0
@@ -10,6 +10,7 @@ const PHYSICS_FPS := 60.0
 const CROWD := 24
 const ALMOST_CLEAR := 0.1
 const AIM := Vector2(1.0, -0.45)
+const ZANKON := preload("res://data/upgrades/zankon.tres")
 
 
 func _initialize() -> void:
@@ -31,7 +32,9 @@ func _run() -> void:
 	Input.action_press("iai")
 	await _wait(0.05)
 	Input.action_release("move_right")
-	arena.get_node("Entities/Player").facing = AIM.normalized()
+	var player: Player = arena.get_node("Entities/Player")
+	player.facing = AIM.normalized()
+	player.apply_upgrade(ZANKON)
 	await _wait(0.55)
 	await _shot("3_charge_guide")
 	await _wait(0.4)
@@ -41,6 +44,11 @@ func _run() -> void:
 	await _shot("4_slash")
 	await _wait(0.4)
 	await _shot("5_after")
+	var growth: RunGrowth = arena.get_node("Growth")
+	growth.add_xp(growth.growth.xp_to_next())
+	await _wait(0.1)
+	await _shot("5b_level_up")
+	arena.get_node("HUD/UpgradeMenu").choose(0)
 	arena.schedule.elapsed = arena.survival.clear_time - ALMOST_CLEAR
 	await _wait(0.3)
 	await _shot("6_result")

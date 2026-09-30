@@ -18,7 +18,7 @@ func _process(_delta: float) -> void:
 func _draw() -> void:
 	if not visible:
 		return
-	var tip := _player.facing * _player.charge.release().distance
+	var tip := _player.facing * _player.strike_distance(_player.charge.release())
 	var c := issen_color if _player.charge.is_issen_window() else color
 	draw_dashed_line(Vector2.ZERO, tip, c, width, dash_length)
 	draw_circle(tip, tip_radius, c)

@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="UpgradeData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/upgrade_data.gd" id="1_up"]
+
+[resource]
+script = ExtResource("1_up")
+title = "手当"
+description = "HPを2回復"
+heal = 2

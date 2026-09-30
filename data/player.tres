@@ -9,3 +9,4 @@ max_hp = 6
 invincible_time = 1.0
 knockback_distance = 24.0
 knockback_time = 0.15
+pickup_radius = 16.0

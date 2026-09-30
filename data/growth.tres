@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="GrowthData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/growth_data.gd" id="1_gd"]
+[ext_resource type="Resource" path="res://data/heal_upgrade.tres" id="2_heal"]
+
+[resource]
+script = ExtResource("1_gd")
+xp_base = 5
+xp_step = 3
+magnet_speed = 240.0
+collect_distance = 4.0
+choice_count = 3
+choose_lock_time = 0.4
+filler = ExtResource("2_heal")
+upgrade_dir = "res://data/upgrades"
+lingering_base_time = 0.5
+lingering_time_step = 0.3
+lingering_power = 1

@@ -9,3 +9,4 @@ extends Resource
 @export var knockback_distance := 0.0
 @export var knockback_time := 0.0
 @export var color := Color.WHITE
+@export var xp_value := 0

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="UpgradeData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/upgrade_data.gd" id="1_up"]
+
+[resource]
+script = ExtResource("1_up")
+title = "斬痕"
+description = "斬った線に斬撃が残り、触れた敵に威力1。段ごとに長く残る"
+max_level = 3
+stat = &"lingering_level"
+amount = 1.0

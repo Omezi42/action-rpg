@@ -32,19 +32,22 @@
 - `add_xp(n)` は余りを持ち越してレベルを上げ、上がった数を返す。`roll_choices()` は上限未満の候補をシャッフルして3つ、足りなければ手当を1枚足す。`take(upgrade)` で段を上げ `pending` を減らす
 
 ## 経験値の玉(XpOrb、`scripts/stage/xp_orb.gd`、シーン無し)
-- Arena が敵の `defeated(enemy)` で倒れた位置に生成し、`Pickups`(Entities の前)に入れる
+- RunGrowth が `drop_xp()`(Arena が敵の `defeated(enemy)` で呼ぶ)で倒れた位置に生成し、`Entities`(y_sort)に入れる
 - 毎物理フレーム主人公との距離を見て、`pickup_radius()` 以内に入ったら吸い寄せを始める(以後は範囲外でも追う)。`collect_distance` 以内で `collected(value)` を出して消える
 - 踏み込み中も同じ処理なので、通過線の近くの玉は拾われる
 
 ## 斬痕(LingeringSlash、`scripts/player/lingering_slash.gd`、Hitbox を継承)
-- Arena が主人公の `slashed` で `lingering_level > 0` のとき `Effects` に生成する。踏み込みの線に SegmentShape2D を張り、layer は player_attack
+- RunGrowth が主人公の `slashed` で `lingering_level > 0` のとき `Effects` に生成する。踏み込みの線に SegmentShape2D を張り、layer は player_attack
 - 体の高さ(足元 −10px)にずらす。理由:敵の Hurtbox が足元より上にあるため
 - `hit_once_per_activation` で1本につき同じ敵へ1度。寿命が来たら消える。ヒットストップは入れない
 
-## 3択(Arena ↔ UpgradeMenu)
-- Arena は `collected` で `growth.add_xp()`。上がったら `get_tree().paused = true`・ポーズを `locked` にして `HUD/UpgradeMenu` を開く
+## 進行役(RunGrowth、`scripts/stage/run_growth.gd` / `scenes/stage/run_growth.tscn`)
+Arena の子 `Growth`。Arena は `_ready` で `setup()` し、撃破時に `drop_xp()` を呼ぶだけ。成長の処理は Arena に書かない(Arena を小さく保つため)。
+
+## 3択(RunGrowth ↔ UpgradeMenu)
+- RunGrowth は `collected` で `growth.add_xp()`。上がったら `get_tree().paused = true`・ポーズを `locked` にして `HUD/UpgradeMenu` を開く
 - UpgradeMenu(`scripts/ui/upgrade_menu.gd`、Control、`process_mode = ALWAYS`)は札をコード描画し、`chosen(upgrade)` を出す。開いて `choose_lock_time` の間は入力を無視する
   - マウスのボタンは札の上のときだけ扱う(`iai` に左クリックが入っているため、札の外のクリックで決まらないように)
   - `move_left/right` で選び、`iai` で決める。`choose_1〜3` で直接選ぶ
-- Arena は `chosen` で `growth.take()` → `player.apply_upgrade()`。`pending` が残っていれば引き直して開き、無ければ再開し `player.resync_input()`(止まっている間に押した居合を「押した瞬間」と取り違えないため)
+- RunGrowth は `chosen` で `growth.take()` → `player.apply_upgrade()`。`pending` が残っていれば引き直して開き、無ければ再開し `player.resync_input()`(止まっている間に押した居合を「押した瞬間」と取り違えないため)
 - `HUD/XpBar`(`scripts/ui/xp_bar.gd`)が上端にレベルと経験値のバーを描く

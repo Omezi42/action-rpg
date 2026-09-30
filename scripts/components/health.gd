@@ -24,5 +24,12 @@ func damage(amount: int) -> void:
 		died.emit()
 
 
+func heal(amount: int) -> void:
+	if is_dead():
+		return
+	hp = mini(hp + amount, max_hp)
+	changed.emit(hp, max_hp)
+
+
 func is_dead() -> bool:
 	return hp <= 0

@@ -13,6 +13,13 @@
 [ext_resource type="Script" path="res://scripts/ui/pause_menu.gd" id="10_enxlh"]
 [ext_resource type="PackedScene" path="res://scenes/ui/run_status.tscn" id="10_x0var"]
 [ext_resource type="Script" path="res://scripts/ui/run_status.gd" id="11_fog2p"]
+[ext_resource type="PackedScene" path="res://scenes/ui/xp_bar.tscn" id="12_gqh02"]
+[ext_resource type="Script" path="res://scripts/ui/xp_bar.gd" id="13_qbl08"]
+[ext_resource type="PackedScene" path="res://scenes/ui/upgrade_menu.tscn" id="14_lqi5c"]
+[ext_resource type="Script" path="res://scripts/ui/upgrade_menu.gd" id="15_u87tm"]
+[ext_resource type="PackedScene" path="res://scenes/stage/run_growth.tscn" id="18_c2erv"]
+[ext_resource type="Script" path="res://scripts/stage/run_growth.gd" id="19_vdowa"]
+[ext_resource type="Resource" path="res://data/growth.tres" id="20_ruun3"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_gqh02"]
 size = Vector2(480, 16)
@@ -121,6 +128,25 @@ theme_override_constants/outline_size = 4
 horizontal_alignment = 2
 script = ExtResource("11_fog2p")
 
+[node name="XpBar" type="Control" parent="HUD" unique_id=161458875 instance=ExtResource("12_gqh02")]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 16.0
+offset_top = 3.0
+offset_right = 464.0
+offset_bottom = 13.0
+mouse_filter = 2
+script = ExtResource("13_qbl08")
+
+[node name="UpgradeMenu" type="Control" parent="HUD" unique_id=1810323522 instance=ExtResource("14_lqi5c")]
+process_mode = 3
+layout_mode = 3
+anchors_preset = 0
+offset_right = 480.0
+offset_bottom = 270.0
+mouse_filter = 2
+script = ExtResource("15_u87tm")
+
 [node name="GameOver" type="CanvasLayer" parent="." unique_id=1845001762]
 process_mode = 3
 layer = 2
@@ -155,3 +181,7 @@ offset_bottom = 270.0
 text = "ポーズ"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="Growth" type="Node" parent="." unique_id=316475707 instance=ExtResource("18_c2erv")]
+script = ExtResource("19_vdowa")
+data = ExtResource("20_ruun3")
