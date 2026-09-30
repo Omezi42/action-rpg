@@ -9,4 +9,4 @@
 | DOOMED | 一閃でHP0。止まって `fall()` を待つ |
 
 - ContactHitbox は CHASE の間だけ有効(被弾硬直中は接触ダメージなし)
-- 撃破時に `defeated` を出して `queue_free()`。主人公は group `"player"` で探す
+- 撃破時に `defeated(self)` を出して `queue_free()`(Arena が位置と `xp_value` で玉を落とす)。主人公は group `"player"` で探す

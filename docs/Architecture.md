@@ -10,3 +10,4 @@
 | 4 | 敵(Enemy / EnemyData) | `arch/04_enemy.md` |
 | 5 | 試作場・演出・UI | `arch/05_stage_ui.md` |
 | 6 | 検証(check.sh・テスト・撮影) | `arch/06_verification.md` |
+| 7 | 成長(経験値の玉・レベルアップ・強化) | `arch/07_growth.md` |

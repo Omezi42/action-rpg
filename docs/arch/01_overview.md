@@ -5,13 +5,13 @@
 | `scenes/stage/arena.tscn` | メインシーン(アリーナ) |
 | `scenes/player/player.tscn` / `scenes/enemies/kooni.tscn` | 主人公・小鬼 |
 | `scripts/components/` | Health / Hitbox / Hurtbox |
-| `scripts/data/` | Resource 定義(PlayerData / IaiStage / IaiData / EnemyData / SurvivalData) |
-| `data/` | 数値の実体(`player.tres` `iai.tres` `survival.tres` `enemies/kooni.tres`) |
+| `scripts/data/` | Resource 定義(PlayerData / IaiStage / IaiData / EnemyData / SurvivalData / SpawnEntry / UpgradeData / GrowthData) |
+| `data/` | 数値の実体(`player.tres` `iai.tres` `survival.tres` `growth.tres` `enemies/*.tres` `upgrades/*.tres`) |
 | `scripts/effects/` | 斬撃の軌跡・ヒット火花(コード描画、シーン無し) |
-| `scripts/ui/` | ハート・ゲームオーバー・ポーズ |
+| `scripts/ui/` | ハート・ゲームオーバー・ポーズ・経験値バー・強化の3択 |
 
 - 画面は 480×270 を `stretch/mode=viewport` + `scale_mode=integer` で拡大(GameDesign.md 6章)
-- 入力アクション:`move_left/right/up/down` `iai` `pause`(GameDesign.md 2章)
+- 入力アクション:`move_left/right/up/down` `iai` `pause` `choose_1〜3`(GameDesign.md 2章)
 - 絵が届くまでは各 `*_visual.gd` が仮の図形を描く。足元が原点
 
 ## 物理レイヤー

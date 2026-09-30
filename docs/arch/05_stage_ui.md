@@ -16,3 +16,4 @@
 - `GameOver`:結果表示(ゲームオーバー / クリア・生存時間・撃破数)。`process_mode = ALWAYS`、居合ボタンで `reload_current_scene()`
 - `Pause`:`process_mode = ALWAYS`。pause アクションで `get_tree().paused` を切り替える。`locked` の間は無視
 - 溜めゲージは主人公シーンの `ChargeGauge`(頭上、構え中だけ表示)
+- `HUD/XpBar` と `HUD/UpgradeMenu` は Architecture.md 7章
