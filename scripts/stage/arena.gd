@@ -54,6 +54,7 @@ func alive_enemies() -> int:
 
 func spawn_enemy() -> void:
 	var enemy: Enemy = enemy_scene.instantiate()
+	enemy.data = schedule.pick_enemy()
 	enemy.position = schedule.pick_spawn_point(get_viewport_rect(), _player.global_position)
 	enemy.defeated.connect(_on_enemy_defeated)
 	_entities.add_child(enemy)

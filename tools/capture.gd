@@ -4,6 +4,7 @@ extends SceneTree
 ## → 斬り抜けた後 → 残り時間を飛ばしてクリアの結果表示 の7枚。
 ## マウスの狙いは実カーソルを動かさないよう facing を直接向ける。
 
+const ALL_KINDS_TIME := 25.0
 const SCALE := 3
 const PHYSICS_FPS := 60.0
 const CROWD := 24
@@ -20,6 +21,7 @@ func _run() -> void:
 	await _wait(0.5)
 	await _shot("1_start")
 	var arena := current_scene
+	arena.schedule.elapsed = ALL_KINDS_TIME
 	for i in CROWD:
 		arena.spawn_enemy()
 	await _wait(1.8)

@@ -36,6 +36,24 @@ func time_left() -> float:
 	return maxf(_data.clear_time - elapsed, 0.0)
 
 
+## 出現を始めている種類から重みで1つ選ぶ。roll は 0〜1
+func pick_enemy(roll: float = randf()) -> EnemyData:
+	var available := _data.spawns.filter(
+		func(e: SpawnEntry) -> bool: return e.start_time <= elapsed
+	)
+	if available.is_empty():
+		return null
+	var total := 0
+	for entry: SpawnEntry in available:
+		total += entry.weight
+	var target := roll * total
+	for entry: SpawnEntry in available:
+		target -= entry.weight
+		if target < 0.0:
+			return entry.enemy
+	return available.back().enemy
+
+
 ## screen を spawn_margin だけ縮めた周上の点。主人公に近すぎる点は引き直す
 func pick_spawn_point(screen: Rect2, player_pos: Vector2) -> Vector2:
 	var area := screen.grow(-_data.spawn_margin)

@@ -4,10 +4,10 @@
 
 [resource]
 script = ExtResource("1_btko1")
-max_hp = 3
+max_hp = 1
 contact_damage = 1
-chase_speed = 50.0
+chase_speed = 90.0
 hurt_time = 0.3
 knockback_distance = 12.0
 knockback_time = 0.15
-color = Color(0.78431374, 0.627451, 0.3764706, 1)
+color = Color(0.7529412, 0.3137255, 0.3019608, 1)

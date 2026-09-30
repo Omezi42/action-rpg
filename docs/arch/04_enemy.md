@@ -1,6 +1,6 @@
 # 4. 敵
 
-`scripts/enemies/enemy.gd`(class Enemy)が全敵共通。種類は EnemyData(`data/enemies/*.tres`)とシーンで分け、色違いは `color` だけ変えた .tres で作る。
+`scripts/enemies/enemy.gd`(class Enemy)が全敵共通。種類は EnemyData(`data/enemies/*.tres`:kooni / aka_oni / ao_oni)で分ける。シーンは `kooni.tscn` 1つを使い回し、Arena が出現時に `add_child` の前で `data` を差し替える(`_ready` で読むため)。
 
 | 状態 | すること |
 |---|---|

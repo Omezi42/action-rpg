@@ -1,6 +1,27 @@
 [gd_resource type="Resource" script_class="SurvivalData" format=3]
 
 [ext_resource type="Script" path="res://scripts/data/survival_data.gd" id="1_surv"]
+[ext_resource type="Script" path="res://scripts/data/spawn_entry.gd" id="2_entry"]
+[ext_resource type="Resource" path="res://data/enemies/kooni.tres" id="3_kooni"]
+[ext_resource type="Resource" path="res://data/enemies/aka_oni.tres" id="4_aka"]
+[ext_resource type="Resource" path="res://data/enemies/ao_oni.tres" id="5_ao"]
+
+[sub_resource type="Resource" id="SpawnEntry_kooni"]
+script = ExtResource("2_entry")
+enemy = ExtResource("3_kooni")
+weight = 6
+
+[sub_resource type="Resource" id="SpawnEntry_aka"]
+script = ExtResource("2_entry")
+enemy = ExtResource("4_aka")
+weight = 3
+start_time = 10.0
+
+[sub_resource type="Resource" id="SpawnEntry_ao"]
+script = ExtResource("2_entry")
+enemy = ExtResource("5_ao")
+weight = 2
+start_time = 25.0
 
 [resource]
 script = ExtResource("1_surv")
@@ -10,3 +31,4 @@ spawn_interval_end = 0.4
 max_enemies = 40
 spawn_margin = 24.0
 spawn_min_player_distance = 64.0
+spawns = Array[ExtResource("2_entry")]([SubResource("SpawnEntry_kooni"), SubResource("SpawnEntry_aka"), SubResource("SpawnEntry_ao")])

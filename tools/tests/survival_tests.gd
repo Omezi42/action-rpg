@@ -2,6 +2,9 @@ extends RefCounted
 ## 出現の計算、小鬼の追跡、制限時間でのクリアを確かめる(GameDesign.md 1・4・5章)。
 
 const SURVIVAL := preload("res://data/survival.tres")
+const KOONI := preload("res://data/enemies/kooni.tres")
+const AKA_ONI := preload("res://data/enemies/aka_oni.tres")
+const AO_ONI := preload("res://data/enemies/ao_oni.tres")
 const ARENA_SCENE := preload("res://scenes/stage/arena.tscn")
 const ENEMY_SCENE := preload("res://scenes/enemies/kooni.tscn")
 const PLAYER_SCENE := preload("res://scenes/player/player.tscn")
@@ -16,6 +19,7 @@ func run(tree: SceneTree, check: Callable) -> void:
 	_tree = tree
 	_test_schedule(check)
 	_test_spawn_point(check)
+	_test_pick_enemy(check)
 	await _test_enemy_chases(check)
 	await _test_clear_stops_run(check)
 
@@ -30,6 +34,18 @@ func _test_schedule(check: Callable) -> void:
 	check.call(schedule.advance(0.1), "2秒で次が出る")
 	schedule.advance(58.0)
 	check.call(schedule.is_cleared(), "60秒でクリア")
+
+
+func _test_pick_enemy(check: Callable) -> void:
+	var schedule := SpawnSchedule.new(SURVIVAL)
+	check.call(schedule.pick_enemy(0.99) == KOONI, "開始時は小鬼だけ")
+	schedule.advance(10.0)
+	check.call(schedule.pick_enemy(0.99) == AKA_ONI, "10秒から赤鬼が出る")
+	check.call(schedule.pick_enemy(0.5) == KOONI, "重み6:3で小鬼が先")
+	schedule.advance(15.0)
+	check.call(schedule.pick_enemy(0.99) == AO_ONI, "25秒から青鬼が出る")
+	check.call(schedule.pick_enemy(0.6) == AKA_ONI, "重み6:3:2の中ほどは赤鬼")
+	check.call(schedule.pick_enemy(0.0) == KOONI, "roll 0 は先頭の小鬼")
 
 
 func _test_spawn_point(check: Callable) -> void:

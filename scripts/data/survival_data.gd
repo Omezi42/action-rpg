@@ -8,3 +8,4 @@ extends Resource
 @export var max_enemies := 0
 @export var spawn_margin := 0.0
 @export var spawn_min_player_distance := 0.0
+@export var spawns: Array[SpawnEntry] = []
