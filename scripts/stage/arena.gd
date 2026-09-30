@@ -37,8 +37,10 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	if ended:
 		return
-	if schedule.advance(delta) and _alive < survival.max_enemies:
+	if schedule.advance(delta) and _alive < schedule.max_enemies_at(schedule.elapsed):
 		spawn_enemy()
+	if schedule.take_horde():
+		spawn_horde()
 	_update_status()
 	if schedule.is_cleared():
 		_end(true)
@@ -53,9 +55,19 @@ func alive_enemies() -> int:
 
 
 func spawn_enemy() -> void:
+	var at := schedule.pick_spawn_point(get_viewport_rect(), _player.global_position)
+	_add_enemy(schedule.pick_enemy(), at)
+
+
+func spawn_horde() -> void:
+	for at in schedule.horde_points(get_viewport_rect(), _player.global_position):
+		_add_enemy(survival.horde_enemy, at)
+
+
+func _add_enemy(data: EnemyData, at: Vector2) -> void:
 	var enemy: Enemy = enemy_scene.instantiate()
-	enemy.data = schedule.pick_enemy()
-	enemy.position = schedule.pick_spawn_point(get_viewport_rect(), _player.global_position)
+	enemy.data = data
+	enemy.position = at
 	enemy.defeated.connect(_on_enemy_defeated)
 	_entities.add_child(enemy)
 	_alive += 1

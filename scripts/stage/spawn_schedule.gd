@@ -8,6 +8,7 @@ var elapsed := 0.0
 
 var _data: SurvivalData
 var _next_spawn := 0.0
+var _next_horde := 0
 
 
 func _init(data: SurvivalData) -> void:
@@ -24,8 +25,57 @@ func advance(delta: float) -> bool:
 
 
 func interval_at(time: float) -> float:
-	var t := clampf(time / _data.clear_time, 0.0, 1.0)
-	return lerpf(_data.spawn_interval_start, _data.spawn_interval_end, t)
+	var index := _phase_index(time)
+	var phase := _data.phases[index]
+	var end_time := _data.clear_time
+	if index + 1 < _data.phases.size():
+		end_time = _data.phases[index + 1].start_time
+	var t := clampf(inverse_lerp(phase.start_time, end_time, time), 0.0, 1.0)
+	return lerpf(phase.interval_start, phase.interval_end, t)
+
+
+func max_enemies_at(time: float) -> int:
+	return _data.phases[_phase_index(time)].max_enemies
+
+
+func _phase_index(time: float) -> int:
+	var index := 0
+	for i in _data.phases.size():
+		if time >= _data.phases[i].start_time:
+			index = i
+	return index
+
+
+## 大群の時刻を過ぎていれば true(1回につき1度だけ)
+func take_horde() -> bool:
+	if _next_horde >= _data.horde_times.size() or elapsed < _data.horde_times[_next_horde]:
+		return false
+	_next_horde += 1
+	return true
+
+
+## 主人公から最も遠い辺の沿いに、辺の中央ぞろえで horde_count 体ぶんの位置
+func horde_points(screen: Rect2, player_pos: Vector2) -> Array[Vector2]:
+	var area := screen.grow(-_data.spawn_margin)
+	var sides := [
+		[area.position, Vector2(area.end.x, area.position.y), player_pos.y - area.position.y],
+		[Vector2(area.position.x, area.end.y), area.end, area.end.y - player_pos.y],
+		[area.position, Vector2(area.position.x, area.end.y), player_pos.x - area.position.x],
+		[Vector2(area.end.x, area.position.y), area.end, area.end.x - player_pos.x],
+	]
+	var far: Array = sides[0]
+	for side: Array in sides:
+		if side[2] > far[2]:
+			far = side
+	var from: Vector2 = far[0]
+	var to: Vector2 = far[1]
+	var along := from.direction_to(to)
+	var center := (from + to) / 2.0
+	var points: Array[Vector2] = []
+	for i in _data.horde_count:
+		var offset := (i - (_data.horde_count - 1) / 2.0) * _data.horde_spacing
+		points.append(center + along * offset)
+	return points
 
 
 func is_cleared() -> bool:

@@ -5,6 +5,7 @@
 [ext_resource type="Resource" path="res://data/enemies/kooni.tres" id="3_kooni"]
 [ext_resource type="Resource" path="res://data/enemies/aka_oni.tres" id="4_aka"]
 [ext_resource type="Resource" path="res://data/enemies/ao_oni.tres" id="5_ao"]
+[ext_resource type="Script" path="res://scripts/data/spawn_phase.gd" id="6_phase"]
 
 [sub_resource type="Resource" id="SpawnEntry_kooni"]
 script = ExtResource("2_entry")
@@ -15,20 +16,49 @@ weight = 6
 script = ExtResource("2_entry")
 enemy = ExtResource("4_aka")
 weight = 3
-start_time = 10.0
+start_time = 60.0
 
 [sub_resource type="Resource" id="SpawnEntry_ao"]
 script = ExtResource("2_entry")
 enemy = ExtResource("5_ao")
 weight = 2
-start_time = 25.0
+start_time = 180.0
+
+[sub_resource type="Resource" id="SpawnPhase_intro"]
+script = ExtResource("6_phase")
+interval_start = 1.5
+interval_end = 1.0
+max_enemies = 30
+
+[sub_resource type="Resource" id="SpawnPhase_middle"]
+script = ExtResource("6_phase")
+start_time = 60.0
+interval_start = 1.0
+interval_end = 0.5
+max_enemies = 60
+
+[sub_resource type="Resource" id="SpawnPhase_late"]
+script = ExtResource("6_phase")
+start_time = 180.0
+interval_start = 0.5
+interval_end = 0.35
+max_enemies = 90
+
+[sub_resource type="Resource" id="SpawnPhase_final"]
+script = ExtResource("6_phase")
+start_time = 270.0
+interval_start = 0.3
+interval_end = 0.3
+max_enemies = 100
 
 [resource]
 script = ExtResource("1_surv")
-clear_time = 60.0
-spawn_interval_start = 2.0
-spawn_interval_end = 0.4
-max_enemies = 40
+clear_time = 300.0
+phases = Array[ExtResource("6_phase")]([SubResource("SpawnPhase_intro"), SubResource("SpawnPhase_middle"), SubResource("SpawnPhase_late"), SubResource("SpawnPhase_final")])
+spawns = Array[ExtResource("2_entry")]([SubResource("SpawnEntry_kooni"), SubResource("SpawnEntry_aka"), SubResource("SpawnEntry_ao")])
+horde_times = PackedFloat32Array(90, 150, 210, 270)
+horde_count = 12
+horde_spacing = 16.0
+horde_enemy = ExtResource("3_kooni")
 spawn_margin = 24.0
 spawn_min_player_distance = 64.0
-spawns = Array[ExtResource("2_entry")]([SubResource("SpawnEntry_kooni"), SubResource("SpawnEntry_aka"), SubResource("SpawnEntry_ao")])
