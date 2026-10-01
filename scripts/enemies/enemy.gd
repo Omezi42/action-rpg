@@ -28,6 +28,8 @@ func _ready() -> void:
 	contact_hitbox.power = data.contact_damage
 	if alerted:
 		state = State.CHASE
+	else:
+		_face_player()
 
 
 func _physics_process(delta: float) -> void:
@@ -57,6 +59,9 @@ func _wander(delta: float) -> void:
 	if _player_within(data.sight_range):
 		_enter(State.NOTICE)
 		return
+	if _player() and not _player_within(data.despawn_range):
+		queue_free()
+		return
 	_wander_left -= delta
 	if _wander_left <= 0.0:
 		_turn()
@@ -78,6 +83,16 @@ func _chase() -> void:
 		return
 	velocity = global_position.direction_to(player.global_position) * data.chase_speed
 	move_and_slide()
+
+
+## 出現して最初のうろつきは主人公の方へ向ける(画面外から入ってくるように)
+func _face_player() -> void:
+	var player := _player()
+	if not player:
+		return
+	var spread := randf_range(-data.initial_wander_spread, data.initial_wander_spread)
+	_wander_dir = global_position.direction_to(player.global_position).rotated(spread)
+	_wander_left = randf_range(data.wander_turn_min, data.wander_turn_max)
 
 
 func _turn() -> void:

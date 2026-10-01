@@ -18,3 +18,7 @@ extends Resource
 @export var sight_range := 0.0
 @export var notice_time := 0.0
 @export var lose_range := 0.0
+## 出現して最初のうろつきは主人公の方向 ± これ(ラジアン)
+@export var initial_wander_spread := 0.0
+## うろつき中に主人公からこれより離れたら消える
+@export var despawn_range := 0.0

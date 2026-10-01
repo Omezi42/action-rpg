@@ -85,6 +85,11 @@ func interrupt_input() -> void:
 		_state_time = 0.0
 
 
+## 構え中に今離したときの踏み込みの終点(壁は考えない)
+func aim_tip() -> Vector2:
+	return global_position + facing * strike_distance(charge.release())
+
+
 func strike_distance(strike: IaiStage) -> float:
 	return strike.distance * stats.distance_scale
 
@@ -115,13 +120,15 @@ func _start_charge() -> void:
 	velocity = Vector2.ZERO
 	charge.reset()
 	_aiming_with_mouse = Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT)
-	_aim_anchor = get_global_mouse_position()
+	_aim_anchor = get_viewport().get_mouse_position()
 
 
 func _process_charge(delta: float, iai_pressed: bool) -> void:
 	_read_move_input()
 	if _aiming_with_mouse:
-		var aim := slingshot_direction(_aim_anchor, get_global_mouse_position(), iai.aim_deadzone)
+		var aim := slingshot_direction(
+			_aim_anchor, get_viewport().get_mouse_position(), iai.aim_deadzone
+		)
 		if aim != Vector2.ZERO:
 			facing = aim
 	if charge.advance(delta):

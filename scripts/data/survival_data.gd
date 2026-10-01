@@ -9,5 +9,7 @@ extends Resource
 @export var horde_count := 0
 @export var horde_spacing := 0.0
 @export var horde_enemy: EnemyData
+## フィールドの広さ。原点が左上(GameDesign.md 6章)
+@export var field_size := Vector2.ZERO
+## 出現・大群は、カメラの映す矩形をこれだけ広げた周上
 @export var spawn_margin := 0.0
-@export var spawn_min_player_distance := 0.0

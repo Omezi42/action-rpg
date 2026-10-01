@@ -2,7 +2,7 @@ class_name SpawnSchedule
 extends RefCounted
 ## 経過時間・出現の番・出現位置の計算(GameDesign.md 5章)。ノードを持たないのでテストから直接使える。
 
-const MAX_PICK_TRIES := 16
+const MAX_PICK_TRIES := 32
 
 var elapsed := 0.0
 
@@ -54,28 +54,47 @@ func take_horde() -> bool:
 	return true
 
 
-## 主人公から最も遠い辺の沿いに、辺の中央ぞろえで horde_count 体ぶんの位置
-func horde_points(screen: Rect2, player_pos: Vector2) -> Array[Vector2]:
-	var area := screen.grow(-_data.spawn_margin)
+## 映す矩形の4辺のうち、外側にフィールドが最も広く残る辺の外側へ、辺の中央ぞろえで horde_count 体ぶんの位置。
+## フィールドからはみ出す分は内側へ詰める
+func horde_points(view: Rect2) -> Array[Vector2]:
+	var field := field_rect()
+	var area := view.grow(_data.spawn_margin)
 	var sides := [
-		[area.position, Vector2(area.end.x, area.position.y), player_pos.y - area.position.y],
-		[Vector2(area.position.x, area.end.y), area.end, area.end.y - player_pos.y],
-		[area.position, Vector2(area.position.x, area.end.y), player_pos.x - area.position.x],
-		[Vector2(area.end.x, area.position.y), area.end, area.end.x - player_pos.x],
+		[
+			Vector2(view.get_center().x, area.position.y),
+			Vector2.RIGHT,
+			view.position.y - field.position.y
+		],
+		[Vector2(view.get_center().x, area.end.y), Vector2.RIGHT, field.end.y - view.end.y],
+		[
+			Vector2(area.position.x, view.get_center().y),
+			Vector2.DOWN,
+			view.position.x - field.position.x
+		],
+		[Vector2(area.end.x, view.get_center().y), Vector2.DOWN, field.end.x - view.end.x],
 	]
 	var far: Array = sides[0]
 	for side: Array in sides:
 		if side[2] > far[2]:
 			far = side
-	var from: Vector2 = far[0]
-	var to: Vector2 = far[1]
-	var along := from.direction_to(to)
-	var center := (from + to) / 2.0
+	var along: Vector2 = far[1]
+	var half_length := (_data.horde_count - 1) / 2.0 * _data.horde_spacing
+	var inner := field.grow(-_data.spawn_margin).grow_individual(
+		-half_length * along.x,
+		-half_length * along.y,
+		-half_length * along.x,
+		-half_length * along.y
+	)
+	var center: Vector2 = far[0].clamp(inner.position, inner.end)
 	var points: Array[Vector2] = []
 	for i in _data.horde_count:
 		var offset := (i - (_data.horde_count - 1) / 2.0) * _data.horde_spacing
 		points.append(center + along * offset)
 	return points
+
+
+func field_rect() -> Rect2:
+	return Rect2(Vector2.ZERO, _data.field_size)
 
 
 func is_cleared() -> bool:
@@ -104,15 +123,16 @@ func pick_enemy(roll: float = randf()) -> EnemyData:
 	return available.back().enemy
 
 
-## screen を spawn_margin だけ縮めた周上の点。主人公に近すぎる点は引き直す
-func pick_spawn_point(screen: Rect2, player_pos: Vector2) -> Vector2:
-	var area := screen.grow(-_data.spawn_margin)
-	var point := Vector2.ZERO
+## 映す矩形を spawn_margin だけ広げた周上の点。フィールドの外・is_blocked(point) が true の点は引き直す。
+## 見つからなければ Vector2.INF
+func pick_spawn_point(view: Rect2, is_blocked: Callable) -> Vector2:
+	var area := view.grow(_data.spawn_margin)
+	var field := field_rect()
 	for i in MAX_PICK_TRIES:
-		point = perimeter_point(area, randf())
-		if point.distance_to(player_pos) > _data.spawn_min_player_distance:
-			break
-	return point
+		var point := perimeter_point(area, randf())
+		if field.has_point(point) and not is_blocked.call(point):
+			return point
+	return Vector2.INF
 
 
 ## 矩形の周を t(0〜1)で一周する点。左上から時計回り

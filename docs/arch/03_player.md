@@ -15,6 +15,7 @@
 - 居合ボタンの押下は `Input.is_action_pressed` の前フレームとの差で取る(テストの `Input.action_press` でも動くため)
 - 一閃の踏み込みでは DashHitbox の `delay_death` を立てる。HPが0になった敵は DOOMED で残り、`_doomed` に積んで納刀の終わり(または被弾)で `fall()` を呼ぶ
 - ヒットストップは `Engine.time_scale = 0` + time_scale を無視するタイマー。連続ヒットはトークンで最後の1回だけが戻す
+- パチンコ式の狙いは画面座標(`get_viewport().get_mouse_position()`)で取る。カメラが構え中に寄るため、ワールド座標だと指を止めていても狙いが動く
 - マウスで構えたかは構え開始時の `Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT)` で決める。引っ張りの遊び(`aim_deadzone`)は IaiData
 - `aim_tip()`:構え中に今離したときの踏み込みの終点(壁は考えない)。FollowCamera が使う
 - 踏み込みの予告線は子の `AimGuide`(`scenes/player/aim_guide.tscn`、`show_behind_parent`)。`charge.release()` の距離で描く

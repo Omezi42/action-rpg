@@ -9,6 +9,10 @@ const HitSpark = preload("res://scripts/effects/hit_spark.gd")
 @export var survival: SurvivalData
 @export var growth: GrowthData
 @export var floor_color := Color("5d8a4a")
+@export var floor_alt_color := Color("598546")
+@export var floor_tile := 32.0
+## 出現位置の判定に使う、壁・岩のコリジョンレイヤー
+@export_flags_2d_physics var obstacle_mask := 1
 
 var schedule: SpawnSchedule
 var progression: Progression
@@ -27,6 +31,7 @@ var _alive := 0
 @onready var _game_over = $GameOver
 @onready var _pause = $Pause
 @onready var _effects: Node2D = $Effects
+@onready var _camera: FollowCamera = $FollowCamera
 
 
 func _ready() -> void:
@@ -35,6 +40,7 @@ func _ready() -> void:
 	schedule = SpawnSchedule.new(survival)
 	progression = Progression.new(growth)
 	_souls.player = _player
+	_camera.setup(_player, schedule.field_rect())
 	_souls.collected.connect(_on_soul_collected)
 	_level_up.chosen.connect(_on_upgrade_chosen)
 	_hearts.bind(_player.health)
@@ -57,7 +63,14 @@ func _physics_process(delta: float) -> void:
 
 
 func _draw() -> void:
-	draw_rect(get_viewport_rect(), floor_color)
+	var field := Rect2(Vector2.ZERO, survival.field_size)
+	draw_rect(field, floor_color)
+	var cols := ceili(field.size.x / floor_tile)
+	var rows := ceili(field.size.y / floor_tile)
+	for y in rows:
+		for x in range(y % 2, cols, 2):
+			var cell := Rect2(field.position + Vector2(x, y) * floor_tile, Vector2.ONE * floor_tile)
+			draw_rect(cell.intersection(field), floor_alt_color)
 
 
 func alive_enemies() -> int:
@@ -65,12 +78,13 @@ func alive_enemies() -> int:
 
 
 func spawn_enemy() -> void:
-	var at := schedule.pick_spawn_point(get_viewport_rect(), _player.global_position)
-	_add_enemy(schedule.pick_enemy(), at)
+	var at := schedule.pick_spawn_point(_camera.view_rect(), _is_blocked)
+	if at != Vector2.INF:
+		_add_enemy(schedule.pick_enemy(), at)
 
 
 func spawn_horde() -> void:
-	for at in schedule.horde_points(get_viewport_rect(), _player.global_position):
+	for at in schedule.horde_points(_camera.view_rect()):
 		_add_enemy(survival.horde_enemy, at, true)
 
 
@@ -80,8 +94,16 @@ func _add_enemy(data: EnemyData, at: Vector2, alerted := false) -> void:
 	enemy.alerted = alerted
 	enemy.position = at
 	enemy.defeated.connect(_on_enemy_defeated)
+	enemy.tree_exiting.connect(_on_enemy_exiting)
 	_entities.add_child(enemy)
 	_alive += 1
+
+
+func _is_blocked(point: Vector2) -> bool:
+	var query := PhysicsPointQueryParameters2D.new()
+	query.position = point
+	query.collision_mask = obstacle_mask
+	return not get_world_2d().direct_space_state.intersect_point(query, 1).is_empty()
 
 
 func _update_status() -> void:
@@ -98,8 +120,12 @@ func _end(cleared: bool) -> void:
 	_game_over.open(cleared, minf(schedule.elapsed, survival.clear_time), kills, progression.level)
 
 
-func _on_enemy_defeated(enemy: Enemy) -> void:
+## 撃破と、遠すぎて消えたときの両方で減らす
+func _on_enemy_exiting() -> void:
 	_alive -= 1
+
+
+func _on_enemy_defeated(enemy: Enemy) -> void:
 	kills += 1
 	_souls.drop(enemy.global_position, enemy.data.soul_value)
 	_update_status()

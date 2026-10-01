@@ -60,5 +60,5 @@ horde_times = PackedFloat32Array(90, 150, 210, 270)
 horde_count = 12
 horde_spacing = 16.0
 horde_enemy = ExtResource("3_kooni")
-spawn_margin = 24.0
-spawn_min_player_distance = 64.0
+field_size = Vector2(1440, 810)
+spawn_margin = 16.0
