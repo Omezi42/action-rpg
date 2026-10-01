@@ -6,7 +6,7 @@
 | 状態 | すること | 抜ける条件 |
 |---|---|---|
 | MOVE | 8方向移動(向きは入力を45°単位に丸める) | 居合を押す → CHARGE |
-| CHARGE | 移動せず向きだけ更新、IaiCharge を進める。マウスで構えたら押した位置を `_aim_anchor` に持ち、`slingshot_direction()` が向きを返す | 離す → DASH |
+| CHARGE | 移動せず向きだけ更新、IaiCharge を進める。マウスで構えたら `cursor_direction()` がカーソルへの向きを返す | 離す → DASH |
 | DASH | 向きへ `distance/duration` で `move_and_collide`。DashHitbox 有効、無敵 | 距離到達 or 壁 → SHEATHE |
 | SHEATHE | 硬直。押された居合はバッファする | `sheathe_time` 経過 → MOVE(バッファがあれば即 CHARGE/抜き打ち) |
 | HURT | ノックバック | `knockback_time` 経過 → MOVE |
@@ -15,8 +15,8 @@
 - 居合ボタンの押下は `Input.is_action_pressed` の前フレームとの差で取る(テストの `Input.action_press` でも動くため)
 - 一閃の踏み込みでは DashHitbox の `delay_death` を立てる。HPが0になった敵は DOOMED で残り、`_doomed` に積んで納刀の終わり(または被弾)で `fall()` を呼ぶ
 - ヒットストップは `Engine.time_scale = 0` + time_scale を無視するタイマー。連続ヒットはトークンで最後の1回だけが戻す
-- パチンコ式の狙いは画面座標(`get_viewport().get_mouse_position()`)で取る。カメラが構え中に寄るため、ワールド座標だと指を止めていても狙いが動く
-- マウスで構えたかは構え開始時の `Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT)` で決める。引っ張りの遊び(`aim_deadzone`)は IaiData
+- カーソルの狙いはワールド座標(`get_global_mouse_position()`)で取る。構え中のカメラはカーソルとほぼ同じ向きへ寄るので、狙いの向きはぶれない
+- マウスで構えたかは構え開始時の `Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT)` で決める。カーソルが近すぎるときの遊び(`aim_deadzone`)は IaiData
 - `aim_tip()`:構え中に今離したときの踏み込みの終点(壁は考えない)。FollowCamera が使う
 - 踏み込みの予告線は子の `AimGuide`(`scenes/player/aim_guide.tscn`、`show_behind_parent`)。`charge.release()` の距離で描く
 - 演出は `slashed(from, to, is_issen)` / `hit_landed(at)` を出すだけで、生成は Arena が行う

@@ -30,7 +30,6 @@ var _dash_traveled := 0.0
 var _doomed: Array[Node] = []
 var _hitstop_token := 0
 var _aiming_with_mouse := false
-var _aim_anchor := Vector2.ZERO
 
 @onready var health: Health = $Health
 @onready var hurtbox: Hurtbox = $Hurtbox
@@ -120,29 +119,32 @@ func _start_charge() -> void:
 	velocity = Vector2.ZERO
 	charge.reset()
 	_aiming_with_mouse = Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT)
-	_aim_anchor = get_viewport().get_mouse_position()
+	_aim_at_cursor()
 
 
 func _process_charge(delta: float, iai_pressed: bool) -> void:
 	_read_move_input()
-	if _aiming_with_mouse:
-		var aim := slingshot_direction(
-			_aim_anchor, get_viewport().get_mouse_position(), iai.aim_deadzone
-		)
-		if aim != Vector2.ZERO:
-			facing = aim
+	_aim_at_cursor()
 	if charge.advance(delta):
 		flash_left = STAGE_FLASH_TIME
 	if not iai_pressed:
 		_start_dash(charge.release())
 
 
-## パチンコ式の狙い:押した位置から引いた向きの逆。引きが deadzone 未満なら ZERO
-static func slingshot_direction(anchor: Vector2, pointer: Vector2, deadzone: float) -> Vector2:
-	var pull := anchor - pointer
-	if pull.length() < deadzone:
+func _aim_at_cursor() -> void:
+	if not _aiming_with_mouse:
+		return
+	var aim := cursor_direction(global_position, get_global_mouse_position(), iai.aim_deadzone)
+	if aim != Vector2.ZERO:
+		facing = aim
+
+
+## カーソルの狙い:主人公からカーソルへの向き。近さが deadzone 未満なら ZERO
+static func cursor_direction(origin: Vector2, cursor: Vector2, deadzone: float) -> Vector2:
+	var offset := cursor - origin
+	if offset.length() < deadzone:
 		return Vector2.ZERO
-	return pull.normalized()
+	return offset.normalized()
 
 
 func _start_dash(strike: IaiStage) -> void:
