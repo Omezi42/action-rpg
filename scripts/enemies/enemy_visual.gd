@@ -6,6 +6,10 @@ extends Node2D
 @export var hurt_color := Color.WHITE
 @export var doomed_tint := Color(0.45, 0.45, 0.45)
 @export var shadow_color := Color(0, 0, 0, 0.3)
+## 気づいた瞬間の頭上の「!」
+@export var notice_color := Color("ffe14d")
+@export var notice_mark := Rect2(-1, -27, 2, 5)
+@export var notice_dot := Rect2(-1, -21, 2, 2)
 
 @onready var _enemy: Enemy = get_parent()
 
@@ -35,3 +39,6 @@ func _draw() -> void:
 			horn_color
 		)
 		draw_rect(Rect2(center.x + 3 * side - 1, center.y - 1, 2, 2), eye_color)
+	if _enemy.state == Enemy.State.NOTICE:
+		draw_rect(notice_mark, notice_color)
+		draw_rect(notice_dot, notice_color)

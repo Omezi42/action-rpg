@@ -94,12 +94,27 @@ func _test_enemy_chases(check: Callable) -> void:
 	player.position = Vector2(100, 100)
 	world.add_child(player)
 	player.set_physics_process(false)
-	var enemy: Enemy = ENEMY_SCENE.instantiate()
-	enemy.position = Vector2(300, 100)
-	world.add_child(enemy)
-	await _frames(0.5)
-	check.call(enemy.position.x < 280 and enemy.position.x > 270, "小鬼は遠くからでも追ってくる")
+	var far_enemy := _add_test_enemy(world, Vector2(400, 100), false)
+	var near_enemy := _add_test_enemy(world, Vector2(200, 100), false)
+	var horde_enemy := _add_test_enemy(world, Vector2(300, 100), true)
+	await _frames(0.1)
+	check.call(far_enemy.state == Enemy.State.WANDER, "視認距離の外ではうろつく")
+	check.call(near_enemy.state == Enemy.State.NOTICE, "視認距離に入ると気づいて止まる")
+	check.call(horde_enemy.state == Enemy.State.CHASE, "大群は最初から追跡する")
+	await _frames(KOONI.notice_time)
+	check.call(near_enemy.state == Enemy.State.CHASE, "気づいた後に追跡へ移る")
+	near_enemy.position = Vector2(100 + KOONI.lose_range + 20, 100)
+	await _frames(0.05)
+	check.call(near_enemy.state == Enemy.State.WANDER, "離れすぎると見失う")
 	world.free()
+
+
+func _add_test_enemy(world: Node2D, at: Vector2, alerted: bool) -> Enemy:
+	var enemy: Enemy = ENEMY_SCENE.instantiate()
+	enemy.position = at
+	enemy.alerted = alerted
+	world.add_child(enemy)
+	return enemy
 
 
 func _test_clear_stops_run(check: Callable) -> void:

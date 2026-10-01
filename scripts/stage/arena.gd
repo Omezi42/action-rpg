@@ -71,12 +71,13 @@ func spawn_enemy() -> void:
 
 func spawn_horde() -> void:
 	for at in schedule.horde_points(get_viewport_rect(), _player.global_position):
-		_add_enemy(survival.horde_enemy, at)
+		_add_enemy(survival.horde_enemy, at, true)
 
 
-func _add_enemy(data: EnemyData, at: Vector2) -> void:
+func _add_enemy(data: EnemyData, at: Vector2, alerted := false) -> void:
 	var enemy: Enemy = enemy_scene.instantiate()
 	enemy.data = data
+	enemy.alerted = alerted
 	enemy.position = at
 	enemy.defeated.connect(_on_enemy_defeated)
 	_entities.add_child(enemy)
