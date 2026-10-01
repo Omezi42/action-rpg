@@ -16,6 +16,7 @@
 - 一閃の踏み込みでは DashHitbox の `delay_death` を立てる。HPが0になった敵は DOOMED で残り、`_doomed` に積んで納刀の終わり(または被弾)で `fall()` を呼ぶ
 - ヒットストップは `Engine.time_scale = 0` + time_scale を無視するタイマー。連続ヒットはトークンで最後の1回だけが戻す
 - マウスで構えたかは構え開始時の `Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT)` で決める。引っ張りの遊び(`aim_deadzone`)は IaiData
+- `aim_tip()`:構え中に今離したときの踏み込みの終点(壁は考えない)。FollowCamera が使う
 - 踏み込みの予告線は子の `AimGuide`(`scenes/player/aim_guide.tscn`、`show_behind_parent`)。`charge.release()` の距離で描く
 - 演出は `slashed(from, to, is_issen)` / `hit_landed(at)` を出すだけで、生成は Arena が行う
 
