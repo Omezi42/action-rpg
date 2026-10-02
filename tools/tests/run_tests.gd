@@ -7,8 +7,10 @@ const SurvivalTests = preload("res://tools/tests/survival_tests.gd")
 const GrowthTests = preload("res://tools/tests/growth_tests.gd")
 const FlowTests = preload("res://tools/tests/flow_tests.gd")
 const EnemyAttackTests = preload("res://tools/tests/enemy_attack_tests.gd")
+const TrainingTests = preload("res://tools/tests/training_tests.gd")
 ## 本物の最高記録に触れないよう、テスト中の記録はここへ書く
 const TEST_RECORDS_PATH := "user://test_records.cfg"
+const TEST_PROGRESS_PATH := "user://test_progress.cfg"
 
 var _failures := 0
 var _checks := 0
@@ -20,6 +22,8 @@ func _initialize() -> void:
 
 func _run() -> void:
 	RunRecords.path = TEST_RECORDS_PATH
+	TrainingProgress.path = TEST_PROGRESS_PATH
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(TEST_PROGRESS_PATH))
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(TEST_RECORDS_PATH))
 	IaiTests.new().run(_assert_true)
 	await CombatTests.new().run(self, _assert_true)
@@ -27,6 +31,8 @@ func _run() -> void:
 	await GrowthTests.new().run(self, _assert_true)
 	await FlowTests.new().run(self, _assert_true)
 	await EnemyAttackTests.new().run(self, _assert_true)
+	await TrainingTests.new().run(self, _assert_true)
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(TEST_PROGRESS_PATH))
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(TEST_RECORDS_PATH))
 	if _failures == 0:
 		print("tests passed (%d checks)" % _checks)

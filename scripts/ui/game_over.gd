@@ -24,7 +24,8 @@ func open(
 	kills: int,
 	level: int,
 	hitokiri := 0,
-	updated: Array[String] = []
+	updated: Array[String] = [],
+	merit := 0
 ) -> void:
 	_opened_at = Time.get_ticks_msec()
 	var title := "クリア!" if cleared else "ゲームオーバー"
@@ -35,6 +36,7 @@ func open(
 		"撃破 %d%s" % [kills, _mark(updated, "best_kills")],
 		"到達 Lv %d%s" % [level, _mark(updated, "best_level")],
 		"最多人斬り %d%s" % [hitokiri, _mark(updated, "best_hitokiri")],
+		"武功 +%d" % merit,
 		"",
 		"居合ボタンでもう一度 / Escでタイトルへ",
 	]

@@ -4,6 +4,9 @@ extends CanvasLayer
 ## 左右されないよう実時間で測る。
 
 signal chosen(upgrade: UpgradeData)
+## 修行の引き直し・封じ(GameDesign.md 8章)。使えるかは受け手が判断して開き直す
+signal reroll_requested
+signal seal_requested(index: int)
 
 const UpgradeCard = preload("res://scripts/ui/upgrade_card.gd")
 const MSEC_PER_SEC := 1000.0
@@ -16,6 +19,8 @@ const NUMBER_KEYS := [KEY_1, KEY_2, KEY_3]
 @export var card_top := 84.0
 @export var title_top := 48.0
 @export var title_size := 16
+@export var footer_top := 216.0
+@export var footer_size := 10
 
 var _cards: Array = []
 var _selected := 0
@@ -32,7 +37,14 @@ func _ready() -> void:
 	add_child(_root)
 
 
-func open(choices: Array[UpgradeData], levels: Array[int], is_scroll := false) -> void:
+func open(
+	choices: Array[UpgradeData],
+	levels: Array[int],
+	is_scroll := false,
+	rerolls := 0,
+	seals := 0,
+	selected := 0
+) -> void:
 	for child in _root.get_children():
 		child.free()
 	_cards.clear()
@@ -58,7 +70,8 @@ func open(choices: Array[UpgradeData], levels: Array[int], is_scroll := false) -
 		_root.add_child(card)
 		card.setup(choices[i], levels[i], i + 1)
 		_cards.append(card)
-	_select(0)
+	_add_footer(screen, rerolls, seals)
+	_select(selected)
 	_opened_at = Time.get_ticks_msec()
 	_last_mouse = _root.get_global_mouse_position()
 	visible = true
@@ -87,7 +100,15 @@ func _process(_delta: float) -> void:
 		_select(_selected - 1)
 	if Input.is_action_just_pressed("move_right"):
 		_select(_selected + 1)
-	if is_locked() or not Input.is_action_just_pressed("iai"):
+	if is_locked():
+		return
+	if Input.is_action_just_pressed("reroll"):
+		reroll_requested.emit()
+		return
+	if Input.is_action_just_pressed("seal"):
+		seal_requested.emit(_selected)
+		return
+	if not Input.is_action_just_pressed("iai"):
 		return
 	if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
 		choose(hovered)
@@ -105,6 +126,23 @@ func _input(event: InputEvent) -> void:
 	get_viewport().set_input_as_handled()
 	if not is_locked():
 		choose(index)
+
+
+func _add_footer(screen: Vector2, rerolls: int, seals: int) -> void:
+	var parts: Array[String] = []
+	if rerolls > 0:
+		parts.append("R 引き直し 残り%d" % rerolls)
+	if seals > 0:
+		parts.append("F 封じ 残り%d" % seals)
+	if parts.is_empty():
+		return
+	var footer := Label.new()
+	footer.text = "   ".join(parts)
+	footer.add_theme_font_size_override("font_size", footer_size)
+	footer.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	footer.size = Vector2(screen.x, footer_size * 2.0)
+	footer.position = Vector2(0, footer_top)
+	_root.add_child(footer)
 
 
 func _card_at(point: Vector2) -> int:

@@ -1,10 +1,12 @@
 extends Control
 ## タイトル画面(GameDesign.md 9章)。居合で挑戦を始め、Escで終える。最高記録を出す。
 
+const TrainingMenu = preload("res://scripts/ui/training_menu.gd")
 const MSEC_PER_SEC := 1000.0
 const SECONDS_PER_MINUTE := 60
 
 @export_file("*.tscn") var arena_scene := "res://scenes/stage/arena.tscn"
+@export var training: TrainingCatalog = preload("res://data/training.tres")
 @export var game_title := "居合サバイバー"
 @export var input_lock_time := 0.3
 @export var back_color := Color("1d2330")
@@ -20,11 +22,14 @@ const SECONDS_PER_MINUTE := 60
 @export var prompt_blink_time := 0.5
 @export var records_top := 168.0
 @export var help_top := 244.0
+@export var merit_top := 222.0
 @export var small_size := 10
 @export var dim_text := Color(1, 1, 1, 0.7)
 
 var _opened_at := 0
 var _prompt: Label
+var _merit: Label
+var _training_menu: Control
 
 
 func _ready() -> void:
@@ -35,7 +40,11 @@ func _ready() -> void:
 	_add_label(game_title, title_top, title_size, Color.WHITE)
 	_prompt = _add_label("居合ボタンで始める", prompt_top, small_size + 2, Color.WHITE)
 	_add_label(_records_text(RunRecords.load_saved()), records_top, small_size, dim_text)
-	_add_label("WASD 移動 / 左クリック・J・Space 長押しで溜め、離して居合 / Esc 終了", help_top, small_size, dim_text)
+	_merit = _add_label("", merit_top, small_size, Color.WHITE)
+	_add_label(
+		"WASD 移動 / 左クリック・J・Space 長押しで溜め、離して居合 / Tab 修行 / Esc 終了", help_top, small_size, dim_text
+	)
+	_show_merit()
 
 
 func _process(_delta: float) -> void:
@@ -50,13 +59,34 @@ func _draw() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if Time.get_ticks_msec() - _opened_at < input_lock_time * MSEC_PER_SEC:
+	if _training_menu or Time.get_ticks_msec() - _opened_at < input_lock_time * MSEC_PER_SEC:
 		return
-	if event.is_action_pressed("iai"):
+	if event.is_action_pressed("training"):
+		open_training()
+	elif event.is_action_pressed("iai"):
 		Sfx.play(&"confirm")
 		get_tree().change_scene_to_file(arena_scene)
 	elif event.is_action_pressed("pause"):
 		get_tree().quit()
+
+
+func open_training() -> void:
+	Sfx.play(&"confirm")
+	_training_menu = TrainingMenu.new()
+	add_child(_training_menu)
+	_training_menu.open(training, TrainingProgress.load_saved())
+	_training_menu.closed.connect(_close_training)
+
+
+func _close_training() -> void:
+	_training_menu.queue_free()
+	_training_menu = null
+	_opened_at = Time.get_ticks_msec()
+	_show_merit()
+
+
+func _show_merit() -> void:
+	_merit.text = "武功 %d" % TrainingProgress.load_saved().merit
 
 
 func _add_label(text: String, top: float, font_size: int, color: Color) -> Label:

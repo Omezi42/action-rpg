@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="TrainingCatalog" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/training_catalog.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/data/training_data.gd" id="6"]
+[ext_resource type="Resource" path="res://data/training/karada.tres" id="2"]
+[ext_resource type="Resource" path="res://data/training/ashi.tres" id="3"]
+[ext_resource type="Resource" path="res://data/training/hikinaoshi.tres" id="4"]
+[ext_resource type="Resource" path="res://data/training/fuji.tres" id="5"]
+
+[resource]
+script = ExtResource("1")
+items = Array[ExtResource("6")]([ExtResource("2"), ExtResource("3"), ExtResource("4"), ExtResource("5")])
+kills_per_merit = 10
+merit_per_level = 1
+clear_merit = 30

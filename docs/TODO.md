@@ -83,9 +83,9 @@
 
 ## M9:挑戦をまたぐ積み上げ(武功・修行)
 - [x] GameDesign / Architecture を更新
-- [ ] TrainingData / TrainingCatalog / TrainingProgress と data/training
-- [ ] Arena:修行の反映と武功の加算・結果画面に「武功 +N」
-- [ ] 引き直し・封じ(Progression・レベルアップ画面・入力)
-- [ ] タイトルの武功表示と修行画面(TrainingMenu)
-- [ ] テストと撮影を合わせる
+- [x] TrainingData / TrainingCatalog / TrainingProgress と data/training
+- [x] Arena:修行の反映と武功の加算・結果画面に「武功 +N」
+- [x] 引き直し・封じ(Progression・レベルアップ画面・入力)
+- [x] タイトルの武功表示と修行画面(TrainingMenu)
+- [x] テストと撮影を合わせる
 - [ ] 試遊して「負けた挑戦にも手応えが残るか」「武功の量と値段の釣り合い」を判断

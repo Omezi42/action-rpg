@@ -10,6 +10,7 @@ const HitokiriLabel = preload("res://scripts/effects/hitokiri_label.gd")
 @export var boss_scene: PackedScene
 @export var survival: SurvivalData
 @export var growth: GrowthData
+@export var training: TrainingCatalog = preload("res://data/training.tres")
 @export var floor_color := Color("5d8a4a")
 @export var floor_alt_color := Color("598546")
 @export var floor_tile := 32.0
@@ -32,6 +33,8 @@ var boss: Enemy
 var _alive := 0
 ## 開いている選択画面が巻物か(閉じたときに pending と scroll_count のどちらを減らすか)
 var _choosing_scroll := false
+## 開いている選択画面のカード(封じたときに入れ替えるため)
+var _choices: Array[UpgradeData] = []
 
 @onready var _entities: Node2D = $Entities
 @onready var _player: Player = $Entities/Player
@@ -52,10 +55,13 @@ func _ready() -> void:
 	get_tree().paused = false
 	schedule = SpawnSchedule.new(survival)
 	progression = Progression.new(growth)
+	TrainingProgress.load_saved().apply(training, _player, progression)
 	_souls.player = _player
 	_camera.setup(_player, schedule.field_rect())
 	_souls.collected.connect(_on_soul_collected)
 	_level_up.chosen.connect(_on_upgrade_chosen)
+	_level_up.reroll_requested.connect(_on_reroll)
+	_level_up.seal_requested.connect(_on_seal)
 	_hearts.bind(_player.health)
 	_player.died.connect(_end.bind(false))
 	_player.slashed.connect(_on_player_slashed)
@@ -162,7 +168,13 @@ func _end(cleared: bool) -> void:
 	var updated := RunRecords.load_saved().submit(
 		schedule.elapsed, kills, progression.level, cleared, hitokiri.best
 	)
-	_game_over.open(cleared, schedule.elapsed, kills, progression.level, hitokiri.best, updated)
+	var merit := training.reward(kills, progression.level, cleared)
+	var progress := TrainingProgress.load_saved()
+	progress.merit += merit
+	progress.save()
+	_game_over.open(
+		cleared, schedule.elapsed, kills, progression.level, hitokiri.best, updated, merit
+	)
 
 
 ## 撃破と、遠すぎて消えたときの両方で減らす
@@ -218,13 +230,42 @@ func _open_choices() -> void:
 
 func _open_next_choice() -> void:
 	_choosing_scroll = progression.scroll_count > 0
-	var choices := progression.roll_scroll() if _choosing_scroll else progression.roll_choices()
+	_choices = progression.roll_scroll() if _choosing_scroll else progression.roll_choices()
 	if not _choosing_scroll:
 		Sfx.play(&"level_up")
+	_show_choices()
+
+
+func _show_choices(selected := 0) -> void:
 	var levels: Array[int] = []
-	for upgrade in choices:
+	for upgrade in _choices:
 		levels.append(progression.level_of(upgrade))
-	_level_up.open(choices, levels, _choosing_scroll)
+	_level_up.open(
+		_choices,
+		levels,
+		_choosing_scroll,
+		progression.rerolls_left,
+		progression.seals_left,
+		selected
+	)
+
+
+func _on_reroll() -> void:
+	if progression.rerolls_left <= 0:
+		return
+	progression.rerolls_left -= 1
+	_choices = progression.roll_scroll() if _choosing_scroll else progression.roll_choices()
+	Sfx.play(&"confirm")
+	_show_choices()
+
+
+func _on_seal(index: int) -> void:
+	if index < 0 or index >= _choices.size() or not progression.can_seal(_choices[index]):
+		return
+	progression.seal(_choices[index])
+	_choices = progression.replace_choice(_choices, index, _choosing_scroll)
+	Sfx.play(&"confirm")
+	_show_choices(mini(index, _choices.size() - 1))
 
 
 func _on_upgrade_chosen(upgrade: UpgradeData) -> void:

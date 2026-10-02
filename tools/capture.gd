@@ -3,7 +3,7 @@ extends SceneTree
 ## 起動直後 → フィールドの角(カメラが端で止まる)→ 群れを湧かせて寄ってきたところ → 敵の攻撃の予告 → 赤鬼のジャンプ → 斜めに構えて弐(予告線)→ 一閃の受付中 → 踏み込み直後
 ## → 斬り抜けた後(魂が落ちている)→ 人斬りの文字 → レベルアップ画面 → 燕返しの斬り返し中 → 影縫いで止まった敵
 ## → 精鋭鬼 → 巻物 → 巻物の画面 → 残り時間を飛ばして大鬼 → 突進の予告 → 大鬼を倒した結果表示。
-## 最初にタイトル画面も撮る。
+## 最初にタイトル画面と修行の画面も撮る。レベルアップ画面は引き直し・封じの残りが出ている状態で撮る。
 ## 群れには大群(一列)と全種類(弓鬼を含む)を混ぜ、斬痕・残心を取った状態で斬る。
 ## マウスの狙いは実カーソルを動かさないよう facing を直接向ける。
 
@@ -20,6 +20,7 @@ const CROWD_WAIT := 3.0
 const ARENA_PATH := "res://scenes/stage/arena.tscn"
 ## 本物の最高記録に触れないよう、撮影中の記録はここへ書く
 const CAPTURE_RECORDS_PATH := "user://capture_records.cfg"
+const CAPTURE_PROGRESS_PATH := "user://capture_progress.cfg"
 const BOSS_WAIT := 2.5
 const BOSS_APPROACH := Vector2(-100, 30)
 const KOONI := preload("res://data/enemies/kooni.tres")
@@ -40,6 +41,9 @@ const RETURN_SHOT_WAIT := 0.06
 ## 影縫い3段の時間
 const BIND_TIME := 1.8
 const BIND_OFFSETS: Array[Vector2] = [Vector2(40, -20), Vector2(56, 16)]
+## 修行の画面に段の違いが出るよう、武功を持たせて1項目だけ買っておく
+const CAPTURE_MERIT := 120
+const TRAINING := preload("res://data/training.tres")
 
 
 func _initialize() -> void:
@@ -48,9 +52,17 @@ func _initialize() -> void:
 
 func _run() -> void:
 	RunRecords.path = CAPTURE_RECORDS_PATH
+	TrainingProgress.path = CAPTURE_PROGRESS_PATH
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(CAPTURE_PROGRESS_PATH))
+	var progress := TrainingProgress.new()
+	progress.merit = CAPTURE_MERIT
+	progress.buy(TRAINING.items[0])
 	change_scene_to_file(ProjectSettings.get_setting("application/run/main_scene"))
 	await _wait(0.5)
 	await _shot("0_title")
+	current_scene.open_training()
+	await _wait(0.1)
+	await _shot("0b_training")
 	change_scene_to_file(ARENA_PATH)
 	await _wait(0.5)
 	await _shot("1_start")
@@ -88,6 +100,8 @@ func _run() -> void:
 	await _shot("5_after")
 	await _wait(HITOKIRI_WAIT)
 	await _shot("5b_hitokiri")
+	arena.progression.rerolls_left = 1
+	arena.progression.seals_left = 2
 	arena._on_soul_collected(arena.progression.exp_to_next())
 	await _wait(0.1)
 	await _shot("6_level_up")
@@ -105,6 +119,7 @@ func _run() -> void:
 	await _wait(0.3)
 	await _shot("8_result")
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(CAPTURE_RECORDS_PATH))
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(CAPTURE_PROGRESS_PATH))
 	quit()
 
 
