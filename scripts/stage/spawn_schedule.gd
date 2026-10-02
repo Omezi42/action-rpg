@@ -9,6 +9,7 @@ var elapsed := 0.0
 var _data: SurvivalData
 var _next_spawn := 0.0
 var _next_horde := 0
+var _next_elite := 0
 var _boss_taken := false
 
 
@@ -56,6 +57,14 @@ func take_horde() -> bool:
 	if _next_horde >= _data.horde_times.size() or elapsed < _data.horde_times[_next_horde]:
 		return false
 	_next_horde += 1
+	return true
+
+
+## 精鋭鬼の時刻を過ぎていれば true(1回につき1度だけ)
+func take_elite() -> bool:
+	if _next_elite >= _data.elite_times.size() or elapsed < _data.elite_times[_next_elite]:
+		return false
+	_next_elite += 1
 	return true
 
 

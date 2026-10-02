@@ -13,6 +13,9 @@ extends Node2D
 ## 弓鬼の構え:弓の向きに出す線
 @export var aim_color := Color(1, 0.9, 0.6, 0.8)
 @export var aim_length := 18.0
+## 精鋭鬼の金の縁取り
+@export var elite_color := Color("e0b040")
+@export var elite_outline := 1.0
 
 @onready var _enemy: Enemy = get_parent()
 
@@ -34,6 +37,8 @@ func _draw() -> void:
 	draw_circle(Vector2.ZERO, 7, shadow_color)
 	draw_set_transform(Vector2(0, -_enemy.air_height()))
 	var center := Vector2(0, -8)
+	if _enemy.elite:
+		draw_circle(center, 8 + elite_outline, elite_color)
 	draw_circle(center, 8, body_color)
 	for side in [-1, 1]:
 		var base := center + Vector2(4 * side, -6)

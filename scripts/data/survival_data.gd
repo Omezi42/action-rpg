@@ -16,3 +16,7 @@ extends Resource
 ## 残り時間0から大鬼を倒すまでの出現(GameDesign.md 5章「ボス」)
 @export var boss_spawn_interval := 0.0
 @export var boss_max_enemies := 0
+## 精鋭鬼(GameDesign.md 5章):出す時刻・HPの倍率・見た目と被弾判定の倍率
+@export var elite_times := PackedFloat32Array()
+@export var elite_hp_scale := 0
+@export var elite_visual_scale := 0.0

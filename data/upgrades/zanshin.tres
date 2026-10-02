@@ -11,3 +11,4 @@ description = "踏み込みの終わりに
 stat = 8
 amount = 16.0
 max_level = 3
+kind = 1

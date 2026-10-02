@@ -1,7 +1,7 @@
 extends SceneTree
 ## 見た目確認用のスクリーンショット(logs/shot_*.png)。ウィンドウありで起動する。
 ## 起動直後 → フィールドの角(カメラが端で止まる)→ 群れを湧かせて寄ってきたところ → 敵の攻撃の予告 → 赤鬼のジャンプ → 斜めに構えて弐(予告線)→ 一閃の受付中 → 踏み込み直後
-## → 斬り抜けた後(魂が落ちている)→ 人斬りの文字 → レベルアップ画面 → 残り時間を飛ばして大鬼 → 突進の予告 → 大鬼を倒した結果表示。
+## → 斬り抜けた後(魂が落ちている)→ 人斬りの文字 → レベルアップ画面 → 精鋭鬼 → 巻物 → 巻物の画面 → 残り時間を飛ばして大鬼 → 突進の予告 → 大鬼を倒した結果表示。
 ## 最初にタイトル画面も撮る。
 ## 群れには大群(一列)と全種類(弓鬼を含む)を混ぜ、斬痕・残心を取った状態で斬る。
 ## マウスの狙いは実カーソルを動かさないよう facing を直接向ける。
@@ -31,6 +31,7 @@ const WARNING_WAIT := 0.3
 const JUMP_WAIT := 0.25
 ## 一閃の納刀が終わって「N人斬り」が出ているあたりまで(ヒットストップの分だけ遅れる)
 const HITOKIRI_WAIT := 0.2
+const ELITE_OFFSET := Vector2(48, 0)
 
 
 func _initialize() -> void:
@@ -83,6 +84,7 @@ func _run() -> void:
 	await _wait(0.1)
 	await _shot("6_level_up")
 	arena.get_node("LevelUp").choose(0)
+	await _shot_elite_and_scroll(arena, player)
 	arena.schedule.elapsed = arena.survival.clear_time - ALMOST_CLEAR
 	await _wait(BOSS_WAIT)
 	await _shot("7_boss")
@@ -107,6 +109,32 @@ func _shot_warnings(arena: Node, player: Player) -> void:
 	await _shot("2b_enemy_warnings")
 	await _wait(JUMP_WAIT)
 	await _shot("2c_aka_oni_jump")
+
+
+## 精鋭鬼(金の縁)を主人公の横に出して撮り、倒して落ちた巻物を撮り、拾って巻物の画面を撮る
+func _shot_elite_and_scroll(arena: Node, player: Player) -> void:
+	player.invincible_left = WARNING_GUARD
+	player.hurtbox.invincible = true
+	var elite: Enemy = arena.spawn_elite()
+	elite.position = player.position + ELITE_OFFSET
+	await _wait(0.1)
+	await _shot("6b_elite")
+	elite.health.damage(elite.health.hp)
+	elite.fall()
+	await _wait(0.1)
+	await _shot("6c_scroll")
+	player.position = elite_drop_point(arena)
+	await _wait(0.1)
+	await _shot("6d_scroll_menu")
+	var menu := arena.get_node("LevelUp")
+	menu.choose(menu._cards.size() - 1)
+
+
+func elite_drop_point(arena: Node) -> Vector2:
+	for node in arena.get_node("Entities").get_children():
+		if node is Scroll:
+			return node.position
+	return Vector2.ZERO
 
 
 ## 主人公を大鬼の近くへ置き、突進の予告が半分進んだところまで待つ

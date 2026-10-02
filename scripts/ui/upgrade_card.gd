@@ -4,6 +4,8 @@ extends Control
 @export var panel_color := Color("24243a")
 @export var border_color := Color("8888a0")
 @export var selected_color := Color("ffd84a")
+## 奥義のカードの枠(GameDesign.md 6章)
+@export var ougi_color := Color("e0b040")
 @export var border_width := 1.0
 @export var selected_width := 2.0
 @export var padding := 6.0
@@ -50,5 +52,7 @@ func _draw() -> void:
 	draw_rect(rect, panel_color)
 	if selected:
 		draw_rect(rect, selected_color, false, selected_width)
+	elif upgrade and upgrade.kind == UpgradeData.Kind.OUGI:
+		draw_rect(rect, ougi_color, false, selected_width)
 	else:
 		draw_rect(rect, border_color, false, border_width)

@@ -71,3 +71,6 @@ field_size = Vector2(1440, 810)
 spawn_margin = 16.0
 boss_spawn_interval = 1.0
 boss_max_enemies = 30
+elite_times = PackedFloat32Array(120, 240)
+elite_hp_scale = 5
+elite_visual_scale = 1.5

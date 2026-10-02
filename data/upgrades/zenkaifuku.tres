@@ -4,11 +4,7 @@
 
 [resource]
 script = ExtResource("1_upg")
-label = "斬痕"
-description = "壱以上で斬った線に
-斬撃が残る
-+0.3秒"
-stat = 7
-amount = 0.3
-max_level = 3
-kind = 1
+label = "全回復"
+description = "HPを最大まで戻す"
+stat = 9
+max_level = 1

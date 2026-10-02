@@ -31,6 +31,8 @@ func run(tree: SceneTree, check: Callable) -> void:
 	await _test_camera(check)
 	await _test_enemy_chases(check)
 	await _test_enemy_despawns(check)
+	_test_elite_schedule(check)
+	await _test_elite_drops_scroll(check)
 	await _test_boss_clears_run(check)
 
 
@@ -223,6 +225,56 @@ func _test_enemy_despawns(check: Callable) -> void:
 	check.call(not is_instance_valid(far_enemy), "うろつき中に600px以上離れた敵は消える")
 	check.call(not defeated[0], "消えた敵は撃破に数えない")
 	world.free()
+
+
+func _test_elite_schedule(check: Callable) -> void:
+	var schedule := SpawnSchedule.new(SURVIVAL)
+	schedule.advance(119.0)
+	check.call(not schedule.take_elite(), "2:00までは精鋭鬼が来ない")
+	schedule.advance(1.0)
+	check.call(schedule.take_elite() and not schedule.take_elite(), "2:00に1度だけ")
+	schedule.advance(120.0)
+	check.call(schedule.take_elite(), "4:00に2体目")
+	schedule.advance(60.0)
+	check.call(not schedule.take_elite(), "精鋭鬼は2体まで")
+
+
+## 精鋭鬼を倒すと巻物が落ち、拾うと巻物の3枚が出て、全回復でHPが戻る(GameDesign.md 5・8章)
+func _test_elite_drops_scroll(check: Callable) -> void:
+	var arena: Node2D = ARENA_SCENE.instantiate()
+	_tree.root.add_child(arena)
+	await _frames(0.1)
+	var player: Player = arena.get_node("Entities/Player")
+	arena.schedule.elapsed = 120.0
+	var elite: Enemy = arena.spawn_elite()
+	check.call(elite.elite and elite.state == Enemy.State.CHASE, "精鋭鬼は最初から追跡する")
+	check.call(elite.health.max_hp == elite.data.max_hp * SURVIVAL.elite_hp_scale, "HPは5倍")
+	check.call(is_equal_approx(elite.hurtbox.scale.x, SURVIVAL.elite_visual_scale), "被弾判定は1.5倍")
+	elite.position = player.position + Vector2(1000, 0)
+	await _frames(0.1)
+	check.call(is_instance_valid(elite) and elite.state != Enemy.State.WANDER, "遠くても見失わず消えない")
+	var hitbox := Hitbox.new()
+	hitbox.power = elite.health.hp
+	elite.hurtbox.hurt.emit(hitbox)
+	hitbox.free()
+	await _frames(1.0 / PHYSICS_FPS)
+	var scrolls := arena.get_node("Entities").get_children().filter(
+		func(n: Node) -> bool: return n is Scroll
+	)
+	check.call(scrolls.size() == 1, "倒すと巻物を1つ落とす")
+	player.health.damage(3)
+	scrolls[0].position = player.position
+	await _frames(2.0 / PHYSICS_FPS)
+	var menu := arena.get_node("LevelUp")
+	check.call(
+		_tree.paused and menu.visible and arena.progression.scroll_count == 1, "拾うと止めて巻物の画面を出す"
+	)
+	check.call(menu._cards.back().upgrade == arena.growth.full_heal, "巻物の末尾は全回復")
+	menu.choose(menu._cards.size() - 1)
+	check.call(player.health.hp == player.health.max_hp, "全回復でHPが最大に戻る")
+	check.call(not _tree.paused and arena.progression.scroll_count == 0, "選ぶと再開する")
+	arena.free()
+	_tree.paused = false
 
 
 func _add_test_enemy(world: Node2D, at: Vector2, alerted: bool) -> Enemy:

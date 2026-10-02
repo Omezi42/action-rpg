@@ -32,7 +32,7 @@ func _ready() -> void:
 	add_child(_root)
 
 
-func open(choices: Array[UpgradeData], levels: Array[int]) -> void:
+func open(choices: Array[UpgradeData], levels: Array[int], is_scroll := false) -> void:
 	for child in _root.get_children():
 		child.free()
 	_cards.clear()
@@ -43,7 +43,7 @@ func open(choices: Array[UpgradeData], levels: Array[int]) -> void:
 	dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_root.add_child(dim)
 	var title := Label.new()
-	title.text = "レベルアップ!"
+	title.text = "巻物" if is_scroll else "レベルアップ!"
 	title.add_theme_font_size_override("font_size", title_size)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.size = Vector2(screen.x, title_size * 2.0)

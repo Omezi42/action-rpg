@@ -12,3 +12,7 @@ extends Resource
 @export var choose_lock_time := 0.0
 @export var upgrades: Array[UpgradeData] = []
 @export var heal: UpgradeData
+## 巻物(GameDesign.md 8章):奥義・挙動の強化から選ぶ枚数と、必ず足す「全回復」
+@export var scroll_pick_count := 0
+@export var full_heal: UpgradeData
+@export var ougi: Array[UpgradeData] = []

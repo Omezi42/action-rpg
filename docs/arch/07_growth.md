@@ -6,7 +6,7 @@ GameDesign.md 8章。数値は GrowthData(`data/growth.tres`)、強化1種は Up
 `label` `description` `stat`(enum Stat:CHARGE_TIME / DASH_DISTANCE / POWER / ISSEN_WINDOW / MOVE_SPEED / MAX_HP / HEAL / LINGER / SHOCKWAVE / RETURN_SLASH / SHADOW_BIND / FULL_HEAL / OUGI_HOMURA / OUGI_DAIZANSHIN / OUGI_TSUBAME / OUGI_KAGE)`amount` `max_level`。
 同じ種類の数値違いは .tres を足すだけ。新しい種類は Stat と `Progression.take()` に1行足す。
 - `kind`(enum Kind:STAT / BEHAVIOR / OUGI)。BEHAVIOR は巻物の候補、OUGI はレベルアップに出ない
-- 奥義は `requires: Array[UpgradeData]`(すべて `max_level` に達していれば巻物に出る)。`max_level = 1`
+- 奥義は `requires: Array[Resource]`(中身は UpgradeData。すべて `max_level` に達していれば巻物に出る)。`max_level = 1`
 - 影縫いの1段目と以後の差があるので、`base_amount`(1段目の値。0なら `amount`)を持つ
 
 ## PlayerStats(`scripts/growth/player_stats.gd`、RefCounted)
@@ -23,7 +23,7 @@ GameDesign.md 8章。数値は GrowthData(`data/growth.tres`)、強化1種は Up
 - `add_exp(n)`:足りた分だけ level と pending を上げる。`exp_to_next()` は `exp_base + exp_step × (level − 1)`
 - `roll_choices()`:最大でない強化から `choice_count` 枚。無ければ `[heal]`
 - `take(upgrade, player)`:段階を上げ、PlayerStats か Health に反映して pending を1減らす(巻物から取ったときは減らさない)
-- `roll_scroll()`:条件を満たした未取得の奥義を先に、残りを最大でない BEHAVIOR から、合わせて `GrowthData.scroll_pick_count`(2)枚。末尾に `GrowthData.full_heal` を足す
+- `roll_scroll()`:条件を満たした未取得の奥義(`GrowthData.ougi`)を先に、残りを最大でない BEHAVIOR から、合わせて `GrowthData.scroll_pick_count`(2)枚。末尾に `GrowthData.full_heal`(`data/upgrades/zenkaifuku.tres`、Stat FULL_HEAL)を足す
 - `scroll_count`:拾って選び待ちの巻物の数
 
 ## SoulField(`scripts/growth/soul_field.gd`、Node2D)
@@ -36,7 +36,8 @@ GameDesign.md 8章。数値は GrowthData(`data/growth.tres`)、強化1種は Up
 ## Scroll(`scripts/growth/scroll.gd`、Node2D)
 - Arena が精鋭鬼の倒れた位置に Entities へ足す。巻物の絵はコード描画
 - 毎物理フレーム主人公との距離が `pickup_radius`(16、`@export`)以内なら `picked` を出して消える
-- Arena:`picked` → `scroll_count += 1` → レベルアップと同じく止めて `open(roll_scroll(), levels, true)`。巻物の選び待ちはレベルアップより先に出す
+- Arena:`picked` → `scroll_count += 1` → `_open_choices()`。魂の取得も同じ入口を通り、`scroll_count` が残っていれば巻物を、無ければレベルアップを開く。`_choosing_scroll` で `take(…, from_scroll)` を切り替える
+- Arena は巻物を `call_deferred` で足す(敵の `defeated` は物理のコールバック中に出るため)
 
 ## レベルアップ画面(`scripts/ui/level_up_menu.gd`、CanvasLayer・process_mode ALWAYS)
 - `open(choices, levels, is_scroll := false)`:カードを作り直して表示。`chosen(upgrade)` を出して閉じる。`is_scroll` なら上に「巻物」と出す。UpgradeCard は `kind == OUGI` なら金の枠

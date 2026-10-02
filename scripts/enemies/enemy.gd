@@ -20,6 +20,10 @@ const PARABOLA_PEAK := 4.0
 @export var data: EnemyData
 ## add_child の前に立てると気づいた状態(追跡)から始まる。大群に使う
 @export var alerted := false
+## 精鋭鬼(GameDesign.md 5章)。make_elite で立てる
+var elite := false
+## 見失わず、遠くても消えない
+var persistent := false
 
 var state := State.WANDER
 var flash_left := 0.0
@@ -38,6 +42,8 @@ var _shot_cooldown := 0.0
 var _sweep: SweepAttack
 var _jump: JumpAttack
 var _jump_from := Vector2.ZERO
+var _hp_scale := 1
+var _visual_scale := 1.0
 
 @onready var health: Health = $Health
 @onready var hurtbox: Hurtbox = $Hurtbox
@@ -45,7 +51,9 @@ var _jump_from := Vector2.ZERO
 
 
 func _ready() -> void:
-	health.setup(data.max_hp)
+	health.setup(data.max_hp * _hp_scale)
+	$Visual.scale *= _visual_scale
+	hurtbox.scale *= _visual_scale
 	hurtbox.hurt.connect(_on_hurt)
 	attack_hitbox.power = data.attack_damage
 	attack_hitbox.deactivate()
@@ -61,6 +69,15 @@ func _ready() -> void:
 		state = State.CHASE
 	else:
 		_face_player()
+
+
+## add_child の前に呼ぶ。攻撃の当たりの大きさは元の種類のまま
+func make_elite(hp_scale: int, visual_scale: float) -> void:
+	elite = true
+	alerted = true
+	persistent = true
+	_hp_scale = hp_scale
+	_visual_scale = visual_scale
 
 
 func _physics_process(delta: float) -> void:
@@ -110,7 +127,7 @@ func _wander(delta: float) -> void:
 	if _player_within(data.sight_range):
 		_enter(State.NOTICE)
 		return
-	if _player() and not _player_within(data.despawn_range):
+	if not persistent and _player() and not _player_within(data.despawn_range):
 		queue_free()
 		return
 	_wander_left -= delta
@@ -129,7 +146,7 @@ func _notice() -> void:
 
 func _chase() -> void:
 	var player := _player()
-	if not player or not _player_within(data.lose_range):
+	if not player or (not persistent and not _player_within(data.lose_range)):
 		_enter(State.WANDER)
 		return
 	if _can_attack():

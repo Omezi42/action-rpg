@@ -7,6 +7,8 @@ const HAYANUKI := preload("res://data/upgrades/hayanuki.tres")
 const GOUBA := preload("res://data/upgrades/gouba.tres")
 const GANKEN := preload("res://data/upgrades/ganken.tres")
 const FUKABUMI := preload("res://data/upgrades/fukabumi.tres")
+const ZANKON := preload("res://data/upgrades/zankon.tres")
+const ZANSHIN := preload("res://data/upgrades/zanshin.tres")
 const PLAYER_SCENE := preload("res://scenes/player/player.tscn")
 const SOUL_SCENE := preload("res://scenes/pickups/soul_field.tscn")
 const ARENA_SCENE := preload("res://scenes/stage/arena.tscn")
@@ -20,6 +22,7 @@ func run(tree: SceneTree, check: Callable) -> void:
 	_test_exp_curve(check)
 	_test_choices(check)
 	_test_charge_scale(check)
+	_test_scroll_choices(check)
 	await _test_take(check)
 	await _test_soul_pickup(check)
 	await _test_level_up_pauses(check)
@@ -46,6 +49,32 @@ func _test_choices(check: Callable) -> void:
 		for i in upgrade.max_level:
 			p._levels[upgrade] = p.level_of(upgrade) + 1
 	check.call(p.roll_choices() == [GROWTH.heal], "すべて最大なら回復だけ")
+
+
+## 巻物の3枚:奥義を先に、残りを挙動の強化から、末尾に全回復(GameDesign.md 8章)
+func _test_scroll_choices(check: Callable) -> void:
+	var p := Progression.new(GROWTH)
+	var choices := p.roll_scroll()
+	check.call(choices.size() == 3 and choices.back() == GROWTH.full_heal, "巻物は3枚で末尾が全回復")
+	check.call(ZANKON in choices and ZANSHIN in choices, "残りは挙動の強化から")
+	var data: GrowthData = GROWTH.duplicate()
+	var ougi := UpgradeData.new()
+	ougi.kind = UpgradeData.Kind.OUGI
+	ougi.max_level = 1
+	ougi.requires.append(ZANKON)
+	ougi.requires.append(GOUBA)
+	data.ougi = [ougi]
+	p = Progression.new(data)
+	p._levels[ZANKON] = ZANKON.max_level
+	check.call(not ougi in p.roll_scroll(), "条件が揃うまで奥義は出ない")
+	check.call(not ZANKON in p.roll_scroll(), "最大の挙動の強化は出ない")
+	p._levels[GOUBA] = GOUBA.max_level
+	check.call(p.roll_scroll()[0] == ougi, "条件が揃った奥義を先に出す")
+	check.call(not ougi in p.roll_choices(), "奥義はレベルアップに出ない")
+	p._levels[ougi] = 1
+	check.call(not ougi in p.roll_scroll(), "取った奥義は出ない")
+	p._levels[ZANSHIN] = ZANSHIN.max_level
+	check.call(p.roll_scroll() == [data.full_heal], "候補が無ければ全回復だけ")
 
 
 func _test_charge_scale(check: Callable) -> void:

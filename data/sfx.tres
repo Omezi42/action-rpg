@@ -111,6 +111,20 @@ freq_end = 2093.0
 duration = 0.08
 volume_db = -12.0
 
+[sub_resource type="Resource" id="Resource_elite"]
+script = ExtResource("2_c2hmv")
+freq_start = 90.0
+freq_end = 60.0
+duration = 0.45
+volume_db = -8.0
+
+[sub_resource type="Resource" id="Resource_scroll"]
+script = ExtResource("2_c2hmv")
+freq_start = 392.0
+freq_end = 1568.0
+duration = 0.45
+volume_db = -10.0
+
 [resource]
 script = ExtResource("1_rxj31")
 sounds = Dictionary[StringName, ExtResource("2_c2hmv")]({
@@ -118,11 +132,13 @@ sounds = Dictionary[StringName, ExtResource("2_c2hmv")]({
 &"boss_warn": SubResource("Resource_137l0"),
 &"chin": SubResource("Resource_gjv0i"),
 &"confirm": SubResource("Resource_77xdn"),
+&"elite_appear": SubResource("Resource_elite"),
 &"dash": SubResource("Resource_v78qh"),
 &"hit": SubResource("Resource_n8j00"),
 &"hitokiri": SubResource("Resource_hitokiri"),
 &"hurt": SubResource("Resource_wcsp4"),
 &"issen": SubResource("Resource_hy46o"),
+&"scroll": SubResource("Resource_scroll"),
 &"level_up": SubResource("Resource_c4ito"),
 &"shot": SubResource("Resource_shot"),
 &"soul": SubResource("Resource_bamc2"),

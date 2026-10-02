@@ -6,6 +6,8 @@ var level := 1
 var experience := 0
 ## 選び待ちのレベルアップ数
 var pending := 0
+## 拾って選び待ちの巻物の数
+var scroll_count := 0
 
 var _data: GrowthData
 var _levels: Dictionary = {}
@@ -44,9 +46,39 @@ func roll_choices() -> Array[UpgradeData]:
 	return choices
 
 
-func take(upgrade: UpgradeData, player: Player) -> void:
+## 巻物の3枚:条件を満たした未取得の奥義を先に、残りを最大でない挙動の強化から。末尾に必ず全回復
+func roll_scroll() -> Array[UpgradeData]:
+	var ougi := _data.ougi.filter(
+		func(u: UpgradeData) -> bool: return level_of(u) == 0 and _requirements_met(u)
+	)
+	var behaviors := _data.upgrades.filter(
+		func(u: UpgradeData) -> bool:
+			return u.kind == UpgradeData.Kind.BEHAVIOR and level_of(u) < u.max_level
+	)
+	ougi.shuffle()
+	behaviors.shuffle()
+	var choices: Array[UpgradeData] = []
+	for upgrade: UpgradeData in (ougi + behaviors).slice(0, _data.scroll_pick_count):
+		choices.append(upgrade)
+	choices.append(_data.full_heal)
+	return choices
+
+
+func _requirements_met(upgrade: UpgradeData) -> bool:
+	return upgrade.requires.all(
+		func(u: Resource) -> bool:
+			var required := u as UpgradeData
+			return level_of(required) >= required.max_level
+	)
+
+
+## 巻物から選んだときは pending ではなく scroll_count を減らす
+func take(upgrade: UpgradeData, player: Player, from_scroll := false) -> void:
 	_levels[upgrade] = level_of(upgrade) + 1
-	pending = maxi(pending - 1, 0)
+	if from_scroll:
+		scroll_count = maxi(scroll_count - 1, 0)
+	else:
+		pending = maxi(pending - 1, 0)
 	var stats := player.stats
 	match upgrade.stat:
 		UpgradeData.Stat.CHARGE_TIME:
@@ -67,3 +99,5 @@ func take(upgrade: UpgradeData, player: Player) -> void:
 			stats.linger_time += upgrade.amount
 		UpgradeData.Stat.SHOCKWAVE:
 			stats.shockwave_radius += upgrade.amount
+		UpgradeData.Stat.FULL_HEAL:
+			player.health.heal(player.health.max_hp)

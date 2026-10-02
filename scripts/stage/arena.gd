@@ -30,6 +30,8 @@ var ended := false
 var boss: Enemy
 
 var _alive := 0
+## 開いている選択画面が巻物か(閉じたときに pending と scroll_count のどちらを減らすか)
+var _choosing_scroll := false
 
 @onready var _entities: Node2D = $Entities
 @onready var _player: Player = $Entities/Player
@@ -71,6 +73,8 @@ func _physics_process(delta: float) -> void:
 		spawn_enemy()
 	if schedule.take_horde():
 		spawn_horde()
+	if schedule.take_elite():
+		spawn_elite()
 	if schedule.take_boss():
 		spawn_boss()
 	_update_status()
@@ -110,14 +114,24 @@ func spawn_boss() -> void:
 	Sfx.play(&"boss_appear")
 
 
+func spawn_elite() -> Enemy:
+	var at := schedule.edge_center(_camera.view_rect())
+	var elite := _add_enemy(schedule.pick_enemy(), at, true, enemy_scene, true)
+	elite.defeated.connect(_drop_scroll)
+	Sfx.play(&"elite_appear")
+	return elite
+
+
 ## data が null ならシーンの持つ EnemyData のまま
 func _add_enemy(
-	data: EnemyData, at: Vector2, alerted := false, scene: PackedScene = enemy_scene
+	data: EnemyData, at: Vector2, alerted := false, scene: PackedScene = enemy_scene, elite := false
 ) -> Enemy:
 	var enemy: Enemy = scene.instantiate()
 	if data:
 		enemy.data = data
 	enemy.alerted = alerted
+	if elite:
+		enemy.make_elite(survival.elite_hp_scale, survival.elite_visual_scale)
 	enemy.position = at
 	enemy.defeated.connect(_on_enemy_defeated)
 	enemy.tree_exiting.connect(_on_enemy_exiting)
@@ -176,26 +190,48 @@ func _on_soul_collected(value: int) -> void:
 	Sfx.play(&"soul")
 	progression.add_exp(value)
 	_update_status()
-	if progression.pending > 0 and not _level_up.visible and not ended:
-		get_tree().paused = true
-		_pause.locked = true
-		_open_level_up()
+	_open_choices()
 
 
-func _open_level_up() -> void:
-	Sfx.play(&"level_up")
-	var choices := progression.roll_choices()
+func _drop_scroll(enemy: Enemy) -> void:
+	var scroll := Scroll.new()
+	scroll.position = enemy.global_position
+	scroll.player = _player
+	scroll.picked.connect(_on_scroll_picked)
+	_entities.add_child.call_deferred(scroll)
+
+
+func _on_scroll_picked() -> void:
+	Sfx.play(&"scroll")
+	progression.scroll_count += 1
+	_open_choices()
+
+
+## 選び待ちがあれば止めて選択画面を開く。巻物をレベルアップより先に出す
+func _open_choices() -> void:
+	if _level_up.visible or ended or (progression.scroll_count == 0 and progression.pending == 0):
+		return
+	get_tree().paused = true
+	_pause.locked = true
+	_open_next_choice()
+
+
+func _open_next_choice() -> void:
+	_choosing_scroll = progression.scroll_count > 0
+	var choices := progression.roll_scroll() if _choosing_scroll else progression.roll_choices()
+	if not _choosing_scroll:
+		Sfx.play(&"level_up")
 	var levels: Array[int] = []
 	for upgrade in choices:
 		levels.append(progression.level_of(upgrade))
-	_level_up.open(choices, levels)
+	_level_up.open(choices, levels, _choosing_scroll)
 
 
 func _on_upgrade_chosen(upgrade: UpgradeData) -> void:
-	progression.take(upgrade, _player)
+	progression.take(upgrade, _player, _choosing_scroll)
 	_update_status()
-	if progression.pending > 0:
-		_open_level_up()
+	if progression.scroll_count > 0 or progression.pending > 0:
+		_open_next_choice()
 		return
 	get_tree().paused = false
 	_pause.locked = false

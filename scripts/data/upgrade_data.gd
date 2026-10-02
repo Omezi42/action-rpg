@@ -12,10 +12,18 @@ enum Stat {
 	HEAL,
 	LINGER,
 	SHOCKWAVE,
+	FULL_HEAL,
 }
+
+## STAT:数値の強化 / BEHAVIOR:挙動の強化(巻物の候補)/ OUGI:奥義(巻物だけに出る)。GameDesign.md 8章
+enum Kind { STAT, BEHAVIOR, OUGI }
 
 @export var label := ""
 @export_multiline var description := ""
 @export var stat := Stat.CHARGE_TIME
 @export var amount := 0.0
 @export var max_level := 0
+@export var kind := Kind.STAT
+## 奥義が巻物に出る条件(UpgradeData)。すべて max_level に達していること。
+## 自分の型の配列にするとスクリプトが自分を参照し続けて解放されないので Resource で持つ
+@export var requires: Array[Resource] = []
