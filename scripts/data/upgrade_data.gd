@@ -2,7 +2,17 @@ class_name UpgradeData
 extends Resource
 ## 強化1種(GameDesign.md 8章の強化表の1行)。
 
-enum Stat { CHARGE_TIME, DASH_DISTANCE, POWER, ISSEN_WINDOW, MOVE_SPEED, MAX_HP, HEAL }
+enum Stat {
+	CHARGE_TIME,
+	DASH_DISTANCE,
+	POWER,
+	ISSEN_WINDOW,
+	MOVE_SPEED,
+	MAX_HP,
+	HEAL,
+	LINGER,
+	SHOCKWAVE,
+}
 
 @export var label := ""
 @export_multiline var description := ""

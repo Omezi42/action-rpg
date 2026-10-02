@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="UpgradeData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/upgrade_data.gd" id="1_upg"]
+
+[resource]
+script = ExtResource("1_upg")
+label = "斬痕"
+description = "壱以上で斬った線に
+斬撃が残る
++0.3秒"
+stat = 7
+amount = 0.3
+max_level = 3

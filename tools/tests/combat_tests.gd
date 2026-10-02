@@ -1,5 +1,5 @@
 extends RefCounted
-## 実際のシーンで居合を出し、敵へのダメージ・一閃の遅延撃破・被弾を確かめる。
+## 実際のシーンで居合を出し、敵へのダメージ・一閃の遅延撃破・被弾・斬痕と残心を確かめる。
 
 const PLAYER_SCENE := preload("res://scenes/player/player.tscn")
 const ENEMY_SCENE := preload("res://scenes/enemies/kooni.tscn")
@@ -15,6 +15,8 @@ func run(tree: SceneTree, check: Callable) -> void:
 	await _test_ichi_damages_once(check)
 	await _test_issen_kills_on_sheathe(check)
 	await _test_contact_hurts_player(check)
+	await _test_shockwave(check)
+	await _test_lingering_slash(check)
 
 
 func _test_charge_roots_player(check: Callable) -> void:
@@ -62,6 +64,32 @@ func _test_contact_hurts_player(check: Callable) -> void:
 	check.call(player.invincible_left > 0.0, "被弾後は無敵")
 	await _frames(0.2)
 	check.call(player.health.hp == 5, "無敵中は重ねて被弾しない")
+	_clear()
+
+
+func _test_shockwave(check: Callable) -> void:
+	var setup := _spawn(Vector2(148, 125))
+	var player: Player = setup[0]
+	var enemy: Enemy = setup[1]
+	player.stats.shockwave_radius = 32.0
+	await _hold_iai(0.3)
+	await _frames(0.2)
+	check.call(enemy.health.hp == 1, "残心の衝撃波が止まった位置の周りに当たる (hp=%d)" % enemy.health.hp)
+	_clear()
+
+
+func _test_lingering_slash(check: Callable) -> void:
+	var setup := _spawn(Vector2(300, 300))
+	var player: Player = setup[0]
+	var enemy: Enemy = setup[1]
+	player.stats.linger_time = 0.5
+	await _hold_iai(0.3)
+	await _frames(0.15)
+	enemy.position = Vector2(124, 100)
+	await _frames(0.1)
+	check.call(enemy.health.hp == 2, "斬痕が斬り抜けた線に残って当たる (hp=%d)" % enemy.health.hp)
+	await _frames(0.2)
+	check.call(enemy.health.hp == 2, "斬痕は同じ敵に1度だけ")
 	_clear()
 
 

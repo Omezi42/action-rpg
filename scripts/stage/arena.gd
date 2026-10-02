@@ -111,6 +111,7 @@ func _add_enemy(
 	enemy.defeated.connect(_on_enemy_defeated)
 	enemy.tree_exiting.connect(_on_enemy_exiting)
 	enemy.rush_warned.connect(Sfx.play.bind(&"boss_warn"))
+	enemy.shot_fired.connect(_on_enemy_shot.bind(enemy.data))
 	_entities.add_child(enemy)
 	_alive += 1
 	return enemy
@@ -150,6 +151,14 @@ func _on_enemy_defeated(enemy: Enemy) -> void:
 	if enemy.data.soul_value > 0:
 		_souls.drop(enemy.global_position, enemy.data.soul_value)
 	_update_status()
+
+
+func _on_enemy_shot(from: Vector2, direction: Vector2, data: EnemyData) -> void:
+	var arrow := Arrow.new()
+	arrow.position = from
+	arrow.setup(direction, data.shot_speed, data.shot_distance, data.shot_damage)
+	_effects.add_child(arrow)
+	Sfx.play(&"shot")
 
 
 func _on_soul_collected(value: int) -> void:

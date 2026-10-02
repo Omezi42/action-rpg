@@ -29,3 +29,10 @@ extends Resource
 @export var rush_distance := 0.0
 @export var rush_time := 0.0
 @export var rush_recover := 0.0
+## 矢(弓鬼。GameDesign.md 5章)。shot_range が0なら撃たない
+@export var shot_range := 0.0
+@export var shot_windup := 0.0
+@export var shot_interval := 0.0
+@export var shot_speed := 0.0
+@export var shot_distance := 0.0
+@export var shot_damage := 0

@@ -1,14 +1,17 @@
 class_name Enemy
 extends CharacterBody2D
-## 敵(うろつき・気づき・追跡・被弾・撃破・突進)。数値と色は EnemyData から読む(GameDesign.md 5章)。
+## 敵(うろつき・気づき・追跡・被弾・撃破・突進・矢)。数値と色は EnemyData から読む(GameDesign.md 5章)。
 
 signal defeated(enemy: Enemy)
 signal rush_warned
+signal shot_fired(from: Vector2, direction: Vector2)
 
-enum State { WANDER, NOTICE, CHASE, HURT, DOOMED, WINDUP, RUSH, RECOVER }
+enum State { WANDER, NOTICE, CHASE, HURT, DOOMED, WINDUP, RUSH, RECOVER, AIM }
 
 const RUSH_STATES := [State.WINDUP, State.RUSH, State.RECOVER]
 const FLASH_TIME := 0.08
+## 矢は体の高さから放つ
+const SHOT_OFFSET := Vector2(0, -10)
 
 @export var data: EnemyData
 ## add_child の前に立てると気づいた状態(追跡)から始まる。大群に使う
@@ -16,7 +19,8 @@ const FLASH_TIME := 0.08
 
 var state := State.WANDER
 var flash_left := 0.0
-var rush_direction := Vector2.ZERO
+## 突進・矢の向き。構えの始めに決める
+var aim_direction := Vector2.ZERO
 
 var _state_time := 0.0
 var _knockback := Vector2.ZERO
@@ -24,6 +28,7 @@ var _wander_dir := Vector2.ZERO
 var _wander_left := 0.0
 var _rush_cooldown := 0.0
 var _rush_traveled := 0.0
+var _shot_cooldown := 0.0
 
 @onready var health: Health = $Health
 @onready var hurtbox: Hurtbox = $Hurtbox
@@ -44,6 +49,7 @@ func _physics_process(delta: float) -> void:
 	_state_time += delta
 	flash_left = maxf(flash_left - delta, 0.0)
 	_rush_cooldown = maxf(_rush_cooldown - delta, 0.0)
+	_shot_cooldown = maxf(_shot_cooldown - delta, 0.0)
 	match state:
 		State.WANDER:
 			_wander(delta)
@@ -59,6 +65,8 @@ func _physics_process(delta: float) -> void:
 			_rush()
 		State.RECOVER:
 			_recover()
+		State.AIM:
+			_aim()
 	contact_hitbox.active = state != State.HURT and state != State.DOOMED
 
 
@@ -100,6 +108,13 @@ func _chase() -> void:
 	if _can_rush():
 		_start_windup(player)
 		return
+	if data.shot_range > 0.0 and _player_within(data.shot_range):
+		velocity = Vector2.ZERO
+		if _shot_cooldown <= 0.0:
+			aim_direction = global_position.direction_to(player.global_position)
+			_shot_cooldown = data.shot_interval
+			_enter(State.AIM)
+		return
 	velocity = global_position.direction_to(player.global_position) * data.chase_speed
 	move_and_slide()
 
@@ -110,7 +125,7 @@ func _can_rush() -> bool:
 
 ## 向きは予告の始めに決める(予告を見て横へ避けられるように)
 func _start_windup(player: Node2D) -> void:
-	rush_direction = global_position.direction_to(player.global_position)
+	aim_direction = global_position.direction_to(player.global_position)
 	_rush_cooldown = data.rush_interval
 	_rush_traveled = 0.0
 	_enter(State.WINDUP)
@@ -134,8 +149,15 @@ func _rush() -> void:
 		data.rush_distance / data.rush_time * delta, data.rush_distance - _rush_traveled
 	)
 	_rush_traveled += step
-	if move_and_collide(rush_direction * step) or _rush_traveled >= data.rush_distance:
+	if move_and_collide(aim_direction * step) or _rush_traveled >= data.rush_distance:
 		_enter(State.RECOVER)
+
+
+func _aim() -> void:
+	velocity = Vector2.ZERO
+	if _state_time >= data.shot_windup:
+		shot_fired.emit(global_position + SHOT_OFFSET, aim_direction)
+		_enter(State.CHASE)
 
 
 func _recover() -> void:

@@ -3,10 +3,12 @@ extends SceneTree
 ## 起動直後 → フィールドの角(カメラが端で止まる)→ 群れを湧かせて寄ってきたところ → 斜めに構えて弐(予告線)→ 一閃の受付中 → 踏み込み直後
 ## → 斬り抜けた後(魂が落ちている)→ レベルアップ画面 → 残り時間を飛ばして大鬼 → 突進の予告 → 大鬼を倒した結果表示。
 ## 最初にタイトル画面も撮る。
-## 群れには大群(一列)も混ぜる。
+## 群れには大群(一列)と全種類(弓鬼を含む)を混ぜ、斬痕・残心を取った状態で斬る。
 ## マウスの狙いは実カーソルを動かさないよう facing を直接向ける。
 
-const ALL_KINDS_TIME := 25.0
+const ALL_KINDS_TIME := 200.0
+const LINGER_TIME := 0.9
+const SHOCKWAVE_RADIUS := 48.0
 const SCALE := 3
 const PHYSICS_FPS := 60.0
 const CROWD := 24
@@ -47,6 +49,8 @@ func _run() -> void:
 	arena.spawn_horde()
 	await _wait(CROWD_WAIT)
 	await _shot("2_crowd")
+	player.stats.linger_time = LINGER_TIME
+	player.stats.shockwave_radius = SHOCKWAVE_RADIUS
 	Input.action_press("move_right")
 	await _wait(0.05)
 	Input.action_press("iai")

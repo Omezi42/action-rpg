@@ -15,6 +15,6 @@ func _draw() -> void:
 	if _enemy.state != Enemy.State.WINDUP:
 		return
 	var ratio := _enemy.windup_ratio()
-	var tip := _enemy.rush_direction * _enemy.data.rush_distance
+	var tip := _enemy.aim_direction * _enemy.data.rush_distance
 	draw_line(Vector2.ZERO, tip, Color(color, color.a * 0.4), width)
 	draw_line(Vector2.ZERO, tip * ratio, color, width)

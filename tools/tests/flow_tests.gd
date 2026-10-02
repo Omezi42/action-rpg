@@ -1,9 +1,11 @@
 extends RefCounted
-## 最高記録・大鬼の突進・結果画面を確かめる(GameDesign.md 5・9章)。
+## 最高記録・大鬼の突進・弓鬼の矢・結果画面を確かめる(GameDesign.md 5・9章)。
 
 const BOSS_SCENE := preload("res://scenes/enemies/oo_oni.tscn")
 const PLAYER_SCENE := preload("res://scenes/player/player.tscn")
 const ARENA_SCENE := preload("res://scenes/stage/arena.tscn")
+const ENEMY_SCENE := preload("res://scenes/enemies/kooni.tscn")
+const YUMI_ONI := preload("res://data/enemies/yumi_oni.tres")
 const PHYSICS_FPS := 60.0
 const RUSH_START := Vector2(200, 200)
 const PLAYER_OFFSET := Vector2(100, 0)
@@ -16,6 +18,8 @@ func run(tree: SceneTree, check: Callable) -> void:
 	_tree = tree
 	_test_records(check)
 	await _test_boss_rush(check)
+	await _test_archer(check)
+	await _test_arrow(check)
 	_test_game_over_records(check)
 
 
@@ -49,7 +53,7 @@ func _test_boss_rush(check: Callable) -> void:
 	boss.rush_warned.connect(func() -> void: warned[0] = true)
 	await _frames(0.1)
 	check.call(boss.state == Enemy.State.WINDUP and warned[0], "近づくと突進の予告に入る")
-	check.call(boss.rush_direction.is_equal_approx(Vector2.RIGHT), "予告の始めに主人公の方へ向く")
+	check.call(boss.aim_direction.is_equal_approx(Vector2.RIGHT), "予告の始めに主人公の方へ向く")
 	var hitbox := Hitbox.new()
 	hitbox.power = 1
 	hitbox.direction = Vector2.LEFT
@@ -66,6 +70,47 @@ func _test_boss_rush(check: Callable) -> void:
 	check.call(absf(traveled - boss.data.rush_distance) < RUSH_TOLERANCE, "予告の向きへ突進の距離だけ進む")
 	await _frames(boss.data.rush_recover + 0.05)
 	check.call(boss.state == Enemy.State.CHASE, "隙の後は追跡へ戻る")
+	world.free()
+
+
+func _test_archer(check: Callable) -> void:
+	var world := Node2D.new()
+	_tree.root.add_child(world)
+	var player: Player = PLAYER_SCENE.instantiate()
+	player.position = RUSH_START + PLAYER_OFFSET
+	player.set_physics_process(false)
+	world.add_child(player)
+	var archer: Enemy = ENEMY_SCENE.instantiate()
+	archer.data = YUMI_ONI
+	archer.position = RUSH_START
+	archer.alerted = true
+	world.add_child(archer)
+	var shots: Array[Vector2] = []
+	archer.shot_fired.connect(func(_from: Vector2, dir: Vector2) -> void: shots.append(dir))
+	await _frames(0.05)
+	check.call(archer.state == Enemy.State.AIM, "射程に入ると立ち止まって構える")
+	await _frames(YUMI_ONI.shot_windup)
+	check.call(shots.size() == 1 and shots[0].is_equal_approx(Vector2.RIGHT), "構えの後に主人公の方へ矢を放つ")
+	await _frames(0.5)
+	check.call(archer.position == RUSH_START, "次の構えまでも射程内なら立ち止まる")
+	check.call(shots.size() == 1, "次の構えまで間を空ける")
+	world.free()
+
+
+func _test_arrow(check: Callable) -> void:
+	var world := Node2D.new()
+	_tree.root.add_child(world)
+	var player: Player = PLAYER_SCENE.instantiate()
+	player.position = RUSH_START + PLAYER_OFFSET
+	world.add_child(player)
+	var arrow := Arrow.new()
+	arrow.position = RUSH_START + Vector2(0, -10)
+	arrow.setup(Vector2.RIGHT, YUMI_ONI.shot_speed, YUMI_ONI.shot_distance, YUMI_ONI.shot_damage)
+	world.add_child(arrow)
+	var hp := player.health.hp
+	await _frames(PLAYER_OFFSET.x / YUMI_ONI.shot_speed + 0.2)
+	check.call(player.health.hp == hp - 1, "矢が当たると1ダメージ")
+	check.call(not is_instance_valid(arrow), "当たった矢は消える")
 	world.free()
 
 

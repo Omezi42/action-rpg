@@ -63,3 +63,7 @@ func take(upgrade: UpgradeData, player: Player) -> void:
 			player.health.raise_max(roundi(upgrade.amount))
 		UpgradeData.Stat.HEAL:
 			player.health.heal(roundi(upgrade.amount))
+		UpgradeData.Stat.LINGER:
+			stats.linger_time += upgrade.amount
+		UpgradeData.Stat.SHOCKWAVE:
+			stats.shockwave_radius += upgrade.amount

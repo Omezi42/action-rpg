@@ -10,6 +10,9 @@ extends Node2D
 @export var notice_color := Color("ffe14d")
 @export var notice_mark := Rect2(-1, -27, 2, 5)
 @export var notice_dot := Rect2(-1, -21, 2, 2)
+## 弓鬼の構え:弓の向きに出す線
+@export var aim_color := Color(1, 0.9, 0.6, 0.8)
+@export var aim_length := 18.0
 
 @onready var _enemy: Enemy = get_parent()
 
@@ -41,6 +44,8 @@ func _draw() -> void:
 			horn_color
 		)
 		draw_rect(Rect2(center.x + 3 * side - 1, center.y - 1, 2, 2), eye_color)
+	if _enemy.state == Enemy.State.AIM:
+		draw_line(center, center + _enemy.aim_direction * aim_length, aim_color, 1.0)
 	if _enemy.state == Enemy.State.NOTICE:
 		draw_rect(notice_mark, notice_color)
 		draw_rect(notice_dot, notice_color)

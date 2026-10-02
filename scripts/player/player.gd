@@ -181,9 +181,24 @@ func _process_dash(delta: float) -> void:
 func _end_dash() -> void:
 	dash_hitbox.deactivate()
 	slashed.emit(_dash_start, global_position, current_strike == iai.issen)
+	if current_strike != iai.stages[0]:
+		_spawn_followups()
 	state = State.SHEATHE
 	_state_time = 0.0
 	_iai_buffered = false
+
+
+## 斬痕・残心(GameDesign.md 8章)。壱以上の踏み込みの終わりに、取っている強化だけ出す
+func _spawn_followups() -> void:
+	if stats.linger_time > 0.0:
+		var slash := LingeringSlash.new()
+		slash.setup(_dash_start, global_position, data.linger_power, stats.linger_time)
+		get_parent().add_child(slash)
+	if stats.shockwave_radius > 0.0:
+		var wave := Shockwave.new()
+		wave.position = global_position
+		wave.setup(data.shockwave_power, stats.shockwave_radius, data.shockwave_time)
+		get_parent().add_child(wave)
 
 
 ## 納刀中に押された居合は、納刀が終わった瞬間に出す(連打で抜き打ちを出し続けるため)

@@ -7,3 +7,7 @@ extends Resource
 @export var invincible_time := 0.0
 @export var knockback_distance := 0.0
 @export var knockback_time := 0.0
+## 斬痕・残心(GameDesign.md 8章)
+@export var linger_power := 0
+@export var shockwave_power := 0
+@export var shockwave_time := 0.0
