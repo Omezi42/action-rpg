@@ -24,4 +24,4 @@
 | 2 | player_body | 主人公の体。mask は world だけ |
 | 3 | enemy_body | 敵の体。mask は world だけ(主人公・敵同士はすり抜ける) |
 | 4 | player_attack | 主人公の DashHitbox。敵の Hurtbox が mask する |
-| 5 | enemy_attack | 敵の ContactHitbox。主人公の Hurtbox が mask する |
+| 5 | enemy_attack | 敵の AttackHitbox・SweepAttack・矢。主人公の Hurtbox が mask する |
