@@ -1,7 +1,7 @@
 extends SceneTree
 ## 見た目確認用のスクリーンショット(logs/shot_*.png)。ウィンドウありで起動する。
 ## 起動直後 → フィールドの角(カメラが端で止まる)→ 群れを湧かせて寄ってきたところ → 敵の攻撃の予告 → 赤鬼のジャンプ → 斜めに構えて弐(予告線)→ 一閃の受付中 → 踏み込み直後
-## → 斬り抜けた後(魂が落ちている)→ 人斬りの文字 → レベルアップ画面 → 精鋭鬼 → 巻物 → 巻物の画面 → 残り時間を飛ばして大鬼 → 突進の予告 → 大鬼を倒した結果表示。
+## → 斬り抜けた後(魂が落ちている)→ 人斬りの文字 → レベルアップ画面 → 燕返しの斬り返し中 → 精鋭鬼 → 巻物 → 巻物の画面 → 残り時間を飛ばして大鬼 → 突進の予告 → 大鬼を倒した結果表示。
 ## 最初にタイトル画面も撮る。
 ## 群れには大群(一列)と全種類(弓鬼を含む)を混ぜ、斬痕・残心を取った状態で斬る。
 ## マウスの狙いは実カーソルを動かさないよう facing を直接向ける。
@@ -32,6 +32,10 @@ const JUMP_WAIT := 0.25
 ## 一閃の納刀が終わって「N人斬り」が出ているあたりまで(ヒットストップの分だけ遅れる)
 const HITOKIRI_WAIT := 0.2
 const ELITE_OFFSET := Vector2(48, 0)
+## 燕返し3段の距離
+const RETURN_DISTANCE := 96.0
+const NI_HOLD := 0.6
+const RETURN_SHOT_WAIT := 0.06
 
 
 func _initialize() -> void:
@@ -84,6 +88,7 @@ func _run() -> void:
 	await _wait(0.1)
 	await _shot("6_level_up")
 	arena.get_node("LevelUp").choose(0)
+	await _shot_return(player)
 	await _shot_elite_and_scroll(arena, player)
 	arena.schedule.elapsed = arena.survival.clear_time - ALMOST_CLEAR
 	await _wait(BOSS_WAIT)
@@ -109,6 +114,27 @@ func _shot_warnings(arena: Node, player: Player) -> void:
 	await _shot("2b_enemy_warnings")
 	await _wait(JUMP_WAIT)
 	await _shot("2c_aka_oni_jump")
+
+
+## 弐で右へ踏み込み、納刀中に押して斬り返しているところを撮る
+func _shot_return(player: Player) -> void:
+	player.invincible_left = WARNING_GUARD
+	player.stats.return_distance = RETURN_DISTANCE
+	await _wait(0.05)
+	Input.action_press("iai")
+	await _wait(0.05)
+	player.facing = Vector2.RIGHT
+	await _wait(NI_HOLD)
+	Input.action_release("iai")
+	for i in roundi(PHYSICS_FPS):
+		await physics_frame
+		if player.state == Player.State.SHEATHE:
+			break
+	Input.action_press("iai")
+	await _wait(RETURN_SHOT_WAIT)
+	await _shot("5c_return")
+	Input.action_release("iai")
+	await _wait(0.5)
 
 
 ## 精鋭鬼(金の縁)を主人公の横に出して撮り、倒して落ちた巻物を撮り、拾って巻物の画面を撮る
