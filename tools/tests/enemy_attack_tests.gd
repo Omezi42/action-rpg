@@ -6,6 +6,8 @@ const ENEMY_SCENE := preload("res://scenes/enemies/kooni.tscn")
 const KOONI := preload("res://data/enemies/kooni.tres")
 const AO_ONI := preload("res://data/enemies/ao_oni.tres")
 const AKA_ONI := preload("res://data/enemies/aka_oni.tres")
+const OO_ONI := preload("res://data/enemies/oo_oni.tres")
+const BIND_TIME := 1.0
 const PHYSICS_FPS := 60.0
 const PLAYER_POS := Vector2(200, 200)
 const TOLERANCE := 4.0
@@ -24,6 +26,9 @@ func run(tree: SceneTree, check: Callable) -> void:
 	await _test_sweep(check, Vector2(30, -48), true)
 	await _test_jump(check, Vector2.ZERO, true)
 	await _test_jump(check, Vector2(0, 40), false)
+	await _test_bind_hit(check)
+	await _test_bind_call(check)
+	await _test_bind_immune(check)
 
 
 func _test_kooni_draw(check: Callable) -> void:
@@ -96,6 +101,57 @@ func _test_jump(check: Callable, player_move: Vector2, hits: bool) -> void:
 	var label := "着地点の円に当たる" if hits else "円から出れば当たらない"
 	check.call(player.health.hp == expected, "%s (hp=%d)" % [label, player.health.hp])
 	_clear()
+
+
+func _test_bind_hit(check: Callable) -> void:
+	var setup := _spawn(AO_ONI, PLAYER_POS - Vector2(100, 0))
+	var enemy: Enemy = setup[1]
+	_hit(enemy, BIND_TIME)
+	check.call(enemy.bound, "影縫いの当たりで生き残ると止まる")
+	await _frames(BIND_TIME - 0.1)
+	check.call(enemy.state == Enemy.State.HURT, "影縫いの時間だけ被弾硬直が続く")
+	await _frames(0.2)
+	check.call(enemy.state != Enemy.State.HURT and not enemy.bound, "影縫いの時間が過ぎると動き出す")
+	_clear()
+
+
+func _test_bind_call(check: Callable) -> void:
+	var setup := _spawn(KOONI, PLAYER_POS - Vector2(40, 0))
+	var player: Player = setup[0]
+	var enemy: Enemy = setup[1]
+	await _frames(0.1)
+	var from := enemy.position
+	enemy.bind(BIND_TIME)
+	check.call(enemy.state == Enemy.State.HURT and enemy.bound, "bind で予告が取り消されて止まる")
+	await _frames(KOONI.attack_windup + KOONI.rush_time)
+	check.call(enemy.position.distance_to(from) < TOLERANCE, "bind はノックバックしない")
+	check.call(player.health.hp == player.health.max_hp, "止まっている間は攻撃しない")
+	_clear()
+
+
+func _test_bind_immune(check: Callable) -> void:
+	var setup := _spawn(OO_ONI, PLAYER_POS - Vector2(200, 0))
+	var boss: Enemy = setup[1]
+	_hit(boss, BIND_TIME)
+	check.call(not boss.bound, "大鬼は影縫いで止まらない")
+	await _frames(OO_ONI.hurt_time + 0.05)
+	check.call(boss.state != Enemy.State.HURT, "大鬼の被弾硬直は元のまま")
+	_clear()
+	setup = _spawn(AKA_ONI, PLAYER_POS - Vector2(80, 0))
+	var aka: Enemy = setup[1]
+	await _frames(0.05 + AKA_ONI.attack_windup + AKA_ONI.jump_time / 2)
+	aka.bind(BIND_TIME)
+	check.call(aka.state == Enemy.State.JUMP, "跳んでいる赤鬼は影縫いで止まらない")
+	_clear()
+
+
+func _hit(enemy: Enemy, bind_time: float) -> void:
+	var hitbox := Hitbox.new()
+	hitbox.power = 1
+	hitbox.direction = Vector2.LEFT
+	hitbox.bind_time = bind_time
+	enemy.hurtbox.hurt.emit(hitbox)
+	hitbox.free()
 
 
 ## 主人公を PLAYER_POS に置き(操作は止める)、気づいた状態の敵を at に置く

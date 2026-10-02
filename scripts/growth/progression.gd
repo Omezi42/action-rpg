@@ -101,5 +101,8 @@ func take(upgrade: UpgradeData, player: Player, from_scroll := false) -> void:
 			stats.shockwave_radius += upgrade.amount
 		UpgradeData.Stat.RETURN_SLASH:
 			stats.return_distance += upgrade.amount
+		UpgradeData.Stat.SHADOW_BIND:
+			var first := level_of(upgrade) == 1 and upgrade.base_amount > 0.0
+			stats.bind_time += upgrade.base_amount if first else upgrade.amount
 		UpgradeData.Stat.FULL_HEAL:
 			player.health.heal(player.health.max_hp)

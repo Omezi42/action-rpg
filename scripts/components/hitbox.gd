@@ -14,6 +14,8 @@ const GROUND_TO_BODY := Vector2(0, -10)
 var active := true
 var direction := Vector2.ZERO
 var delay_death := false
+## 0より大きければ、当たって生き残った敵の被弾硬直をこの時間にする(影縫い)
+var bind_time := 0.0
 
 var _hit_targets: Dictionary = {}
 

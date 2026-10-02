@@ -28,5 +28,5 @@
 - RushGuide(`scenes/enemies/rush_guide.tscn`)は踏み込みの WINDUP 中に予告線を描く。線の太さ `width` はシーンごと(小鬼のシーン4px・大鬼10px)
 - WINDUP / RUSH / SWEEP / LAND 中に斬られたら HURT へ(攻撃の取り消し)。`attack_armor` が true(大鬼)なら状態を変えず光るだけ
 - 撃破時に `defeated(enemy)` を出して `queue_free()`(Arena が位置と `data.soul_value` から魂を落とす)。主人公は group `"player"` で探す
-- 影縫い:`bind(time)` は HURT へ入れて `time` だけ止める(ノックバックなし。予告・攻撃は取り消す)。`attack_armor`(大鬼)と JUMP 中は何もしない。止まっている間は EnemyVisual が足元に影を描く
+- 影縫い:`bind(time)` は HURT へ入れて `time` だけ止める(ノックバックなし。予告・攻撃は取り消す)。`attack_armor`(大鬼)と JUMP 中は何もしない。止まっている間は `bound` が立ち、EnemyVisual が足元に影を描く(被弾の白にはしない。理由:止まっている時間が長く、白いままだと種類が見分けられないため)
 - 精鋭鬼:Arena が `add_child` の前に `make_elite(hp_scale, visual_scale)` を呼ぶ。`elite = true`・`alerted = true`・`persistent = true`。`_ready` で Health の最大HPを `hp_scale` 倍、Visual と Hurtbox を `visual_scale` 倍にし(攻撃の当たりは変えない)、EnemyVisual が金の縁を描く。`persistent` なら見失い・遠くの消去をしない

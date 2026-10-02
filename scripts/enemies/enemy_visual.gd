@@ -16,6 +16,9 @@ extends Node2D
 ## 精鋭鬼の金の縁取り
 @export var elite_color := Color("e0b040")
 @export var elite_outline := 1.0
+## 影縫いで止まっている間の足元の影
+@export var bind_color := Color(0.1, 0.0, 0.2, 0.75)
+@export var bind_radius := 11.0
 
 @onready var _enemy: Enemy = get_parent()
 
@@ -28,13 +31,16 @@ func _draw() -> void:
 	var body_color := _enemy.data.color
 	match _enemy.state:
 		Enemy.State.HURT:
-			body_color = hurt_color
+			if not _enemy.bound:
+				body_color = hurt_color
 		Enemy.State.DOOMED:
 			body_color = body_color * doomed_tint
 	if _enemy.flash_left > 0.0:
 		body_color = hurt_color
 	draw_set_transform(Vector2.ZERO, 0, Vector2(1, 0.35))
 	draw_circle(Vector2.ZERO, 7, shadow_color)
+	if _enemy.bound:
+		draw_circle(Vector2.ZERO, bind_radius, bind_color)
 	draw_set_transform(Vector2(0, -_enemy.air_height()))
 	var center := Vector2(0, -8)
 	if _enemy.elite:

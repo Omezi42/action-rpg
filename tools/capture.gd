@@ -1,7 +1,7 @@
 extends SceneTree
 ## 見た目確認用のスクリーンショット(logs/shot_*.png)。ウィンドウありで起動する。
 ## 起動直後 → フィールドの角(カメラが端で止まる)→ 群れを湧かせて寄ってきたところ → 敵の攻撃の予告 → 赤鬼のジャンプ → 斜めに構えて弐(予告線)→ 一閃の受付中 → 踏み込み直後
-## → 斬り抜けた後(魂が落ちている)→ 人斬りの文字 → レベルアップ画面 → 燕返しの斬り返し中
+## → 斬り抜けた後(魂が落ちている)→ 人斬りの文字 → レベルアップ画面 → 燕返しの斬り返し中 → 影縫いで止まった敵
 ## → 精鋭鬼 → 巻物 → 巻物の画面 → 残り時間を飛ばして大鬼 → 突進の予告 → 大鬼を倒した結果表示。
 ## 最初にタイトル画面も撮る。
 ## 群れには大群(一列)と全種類(弓鬼を含む)を混ぜ、斬痕・残心を取った状態で斬る。
@@ -37,6 +37,9 @@ const ELITE_OFFSET := Vector2(48, 0)
 const RETURN_DISTANCE := 96.0
 const NI_HOLD := 0.6
 const RETURN_SHOT_WAIT := 0.06
+## 影縫い3段の時間
+const BIND_TIME := 1.8
+const BIND_OFFSETS: Array[Vector2] = [Vector2(40, -20), Vector2(56, 16)]
 
 
 func _initialize() -> void:
@@ -90,6 +93,7 @@ func _run() -> void:
 	await _shot("6_level_up")
 	arena.get_node("LevelUp").choose(0)
 	await _shot_return(player)
+	await _shot_bind(arena, player)
 	await _shot_elite_and_scroll(arena, player)
 	arena.schedule.elapsed = arena.survival.clear_time - ALMOST_CLEAR
 	await _wait(BOSS_WAIT)
@@ -136,6 +140,18 @@ func _shot_return(player: Player) -> void:
 	await _shot("5c_return")
 	Input.action_release("iai")
 	await _wait(0.5)
+
+
+## 主人公の横に青鬼と小鬼を出して影縫いで止め、足元の影を撮る
+func _shot_bind(arena: Node, player: Player) -> void:
+	player.invincible_left = WARNING_GUARD
+	player.hurtbox.invincible = true
+	var kinds := [AO_ONI, KOONI]
+	for i in kinds.size():
+		var enemy: Enemy = arena._add_enemy(kinds[i], player.position + BIND_OFFSETS[i], true)
+		enemy.bind(BIND_TIME)
+	await _wait(0.2)
+	await _shot("5d_bind")
 
 
 ## 精鋭鬼(金の縁)を主人公の横に出して撮り、倒して落ちた巻物を撮り、拾って巻物の画面を撮る

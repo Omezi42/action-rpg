@@ -12,3 +12,5 @@ var linger_time := 0.0
 var shockwave_radius := 0.0
 ## 燕返しの距離。0なら返せない
 var return_distance := 0.0
+## 影縫いの時間。0なら止めない
+var bind_time := 0.0

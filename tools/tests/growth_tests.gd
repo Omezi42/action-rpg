@@ -10,6 +10,7 @@ const FUKABUMI := preload("res://data/upgrades/fukabumi.tres")
 const ZANKON := preload("res://data/upgrades/zankon.tres")
 const ZANSHIN := preload("res://data/upgrades/zanshin.tres")
 const TSUBAME := preload("res://data/upgrades/tsubame.tres")
+const KAGENUI := preload("res://data/upgrades/kagenui.tres")
 const PLAYER_SCENE := preload("res://scenes/player/player.tscn")
 const SOUL_SCENE := preload("res://scenes/pickups/soul_field.tscn")
 const ARENA_SCENE := preload("res://scenes/stage/arena.tscn")
@@ -79,6 +80,7 @@ func _test_scroll_choices(check: Callable) -> void:
 	check.call(not ougi in p.roll_scroll(), "取った奥義は出ない")
 	p._levels[ZANSHIN] = ZANSHIN.max_level
 	p._levels[TSUBAME] = TSUBAME.max_level
+	p._levels[KAGENUI] = KAGENUI.max_level
 	check.call(p.roll_scroll() == [data.full_heal], "候補が無ければ全回復だけ")
 
 
@@ -110,6 +112,10 @@ func _test_take(check: Callable) -> void:
 	p.take(TSUBAME, player)
 	p.take(TSUBAME, player)
 	check.call(is_equal_approx(player.return_distance(), 64.0), "燕返しは1段32px")
+	p.take(KAGENUI, player)
+	check.call(is_equal_approx(player.stats.bind_time, 1.0), "影縫いの1段目は1.0秒")
+	p.take(KAGENUI, player)
+	check.call(is_equal_approx(player.stats.bind_time, 1.4), "影縫いの2段目から+0.4秒")
 	player.free()
 
 

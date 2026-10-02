@@ -31,6 +31,8 @@ var flash_left := 0.0
 var aim_direction := Vector2.ZERO
 ## ジャンプ斬りの着地点。予告の始めに決める
 var jump_target := Vector2.ZERO
+## 影縫いで止まっている(GameDesign.md 8章)
+var bound := false
 
 var _state_time := 0.0
 var _knockback := Vector2.ZERO
@@ -44,6 +46,7 @@ var _jump: JumpAttack
 var _jump_from := Vector2.ZERO
 var _hp_scale := 1
 var _visual_scale := 1.0
+var _hurt_time := 0.0
 
 @onready var health: Health = $Health
 @onready var hurtbox: Hurtbox = $Hurtbox
@@ -270,6 +273,7 @@ func _turn() -> void:
 
 func _enter(next: State) -> void:
 	state = next
+	bound = false
 	_state_time = 0.0
 	_wander_left = 0.0
 
@@ -282,7 +286,7 @@ func _player_within(distance: float) -> bool:
 func _process_hurt() -> void:
 	velocity = _knockback if _state_time < data.knockback_time else Vector2.ZERO
 	move_and_slide()
-	if _state_time >= data.hurt_time:
+	if _state_time >= _hurt_time:
 		_enter(State.CHASE)
 
 
@@ -298,12 +302,30 @@ func _on_hurt(hitbox: Hitbox) -> void:
 	_knockback = hitbox.direction * data.knockback_distance / data.knockback_time
 	_state_time = 0.0
 	if not health.is_dead():
+		var binds := hitbox.bind_time > 0.0 and _can_bind()
 		state = State.HURT
+		bound = binds
+		_hurt_time = hitbox.bind_time if binds else data.hurt_time
 	elif hitbox.delay_death:
 		state = State.DOOMED
 		hurtbox.invincible = true
 	else:
 		_defeat()
+
+
+## 影縫いで time だけ止める。ノックバックなし・予告と攻撃は取り消す
+func bind(time: float) -> void:
+	if not _can_bind() or state == State.DOOMED or health.is_dead():
+		return
+	_enter(State.HURT)
+	_knockback = Vector2.ZERO
+	bound = true
+	_hurt_time = time
+
+
+## 大鬼と跳んでいる赤鬼は止まらない(GameDesign.md 8章)
+func _can_bind() -> bool:
+	return not data.attack_armor and state != State.JUMP
 
 
 func _defeat() -> void:

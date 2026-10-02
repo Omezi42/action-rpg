@@ -185,6 +185,7 @@ func _start_dash(strike: IaiStage) -> void:
 	dash_hitbox.power = strike_power(strike)
 	dash_hitbox.direction = facing
 	dash_hitbox.delay_death = strike == iai.issen
+	dash_hitbox.bind_time = stats.bind_time
 	dash_hitbox.activate()
 	strike_started.emit()
 	dash_started.emit()
@@ -223,6 +224,7 @@ func _start_return() -> void:
 	_dash_traveled = 0.0
 	facing = -facing
 	dash_hitbox.power = data.return_power
+	dash_hitbox.bind_time = stats.bind_time
 	dash_hitbox.direction = facing
 	dash_hitbox.activate()
 	return_started.emit()
