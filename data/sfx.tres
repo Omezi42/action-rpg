@@ -104,6 +104,13 @@ duration = 0.1
 volume_db = -14.0
 min_interval = 0.05
 
+[sub_resource type="Resource" id="Resource_hitokiri"]
+script = ExtResource("2_c2hmv")
+freq_start = 1568.0
+freq_end = 2093.0
+duration = 0.08
+volume_db = -12.0
+
 [resource]
 script = ExtResource("1_rxj31")
 sounds = Dictionary[StringName, ExtResource("2_c2hmv")]({
@@ -113,6 +120,7 @@ sounds = Dictionary[StringName, ExtResource("2_c2hmv")]({
 &"confirm": SubResource("Resource_77xdn"),
 &"dash": SubResource("Resource_v78qh"),
 &"hit": SubResource("Resource_n8j00"),
+&"hitokiri": SubResource("Resource_hitokiri"),
 &"hurt": SubResource("Resource_wcsp4"),
 &"issen": SubResource("Resource_hy46o"),
 &"level_up": SubResource("Resource_c4ito"),

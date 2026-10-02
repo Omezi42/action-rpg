@@ -4,6 +4,7 @@ extends Node2D
 
 const SlashTrail = preload("res://scripts/effects/slash_trail.gd")
 const HitSpark = preload("res://scripts/effects/hit_spark.gd")
+const HitokiriLabel = preload("res://scripts/effects/hitokiri_label.gd")
 
 @export var enemy_scene: PackedScene
 @export var boss_scene: PackedScene
@@ -14,9 +15,16 @@ const HitSpark = preload("res://scripts/effects/hit_spark.gd")
 @export var floor_tile := 32.0
 ## 出現位置の判定に使う、壁・岩のコリジョンレイヤー
 @export_flags_2d_physics var obstacle_mask := 1
+## 人斬り(GameDesign.md 3章):文字を出す数・画面を揺らす一閃の数・揺れ幅・揺れる時間・文字の高さ
+@export var hitokiri_min_count := 3
+@export var hitokiri_shake_count := 5
+@export var shake_amplitude := 2.0
+@export var shake_time := 0.15
+@export var hitokiri_label_height := 24.0
 
 var schedule: SpawnSchedule
 var progression: Progression
+var hitokiri := HitokiriCounter.new()
 var kills := 0
 var ended := false
 var boss: Enemy
@@ -50,6 +58,8 @@ func _ready() -> void:
 	_player.died.connect(_end.bind(false))
 	_player.slashed.connect(_on_player_slashed)
 	_player.hit_landed.connect(_on_player_hit_landed)
+	_player.strike_started.connect(hitokiri.start)
+	_player.strike_finished.connect(_on_strike_finished)
 	_connect_sounds()
 	_update_status()
 
@@ -136,9 +146,9 @@ func _end(cleared: bool) -> void:
 	get_tree().paused = true
 	_pause.locked = true
 	var updated := RunRecords.load_saved().submit(
-		schedule.elapsed, kills, progression.level, cleared
+		schedule.elapsed, kills, progression.level, cleared, hitokiri.best
 	)
-	_game_over.open(cleared, schedule.elapsed, kills, progression.level, updated)
+	_game_over.open(cleared, schedule.elapsed, kills, progression.level, hitokiri.best, updated)
 
 
 ## 撃破と、遠すぎて消えたときの両方で減らす
@@ -148,6 +158,7 @@ func _on_enemy_exiting() -> void:
 
 func _on_enemy_defeated(enemy: Enemy) -> void:
 	kills += 1
+	hitokiri.add_kill()
 	if enemy.data.soul_value > 0:
 		_souls.drop(enemy.global_position, enemy.data.soul_value)
 	_update_status()
@@ -189,6 +200,21 @@ func _on_upgrade_chosen(upgrade: UpgradeData) -> void:
 	get_tree().paused = false
 	_pause.locked = false
 	_player.interrupt_input()
+
+
+## 一閃のときはチンが鳴るので人斬りの音は鳴らさない
+func _on_strike_finished(is_issen: bool) -> void:
+	var count := hitokiri.finish()
+	if count < hitokiri_min_count:
+		return
+	var label := HitokiriLabel.new()
+	label.position = _player.global_position + Vector2.UP * hitokiri_label_height
+	label.setup(count, is_issen)
+	_effects.add_child(label)
+	if not is_issen:
+		Sfx.play(&"hitokiri")
+	elif count >= hitokiri_shake_count:
+		_camera.shake(shake_amplitude, shake_time)
 
 
 func _on_player_slashed(from: Vector2, to: Vector2, is_issen: bool) -> void:

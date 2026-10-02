@@ -80,11 +80,12 @@ func _records_text(records: RunRecords) -> String:
 	if records.plays == 0:
 		return "記録なし"
 	return (
-		"最長生存 %s   最多撃破 %d   最高Lv %d\nクリア %d回 / 挑戦 %d回"
+		"最長生存 %s   最多撃破 %d   最高Lv %d\n最多人斬り %d   クリア %d回 / 挑戦 %d回"
 		% [
 			format_time(records.best_time),
 			records.best_kills,
 			records.best_level,
+			records.best_hitokiri,
 			records.clears,
 			records.plays
 		]

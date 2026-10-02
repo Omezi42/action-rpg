@@ -71,8 +71,8 @@
 
 ## M8:まとめて斬る手応え・途中の山場・奥義
 - [x] GameDesign / Architecture を更新
-- [ ] 人斬り:HitokiriCounter・Player の strike_started / strike_finished・HitokiriLabel・FollowCamera.shake
-- [ ] 記録に最多人斬り(RunRecords・結果・タイトル)
+- [x] 人斬り:HitokiriCounter・Player の strike_started / strike_finished・HitokiriLabel・FollowCamera.shake
+- [x] 記録に最多人斬り(RunRecords・結果・タイトル)
 - [ ] 精鋭鬼(SpawnSchedule.take_elite・Enemy.make_elite・金の縁・見失わない)
 - [ ] 巻物(Scroll・Progression.roll_scroll・全回復・レベルアップ画面の巻物表示)
 - [ ] 燕返し(Player の RETURN・return_window・斬痕/残心を出さない)

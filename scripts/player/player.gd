@@ -5,6 +5,9 @@ extends CharacterBody2D
 signal died
 signal slashed(from: Vector2, to: Vector2, is_issen: bool)
 signal hit_landed(at: Vector2)
+## 1回の踏み込みの区切り(踏み込みの始め → 納刀の終わり)。人斬りの数に使う(GameDesign.md 3章)
+signal strike_started
+signal strike_finished(is_issen: bool)
 ## 効果音用(GameDesign.md 10章)
 signal stage_reached(index: int, is_top: bool)
 signal dash_started
@@ -165,6 +168,7 @@ func _start_dash(strike: IaiStage) -> void:
 	dash_hitbox.direction = facing
 	dash_hitbox.delay_death = strike == iai.issen
 	dash_hitbox.activate()
+	strike_started.emit()
 	dash_started.emit()
 
 
@@ -207,6 +211,7 @@ func _finish_sheathe(iai_pressed: bool) -> void:
 	if current_strike == iai.issen:
 		issen_sheathed.emit()
 	state = State.MOVE
+	strike_finished.emit(current_strike == iai.issen)
 	if not _iai_buffered:
 		return
 	_start_charge()
@@ -240,6 +245,8 @@ func _on_dash_landed(target: Hurtbox) -> void:
 func _on_hurt(hitbox: Hitbox) -> void:
 	_release_doomed()
 	dash_hitbox.deactivate()
+	if state == State.DASH or state == State.SHEATHE:
+		strike_finished.emit(current_strike == iai.issen)
 	var away := (global_position - hitbox.global_position).normalized()
 	if away == Vector2.ZERO:
 		away = -facing

@@ -17,6 +17,8 @@ func run(tree: SceneTree, check: Callable) -> void:
 	await _test_contact_is_harmless(check)
 	await _test_shockwave(check)
 	await _test_lingering_slash(check)
+	await _test_hitokiri(check)
+	_test_hitokiri_outside_strike(check)
 
 
 func _test_charge_roots_player(check: Callable) -> void:
@@ -88,6 +90,47 @@ func _test_lingering_slash(check: Callable) -> void:
 	await _frames(0.2)
 	check.call(enemy.health.hp == 2, "斬痕は同じ敵に1度だけ")
 	_clear()
+
+
+## 一閃で並んだ3体を斬ると、納刀の終わりに3人斬りと数える(GameDesign.md 3章)
+func _test_hitokiri(check: Callable) -> void:
+	var setup := _spawn(Vector2(130, 100))
+	var player: Player = setup[0]
+	var counter := HitokiriCounter.new()
+	var enemies: Array[Enemy] = [setup[1]]
+	for x in [160, 190]:
+		var enemy: Enemy = ENEMY_SCENE.instantiate()
+		enemy.position = Vector2(x, 100)
+		_world.add_child(enemy)
+		enemy.set_physics_process(false)
+		enemies.append(enemy)
+	for enemy in enemies:
+		enemy.defeated.connect(counter.add_kill.unbind(1))
+	var result := [-1, false]
+	player.strike_started.connect(counter.start)
+	player.strike_finished.connect(
+		func(is_issen: bool) -> void:
+			result[0] = counter.finish()
+			result[1] = is_issen
+	)
+	await _hold_iai(1.05)
+	await _frames(0.3)
+	check.call(result[0] == -1, "納刀が終わるまでは数え終えない")
+	await _frames(0.4)
+	check.call(result[0] == 3 and result[1], "一閃で3体を斬ると3人斬り (n=%d)" % result[0])
+	check.call(counter.best == 3, "最多人斬りを覚える")
+	_clear()
+
+
+func _test_hitokiri_outside_strike(check: Callable) -> void:
+	var counter := HitokiriCounter.new()
+	counter.add_kill()
+	counter.start()
+	counter.add_kill()
+	check.call(counter.finish() == 1, "踏み込みの外で倒れた敵は数えない")
+	counter.add_kill()
+	counter.start()
+	check.call(counter.finish() == 0 and counter.best == 1, "数え直しは0から")
 
 
 ## プレイヤーを (100,100) に右向きで置き、敵を enemy_pos に置く。敵のAIは止める

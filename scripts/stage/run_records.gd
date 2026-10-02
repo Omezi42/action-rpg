@@ -3,13 +3,14 @@ extends RefCounted
 ## 最高記録の読み書き(GameDesign.md 9章)。テストと撮影は path を別のファイルへ向ける。
 
 const SECTION := "records"
-const KEYS := ["best_time", "best_kills", "best_level", "clears", "plays"]
+const KEYS := ["best_time", "best_kills", "best_level", "best_hitokiri", "clears", "plays"]
 
 static var path := "user://records.cfg"
 
 var best_time := 0.0
 var best_kills := 0
 var best_level := 0
+var best_hitokiri := 0
 var clears := 0
 var plays := 0
 
@@ -25,7 +26,7 @@ static func load_saved() -> RunRecords:
 
 
 ## 1回の挑戦の結果を記録して保存する。更新した最高記録の名前を返す
-func submit(survived: float, kills: int, level: int, cleared: bool) -> Array[String]:
+func submit(survived: float, kills: int, level: int, cleared: bool, hitokiri := 0) -> Array[String]:
 	var updated: Array[String] = []
 	if survived > best_time:
 		best_time = survived
@@ -36,6 +37,9 @@ func submit(survived: float, kills: int, level: int, cleared: bool) -> Array[Str
 	if level > best_level:
 		best_level = level
 		updated.append("best_level")
+	if hitokiri > best_hitokiri:
+		best_hitokiri = hitokiri
+		updated.append("best_hitokiri")
 	plays += 1
 	if cleared:
 		clears += 1

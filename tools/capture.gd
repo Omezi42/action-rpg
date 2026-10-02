@@ -1,7 +1,7 @@
 extends SceneTree
 ## 見た目確認用のスクリーンショット(logs/shot_*.png)。ウィンドウありで起動する。
 ## 起動直後 → フィールドの角(カメラが端で止まる)→ 群れを湧かせて寄ってきたところ → 敵の攻撃の予告 → 赤鬼のジャンプ → 斜めに構えて弐(予告線)→ 一閃の受付中 → 踏み込み直後
-## → 斬り抜けた後(魂が落ちている)→ レベルアップ画面 → 残り時間を飛ばして大鬼 → 突進の予告 → 大鬼を倒した結果表示。
+## → 斬り抜けた後(魂が落ちている)→ 人斬りの文字 → レベルアップ画面 → 残り時間を飛ばして大鬼 → 突進の予告 → 大鬼を倒した結果表示。
 ## 最初にタイトル画面も撮る。
 ## 群れには大群(一列)と全種類(弓鬼を含む)を混ぜ、斬痕・残心を取った状態で斬る。
 ## マウスの狙いは実カーソルを動かさないよう facing を直接向ける。
@@ -29,6 +29,8 @@ const WARNING_GUARD := 2.0
 const WARNING_WAIT := 0.3
 ## 赤鬼が跳んで最も高いあたりまで
 const JUMP_WAIT := 0.25
+## 一閃の納刀が終わって「N人斬り」が出ているあたりまで(ヒットストップの分だけ遅れる)
+const HITOKIRI_WAIT := 0.2
 
 
 func _initialize() -> void:
@@ -75,6 +77,8 @@ func _run() -> void:
 	await _shot("4_slash")
 	await _wait(0.4)
 	await _shot("5_after")
+	await _wait(HITOKIRI_WAIT)
+	await _shot("5b_hitokiri")
 	arena._on_soul_collected(arena.progression.exp_to_next())
 	await _wait(0.1)
 	await _shot("6_level_up")

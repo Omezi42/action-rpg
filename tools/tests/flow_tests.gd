@@ -36,6 +36,9 @@ func _test_records(check: Callable) -> void:
 	loaded = RunRecords.load_saved()
 	check.call(loaded.best_time == 120.0, "下回った記録は残す")
 	check.call(loaded.clears == 1 and loaded.plays == 2, "クリア回数と挑戦回数を数える")
+	updated = loaded.submit(10.0, 1, 1, false, 7)
+	check.call(updated == ["best_hitokiri"], "最多人斬りを記録する")
+	check.call(RunRecords.load_saved().best_hitokiri == 7, "最多人斬りを保存する")
 
 
 func _test_boss_rush(check: Callable) -> void:
@@ -118,11 +121,13 @@ func _test_game_over_records(check: Callable) -> void:
 	var arena: Node2D = ARENA_SCENE.instantiate()
 	_tree.root.add_child(arena)
 	arena.kills = 999
+	arena.hitokiri.best = 999
 	var player: Player = arena.get_node("Entities/Player")
 	player.health.damage(player.health.hp)
 	var label: Label = arena.get_node("GameOver/Label")
 	check.call(arena.ended and label.text.begins_with("ゲームオーバー"), "HP0でゲームオーバー")
 	check.call(label.text.contains("撃破 999 新記録!"), "更新した記録に新記録と出す")
+	check.call(label.text.contains("最多人斬り 999 新記録!"), "結果に最多人斬りを出す")
 	arena.free()
 	_tree.paused = false
 
