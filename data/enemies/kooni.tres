@@ -5,7 +5,6 @@
 [resource]
 script = ExtResource("1_btko1")
 max_hp = 3
-contact_damage = 1
 chase_speed = 50.0
 hurt_time = 0.3
 knockback_distance = 12.0
@@ -20,3 +19,11 @@ notice_time = 0.5
 lose_range = 260.0
 initial_wander_spread = 0.7853982
 despawn_range = 600.0
+attack_damage = 1
+attack_range = 48.0
+attack_interval = 2.0
+attack_windup = 0.6
+attack_recover = 0.8
+hold_range = 48.0
+rush_distance = 64.0
+rush_time = 0.12

@@ -14,7 +14,7 @@ func run(tree: SceneTree, check: Callable) -> void:
 	await _test_charge_roots_player(check)
 	await _test_ichi_damages_once(check)
 	await _test_issen_kills_on_sheathe(check)
-	await _test_contact_hurts_player(check)
+	await _test_contact_is_harmless(check)
 	await _test_shockwave(check)
 	await _test_lingering_slash(check)
 
@@ -56,14 +56,11 @@ func _test_issen_kills_on_sheathe(check: Callable) -> void:
 	_clear()
 
 
-func _test_contact_hurts_player(check: Callable) -> void:
+func _test_contact_is_harmless(check: Callable) -> void:
 	var setup := _spawn(Vector2(100, 100))
 	var player: Player = setup[0]
-	await _frames(0.1)
-	check.call(player.health.hp == 5, "接触で1ダメージ (hp=%d)" % player.health.hp)
-	check.call(player.invincible_left > 0.0, "被弾後は無敵")
 	await _frames(0.2)
-	check.call(player.health.hp == 5, "無敵中は重ねて被弾しない")
+	check.call(player.health.hp == player.health.max_hp, "敵に触れてもダメージは無い")
 	_clear()
 
 

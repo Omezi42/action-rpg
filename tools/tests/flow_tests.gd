@@ -62,13 +62,13 @@ func _test_boss_rush(check: Callable) -> void:
 	check.call(boss.state == Enemy.State.WINDUP, "予告中は斬られても中断しない")
 	check.call(boss.flash_left > 0.0, "斬られると光る")
 	player.position = RUSH_START + Vector2(0, PLAYER_OFFSET.x)
-	await _frames(boss.data.rush_windup)
+	await _frames(boss.data.attack_windup)
 	check.call(boss.state == Enemy.State.RUSH, "予告の後に突進")
 	await _frames(boss.data.rush_time + 0.05)
 	check.call(boss.state == Enemy.State.RECOVER, "突進の後は隙")
 	var traveled := boss.position.x - RUSH_START.x
 	check.call(absf(traveled - boss.data.rush_distance) < RUSH_TOLERANCE, "予告の向きへ突進の距離だけ進む")
-	await _frames(boss.data.rush_recover + 0.05)
+	await _frames(boss.data.attack_recover + 0.05)
 	check.call(boss.state == Enemy.State.CHASE, "隙の後は追跡へ戻る")
 	world.free()
 

@@ -1,0 +1,9 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/rush_guide.gd" id="1_uwlom"]
+
+[node name="RushGuide" type="Node2D" unique_id=1917967241]
+show_behind_parent = true
+script = ExtResource("1_uwlom")
+color = Color(0.9, 0.15, 0.1, 0.55)
+width = 10.0

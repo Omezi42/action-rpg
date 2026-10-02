@@ -47,12 +47,13 @@ script = ExtResource("6_xw7sn")
 position = Vector2(0, -20)
 shape = SubResource("CircleShape2D_yf385")
 
-[node name="ContactHitbox" type="Area2D" parent="." unique_id=197384443]
+[node name="AttackHitbox" type="Area2D" parent="." unique_id=197384443]
 collision_layer = 16
 collision_mask = 0
 monitoring = false
 script = ExtResource("7_373nc")
+hit_once_per_activation = true
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="ContactHitbox" unique_id=1352357957]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AttackHitbox" unique_id=1352357957]
 position = Vector2(0, -20)
 shape = SubResource("CircleShape2D_bt6bq")

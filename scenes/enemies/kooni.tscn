@@ -6,6 +6,8 @@
 [ext_resource type="Script" path="res://scripts/components/health.gd" id="4_qn7xp"]
 [ext_resource type="Script" path="res://scripts/components/hurtbox.gd" id="5_u7n8j"]
 [ext_resource type="Script" path="res://scripts/components/hitbox.gd" id="6_euws3"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/rush_guide.tscn" id="7_r3ivw"]
+[ext_resource type="Script" path="res://scripts/enemies/rush_guide.gd" id="8_qn7xp"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_46mjf"]
 radius = 5.0
@@ -42,12 +44,18 @@ script = ExtResource("5_u7n8j")
 position = Vector2(0, -10)
 shape = SubResource("CircleShape2D_1bj1h")
 
-[node name="ContactHitbox" type="Area2D" parent="." unique_id=197384443]
+[node name="AttackHitbox" type="Area2D" parent="." unique_id=197384443]
 collision_layer = 16
 collision_mask = 0
 monitoring = false
 script = ExtResource("6_euws3")
+hit_once_per_activation = true
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="ContactHitbox" unique_id=1352357957]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AttackHitbox" unique_id=1352357957]
 position = Vector2(0, -10)
 shape = SubResource("CircleShape2D_e8sy1")
+
+[node name="RushGuide" type="Node2D" parent="." unique_id=1917967241 instance=ExtResource("7_r3ivw")]
+show_behind_parent = true
+script = ExtResource("8_qn7xp")
+width = 4.0

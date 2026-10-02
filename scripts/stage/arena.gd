@@ -95,6 +95,7 @@ func spawn_horde() -> void:
 func spawn_boss() -> void:
 	boss = _add_enemy(null, schedule.edge_center(_camera.view_rect()), true, boss_scene)
 	boss.defeated.connect(_end.bind(true).unbind(1))
+	boss.rush_warned.connect(Sfx.play.bind(&"boss_warn"))
 	_boss_bar.bind(boss.health)
 	Sfx.play(&"boss_appear")
 
@@ -110,7 +111,6 @@ func _add_enemy(
 	enemy.position = at
 	enemy.defeated.connect(_on_enemy_defeated)
 	enemy.tree_exiting.connect(_on_enemy_exiting)
-	enemy.rush_warned.connect(Sfx.play.bind(&"boss_warn"))
 	enemy.shot_fired.connect(_on_enemy_shot.bind(enemy.data))
 	_entities.add_child(enemy)
 	_alive += 1

@@ -7,3 +7,4 @@
 - ビルダーで InputEvent を作るときは `device = -1`(全デバイス)にする。既定の 0 だと1台目のパッドにしか反応しない
 - カメラが動く画面でマウスの移動量(押した位置からの差など)を取るときは画面座標を使う。`get_global_mouse_position()` はカメラが動くとマウスを止めていても値が変わる
 - preload した .tres の型付き配列(`Array[UpgradeData]` など)は、要素の型が class_name ではなくスクリプトとして推論され、`for x: UpgradeData in ...` や型付き引数への受け渡しがパースエラーになる。テストでは `var a: Array = res.list` で型なしにして回す
+- パッチスクリプトでシーンを書き換えるとき、そのシーンのスクリプトがコンパイルに失敗している(新しい class_name を `--import` する前など)と、ルートの `script` と `@export` の値が黙って外れたまま保存される。先に `--import` し、パッチ後は `git diff` で `script =` が消えていないかを見る
