@@ -62,3 +62,5 @@ horde_spacing = 16.0
 horde_enemy = ExtResource("3_kooni")
 field_size = Vector2(1440, 810)
 spawn_margin = 16.0
+boss_spawn_interval = 1.0
+boss_max_enemies = 30

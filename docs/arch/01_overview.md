@@ -2,14 +2,16 @@
 
 | 場所 | 中身 |
 |---|---|
-| `scenes/stage/arena.tscn` | メインシーン(アリーナ) |
-| `scenes/player/player.tscn` / `scenes/enemies/kooni.tscn` | 主人公・小鬼 |
+| `scenes/ui/title.tscn` | メインシーン(タイトル) |
+| `scenes/stage/arena.tscn` | 1回の挑戦(アリーナ) |
+| `scenes/player/player.tscn` / `scenes/enemies/kooni.tscn` / `oo_oni.tscn` | 主人公・小鬼(色違いの敵も共用)・大鬼 |
 | `scripts/components/` | Health / Hitbox / Hurtbox |
-| `scripts/data/` | Resource 定義(PlayerData / IaiStage / IaiData / EnemyData / SurvivalData / SpawnEntry / SpawnPhase / GrowthData / UpgradeData) |
-| `data/` | 数値の実体(`player.tres` `iai.tres` `survival.tres` `growth.tres` `enemies/*.tres` `upgrades/*.tres`) |
+| `scripts/data/` | Resource 定義(PlayerData / IaiStage / IaiData / EnemyData / SurvivalData / SpawnEntry / SpawnPhase / GrowthData / UpgradeData / SfxData / SfxBank) |
+| `data/` | 数値の実体(`player.tres` `iai.tres` `survival.tres` `growth.tres` `enemies/*.tres` `upgrades/*.tres` `sfx.tres`) |
 | `scripts/growth/` | 成長(Progression / PlayerStats / SoulField) |
 | `scripts/effects/` | 斬撃の軌跡・ヒット火花(コード描画、シーン無し) |
-| `scripts/ui/` | ハート・ゲームオーバー・ポーズ |
+| `scripts/ui/` | タイトル・ハート・結果・ポーズ・HPバー等 |
+| `scripts/audio/` | 効果音の合成と再生(autoload `SfxPlayer`) |
 
 - 画面は 480×270 を `stretch/mode=viewport` + `scale_mode=integer` で拡大(GameDesign.md 6章)
 - 入力アクション:`move_left/right/up/down` `iai` `pause`(GameDesign.md 2章)

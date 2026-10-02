@@ -1,5 +1,5 @@
 extends RefCounted
-## 出現の計算、小鬼の追跡、制限時間でのクリアを確かめる(GameDesign.md 1・4・5章)。
+## 出現の計算、小鬼の追跡、大鬼を倒してのクリアを確かめる(GameDesign.md 1・4・5章)。
 
 const SURVIVAL := preload("res://data/survival.tres")
 const KOONI := preload("res://data/enemies/kooni.tres")
@@ -30,7 +30,7 @@ func run(tree: SceneTree, check: Callable) -> void:
 	await _test_camera(check)
 	await _test_enemy_chases(check)
 	await _test_enemy_despawns(check)
-	await _test_clear_stops_run(check)
+	await _test_boss_clears_run(check)
 
 
 func _test_schedule(check: Callable) -> void:
@@ -46,7 +46,11 @@ func _test_schedule(check: Callable) -> void:
 	check.call(not schedule.advance(1.4), "次は1.5秒後まで出ない")
 	check.call(schedule.advance(0.1), "1.5秒で次が出る")
 	schedule.advance(298.5)
-	check.call(schedule.is_cleared(), "5分でクリア")
+	check.call(schedule.is_boss_time(), "5分で大鬼の区間")
+	check.call(is_equal_approx(schedule.interval_at(300.0), 1.0), "大鬼の区間の出現間隔1.0秒")
+	check.call(schedule.max_enemies_at(300.0) == 30, "大鬼の区間の上限30")
+	check.call(schedule.take_boss(), "5分で大鬼が出る")
+	check.call(not schedule.take_boss(), "大鬼は1度だけ")
 
 
 func _test_horde(check: Callable) -> void:
@@ -226,16 +230,25 @@ func _add_test_enemy(world: Node2D, at: Vector2, alerted: bool) -> Enemy:
 	return enemy
 
 
-func _test_clear_stops_run(check: Callable) -> void:
+func _test_boss_clears_run(check: Callable) -> void:
 	var arena: Node2D = ARENA_SCENE.instantiate()
 	arena.survival = SURVIVAL.duplicate()
 	arena.survival.clear_time = SHORT_CLEAR_TIME
 	_tree.root.add_child(arena)
 	await _frames(SHORT_CLEAR_TIME + 0.2)
-	check.call(arena.ended, "制限時間でクリアして終わる")
+	check.call(not arena.ended, "残り時間0では終わらない")
+	check.call(arena.boss != null, "残り時間0で大鬼が出る")
+	check.call(arena.get_node("HUD/BossBar").visible, "大鬼のHPバーを出す")
+	check.call(arena.alive_enemies() >= 2, "開始直後から敵が湧く")
+	var boss: Enemy = arena.boss
+	var hitbox := Hitbox.new()
+	hitbox.power = boss.health.hp
+	boss.hurtbox.hurt.emit(hitbox)
+	hitbox.free()
+	check.call(arena.ended, "大鬼を倒すとクリアして終わる")
 	check.call(_tree.paused, "終了時は画面を止める")
 	check.call(arena.get_node("GameOver").visible, "結果を表示する")
-	check.call(arena.alive_enemies() >= 1, "開始直後から敵が湧く")
+	check.call(RunRecords.load_saved().clears == 1, "クリア回数を記録する")
 	arena.free()
 	_tree.paused = false
 

@@ -1,21 +1,29 @@
 class_name Enemy
 extends CharacterBody2D
-## 敵(うろつき・気づき・追跡・被弾・撃破)。数値と色は EnemyData から読む(GameDesign.md 5章)。
+## 敵(うろつき・気づき・追跡・被弾・撃破・突進)。数値と色は EnemyData から読む(GameDesign.md 5章)。
 
 signal defeated(enemy: Enemy)
+signal rush_warned
 
-enum State { WANDER, NOTICE, CHASE, HURT, DOOMED }
+enum State { WANDER, NOTICE, CHASE, HURT, DOOMED, WINDUP, RUSH, RECOVER }
+
+const RUSH_STATES := [State.WINDUP, State.RUSH, State.RECOVER]
+const FLASH_TIME := 0.08
 
 @export var data: EnemyData
 ## add_child の前に立てると気づいた状態(追跡)から始まる。大群に使う
 @export var alerted := false
 
 var state := State.WANDER
+var flash_left := 0.0
+var rush_direction := Vector2.ZERO
 
 var _state_time := 0.0
 var _knockback := Vector2.ZERO
 var _wander_dir := Vector2.ZERO
 var _wander_left := 0.0
+var _rush_cooldown := 0.0
+var _rush_traveled := 0.0
 
 @onready var health: Health = $Health
 @onready var hurtbox: Hurtbox = $Hurtbox
@@ -34,6 +42,8 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	_state_time += delta
+	flash_left = maxf(flash_left - delta, 0.0)
+	_rush_cooldown = maxf(_rush_cooldown - delta, 0.0)
 	match state:
 		State.WANDER:
 			_wander(delta)
@@ -43,6 +53,12 @@ func _physics_process(delta: float) -> void:
 			_chase()
 		State.HURT:
 			_process_hurt()
+		State.WINDUP:
+			_windup()
+		State.RUSH:
+			_rush()
+		State.RECOVER:
+			_recover()
 	contact_hitbox.active = state != State.HURT and state != State.DOOMED
 
 
@@ -81,8 +97,51 @@ func _chase() -> void:
 	if not player or not _player_within(data.lose_range):
 		_enter(State.WANDER)
 		return
+	if _can_rush():
+		_start_windup(player)
+		return
 	velocity = global_position.direction_to(player.global_position) * data.chase_speed
 	move_and_slide()
+
+
+func _can_rush() -> bool:
+	return data.rush_distance > 0.0 and _rush_cooldown <= 0.0 and _player_within(data.rush_range)
+
+
+## 向きは予告の始めに決める(予告を見て横へ避けられるように)
+func _start_windup(player: Node2D) -> void:
+	rush_direction = global_position.direction_to(player.global_position)
+	_rush_cooldown = data.rush_interval
+	_rush_traveled = 0.0
+	_enter(State.WINDUP)
+	rush_warned.emit()
+
+
+## 突進の予告の進み具合 0〜1
+func windup_ratio() -> float:
+	return clampf(_state_time / data.rush_windup, 0.0, 1.0) if state == State.WINDUP else 0.0
+
+
+func _windup() -> void:
+	velocity = Vector2.ZERO
+	if _state_time >= data.rush_windup:
+		_enter(State.RUSH)
+
+
+func _rush() -> void:
+	var delta := get_physics_process_delta_time()
+	var step := minf(
+		data.rush_distance / data.rush_time * delta, data.rush_distance - _rush_traveled
+	)
+	_rush_traveled += step
+	if move_and_collide(rush_direction * step) or _rush_traveled >= data.rush_distance:
+		_enter(State.RECOVER)
+
+
+func _recover() -> void:
+	velocity = Vector2.ZERO
+	if _state_time >= data.rush_recover:
+		_enter(State.CHASE)
 
 
 ## 出現して最初のうろつきは主人公の方へ向ける(画面外から入ってくるように)
@@ -124,6 +183,9 @@ func _player() -> Node2D:
 
 func _on_hurt(hitbox: Hitbox) -> void:
 	health.damage(hitbox.power)
+	flash_left = FLASH_TIME
+	if state in RUSH_STATES and not health.is_dead():
+		return
 	_knockback = hitbox.direction * data.knockback_distance / data.knockback_time
 	_state_time = 0.0
 	if not health.is_dead():

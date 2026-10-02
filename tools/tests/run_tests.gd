@@ -5,6 +5,9 @@ const IaiTests = preload("res://tools/tests/iai_tests.gd")
 const CombatTests = preload("res://tools/tests/combat_tests.gd")
 const SurvivalTests = preload("res://tools/tests/survival_tests.gd")
 const GrowthTests = preload("res://tools/tests/growth_tests.gd")
+const FlowTests = preload("res://tools/tests/flow_tests.gd")
+## 本物の最高記録に触れないよう、テスト中の記録はここへ書く
+const TEST_RECORDS_PATH := "user://test_records.cfg"
 
 var _failures := 0
 var _checks := 0
@@ -15,10 +18,14 @@ func _initialize() -> void:
 
 
 func _run() -> void:
+	RunRecords.path = TEST_RECORDS_PATH
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(TEST_RECORDS_PATH))
 	IaiTests.new().run(_assert_true)
 	await CombatTests.new().run(self, _assert_true)
 	await SurvivalTests.new().run(self, _assert_true)
 	await GrowthTests.new().run(self, _assert_true)
+	await FlowTests.new().run(self, _assert_true)
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(TEST_RECORDS_PATH))
 	if _failures == 0:
 		print("tests passed (%d checks)" % _checks)
 		quit(0)

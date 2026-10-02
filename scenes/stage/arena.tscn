@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" path="res://scripts/stage/arena.gd" id="1_xrn3w"]
 [ext_resource type="PackedScene" path="res://scenes/enemies/kooni.tscn" id="2_7efwd"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/oo_oni.tscn" id="3_c2erv"]
 [ext_resource type="Script" path="res://scripts/stage/obstacle_drawer.gd" id="3_l3o0w"]
 [ext_resource type="Resource" path="res://data/survival.tres" id="3_mei7i"]
 [ext_resource type="Resource" path="res://data/growth.tres" id="4_gqh02"]
@@ -19,7 +20,9 @@
 [ext_resource type="Script" path="res://scripts/stage/follow_camera.gd" id="12_qbl08"]
 [ext_resource type="PackedScene" path="res://scenes/ui/exp_bar.tscn" id="15_u87tm"]
 [ext_resource type="Script" path="res://scripts/ui/exp_bar.gd" id="16_c2erv"]
+[ext_resource type="PackedScene" path="res://scenes/ui/boss_bar.tscn" id="19_ruun3"]
 [ext_resource type="PackedScene" path="res://scenes/ui/level_up_menu.tscn" id="19_vdowa"]
+[ext_resource type="Script" path="res://scripts/ui/boss_bar.gd" id="20_aryjj"]
 [ext_resource type="Script" path="res://scripts/ui/level_up_menu.gd" id="20_ruun3"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_gqh02"]
@@ -79,6 +82,7 @@ size = Vector2(22, 22)
 [node name="Arena" type="Node2D" unique_id=383609430]
 script = ExtResource("1_xrn3w")
 enemy_scene = ExtResource("2_7efwd")
+boss_scene = ExtResource("3_c2erv")
 survival = ExtResource("3_mei7i")
 growth = ExtResource("4_gqh02")
 
@@ -216,6 +220,16 @@ offset_right = 460.0
 offset_bottom = 9.0
 mouse_filter = 2
 script = ExtResource("16_c2erv")
+
+[node name="BossBar" type="Control" parent="HUD" unique_id=1638954541 instance=ExtResource("19_ruun3")]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 90.0
+offset_top = 254.0
+offset_right = 390.0
+offset_bottom = 259.0
+mouse_filter = 2
+script = ExtResource("20_aryjj")
 
 [node name="GameOver" type="CanvasLayer" parent="." unique_id=1845001762]
 process_mode = 3

@@ -5,6 +5,11 @@ extends CharacterBody2D
 signal died
 signal slashed(from: Vector2, to: Vector2, is_issen: bool)
 signal hit_landed(at: Vector2)
+## 効果音用(GameDesign.md 10章)
+signal stage_reached(index: int, is_top: bool)
+signal dash_started
+signal issen_sheathed
+signal damaged
 
 enum State { MOVE, CHARGE, DASH, SHEATHE, HURT, DEAD }
 
@@ -127,6 +132,7 @@ func _process_charge(delta: float, iai_pressed: bool) -> void:
 	_aim_at_cursor()
 	if charge.advance(delta):
 		flash_left = STAGE_FLASH_TIME
+		stage_reached.emit(charge.stage_index(), charge.stage_index() == charge.top_stage_index())
 	if not iai_pressed:
 		_start_dash(charge.release())
 
@@ -159,6 +165,7 @@ func _start_dash(strike: IaiStage) -> void:
 	dash_hitbox.direction = facing
 	dash_hitbox.delay_death = strike == iai.issen
 	dash_hitbox.activate()
+	dash_started.emit()
 
 
 func _process_dash(delta: float) -> void:
@@ -182,6 +189,8 @@ func _end_dash() -> void:
 ## 納刀中に押された居合は、納刀が終わった瞬間に出す(連打で抜き打ちを出し続けるため)
 func _finish_sheathe(iai_pressed: bool) -> void:
 	_release_doomed()
+	if current_strike == iai.issen:
+		issen_sheathed.emit()
 	state = State.MOVE
 	if not _iai_buffered:
 		return
@@ -224,6 +233,7 @@ func _on_hurt(hitbox: Hitbox) -> void:
 	hurtbox.invincible = true
 	state = State.HURT
 	_state_time = 0.0
+	damaged.emit()
 	health.damage(hitbox.power)
 
 

@@ -25,6 +25,8 @@ func _draw() -> void:
 			body_color = hurt_color
 		Enemy.State.DOOMED:
 			body_color = body_color * doomed_tint
+	if _enemy.flash_left > 0.0:
+		body_color = hurt_color
 	draw_set_transform(Vector2.ZERO, 0, Vector2(1, 0.35))
 	draw_circle(Vector2.ZERO, 7, shadow_color)
 	draw_set_transform(Vector2.ZERO)

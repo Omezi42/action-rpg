@@ -13,3 +13,6 @@ extends Resource
 @export var field_size := Vector2.ZERO
 ## 出現・大群は、カメラの映す矩形をこれだけ広げた周上
 @export var spawn_margin := 0.0
+## 残り時間0から大鬼を倒すまでの出現(GameDesign.md 5章「ボス」)
+@export var boss_spawn_interval := 0.0
+@export var boss_max_enemies := 0

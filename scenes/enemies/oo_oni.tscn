@@ -1,0 +1,58 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy.gd" id="1_8ibtp"]
+[ext_resource type="Resource" path="res://data/enemies/oo_oni.tres" id="2_luwn8"]
+[ext_resource type="Script" path="res://scripts/enemies/rush_guide.gd" id="3_ljq3c"]
+[ext_resource type="Script" path="res://scripts/enemies/enemy_visual.gd" id="4_7fa7y"]
+[ext_resource type="Script" path="res://scripts/components/health.gd" id="5_2gypo"]
+[ext_resource type="Script" path="res://scripts/components/hurtbox.gd" id="6_xw7sn"]
+[ext_resource type="Script" path="res://scripts/components/hitbox.gd" id="7_373nc"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_4313o"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_yf385"]
+radius = 16.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_bt6bq"]
+radius = 14.0
+
+[node name="OoOni" type="CharacterBody2D" unique_id=1181288502]
+collision_layer = 4
+motion_mode = 1
+script = ExtResource("1_8ibtp")
+data = ExtResource("2_luwn8")
+
+[node name="RushGuide" type="Node2D" parent="." unique_id=1463217148]
+show_behind_parent = true
+script = ExtResource("3_ljq3c")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1404630756]
+position = Vector2(0, -8)
+shape = SubResource("CircleShape2D_4313o")
+
+[node name="Visual" type="Node2D" parent="." unique_id=1120531325]
+scale = Vector2(2, 2)
+script = ExtResource("4_7fa7y")
+
+[node name="Health" type="Node" parent="." unique_id=1245720143]
+script = ExtResource("5_2gypo")
+
+[node name="Hurtbox" type="Area2D" parent="." unique_id=52793227]
+collision_layer = 0
+collision_mask = 8
+monitorable = false
+script = ExtResource("6_xw7sn")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox" unique_id=1615748918]
+position = Vector2(0, -20)
+shape = SubResource("CircleShape2D_yf385")
+
+[node name="ContactHitbox" type="Area2D" parent="." unique_id=197384443]
+collision_layer = 16
+collision_mask = 0
+monitoring = false
+script = ExtResource("7_373nc")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ContactHitbox" unique_id=1352357957]
+position = Vector2(0, -20)
+shape = SubResource("CircleShape2D_bt6bq")

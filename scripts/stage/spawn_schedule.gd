@@ -9,6 +9,7 @@ var elapsed := 0.0
 var _data: SurvivalData
 var _next_spawn := 0.0
 var _next_horde := 0
+var _boss_taken := false
 
 
 func _init(data: SurvivalData) -> void:
@@ -25,6 +26,8 @@ func advance(delta: float) -> bool:
 
 
 func interval_at(time: float) -> float:
+	if time >= _data.clear_time:
+		return _data.boss_spawn_interval
 	var index := _phase_index(time)
 	var phase := _data.phases[index]
 	var end_time := _data.clear_time
@@ -35,6 +38,8 @@ func interval_at(time: float) -> float:
 
 
 func max_enemies_at(time: float) -> int:
+	if time >= _data.clear_time:
+		return _data.boss_max_enemies
 	return _data.phases[_phase_index(time)].max_enemies
 
 
@@ -54,9 +59,26 @@ func take_horde() -> bool:
 	return true
 
 
-## 映す矩形の4辺のうち、外側にフィールドが最も広く残る辺の外側へ、辺の中央ぞろえで horde_count 体ぶんの位置。
-## フィールドからはみ出す分は内側へ詰める
+## 残り時間が0になっていれば true(1度だけ)
+func take_boss() -> bool:
+	if _boss_taken or not is_boss_time():
+		return false
+	_boss_taken = true
+	return true
+
+
 func horde_points(view: Rect2) -> Array[Vector2]:
+	return line_points(view, _data.horde_count, _data.horde_spacing)
+
+
+## 大鬼の出現位置。大群と同じ辺の中央
+func edge_center(view: Rect2) -> Vector2:
+	return line_points(view, 1, 0.0)[0]
+
+
+## 映す矩形の4辺のうち、外側にフィールドが最も広く残る辺の外側へ、辺の中央ぞろえで count 個の位置。
+## フィールドからはみ出す分は内側へ詰める
+func line_points(view: Rect2, count: int, spacing: float) -> Array[Vector2]:
 	var field := field_rect()
 	var area := view.grow(_data.spawn_margin)
 	var sides := [
@@ -78,7 +100,7 @@ func horde_points(view: Rect2) -> Array[Vector2]:
 		if side[2] > far[2]:
 			far = side
 	var along: Vector2 = far[1]
-	var half_length := (_data.horde_count - 1) / 2.0 * _data.horde_spacing
+	var half_length := (count - 1) / 2.0 * spacing
 	var inner := field.grow(-_data.spawn_margin).grow_individual(
 		-half_length * along.x,
 		-half_length * along.y,
@@ -87,8 +109,8 @@ func horde_points(view: Rect2) -> Array[Vector2]:
 	)
 	var center: Vector2 = far[0].clamp(inner.position, inner.end)
 	var points: Array[Vector2] = []
-	for i in _data.horde_count:
-		var offset := (i - (_data.horde_count - 1) / 2.0) * _data.horde_spacing
+	for i in count:
+		var offset := (i - (count - 1) / 2.0) * spacing
 		points.append(center + along * offset)
 	return points
 
@@ -97,7 +119,7 @@ func field_rect() -> Rect2:
 	return Rect2(Vector2.ZERO, _data.field_size)
 
 
-func is_cleared() -> bool:
+func is_boss_time() -> bool:
 	return elapsed >= _data.clear_time
 
 

@@ -22,3 +22,10 @@ extends Resource
 @export var initial_wander_spread := 0.0
 ## うろつき中に主人公からこれより離れたら消える
 @export var despawn_range := 0.0
+## 突進(大鬼。GameDesign.md 5章)。rush_distance が0なら突進しない
+@export var rush_range := 0.0
+@export var rush_interval := 0.0
+@export var rush_windup := 0.0
+@export var rush_distance := 0.0
+@export var rush_time := 0.0
+@export var rush_recover := 0.0

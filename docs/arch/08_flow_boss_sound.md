@@ -12,13 +12,13 @@
 
 ## 大鬼(GameDesign.md 5章)
 - Enemy に突進の状態 `WINDUP` / `RUSH` / `RECOVER` を足す。EnemyData の `rush_distance` が0なら突進しない(小鬼など)
-- 突進の状態の間は被弾しても状態を変えず、`flash_left` で白く光るだけ。`rush_warned` を出す(効果音用)
+- 突進の状態の間は被弾しても状態を変えず、`flash_left` で白く光るだけ。予告の始めに `rush_warned` を出す(効果音用)。突進は Player の踏み込みと同じく `move_and_collide` で距離を数えて止める
 - シーンは `scenes/enemies/oo_oni.tscn`(小鬼のシーンを Visual 2倍・判定2倍にしたもの + 予告線の `RushGuide`)
-- SurvivalData の `boss` / `boss_scene` / `boss_spawn_interval` / `boss_max_enemies`。SpawnSchedule は `clear_time` 以降を大鬼の区間として扱い、`take_boss()` は1度だけ true
-- 出現位置は `edge_center(view)`(大群と同じ辺の中央)
+- Arena の `boss_scene`、SurvivalData の `boss_spawn_interval` / `boss_max_enemies`。SpawnSchedule は `clear_time` 以降を大鬼の区間として扱い(`is_boss_time()`)、`take_boss()` は1度だけ true
+- 出現位置は `edge_center(view)`(大群と同じ辺の中央。大群と共通の `line_points()`)
 - Arena は大鬼の `defeated` でクリア。生存時間はその時刻。`HUD/BossBar`(`scripts/ui/boss_bar.gd`)が大鬼の Health を描く
 
 ## 効果音(GameDesign.md 10章)
-- autoload `Sfx`(`scripts/audio/sfx.gd`)。起動時に `data/sfx.tres`(SfxBank:名前 → SfxData)から AudioStreamWAV を合成し、8個の AudioStreamPlayer を順に使う
+- autoload `SfxPlayer`(`scripts/audio/sfx.gd`、class_name `Sfx`)。鳴らす側は static の `Sfx.play(name)` を呼び、autoload が無いとき(`--script` のテスト)は何もしない。起動時に `data/sfx.tres`(SfxBank:名前 → SfxData)から AudioStreamWAV を合成し、8個の AudioStreamPlayer を順に使う
 - SfxData(`scripts/data/sfx_data.gd`):`wave`(SQUARE / TRIANGLE / NOISE)`freq_start` `freq_end` `duration` `volume_db`。音の追加は .tres に1行
-- 鳴らすきっかけは信号で受ける。Player の `stage_reached(index)` `dash_started` `hurt`、Enemy の `rush_warned`、Arena 側で斬撃・魂・レベルアップ・大鬼出現。UI は決定時に自分で鳴らす
+- 鳴らすきっかけは信号で受ける。Player の `stage_reached(index, is_top)` `dash_started` `issen_sheathed` `damaged`、Enemy の `rush_warned`、Arena 側で斬撃・魂・レベルアップ・大鬼出現。UI は決定時に自分で鳴らす

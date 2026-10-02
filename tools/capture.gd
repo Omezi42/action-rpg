@@ -1,7 +1,8 @@
 extends SceneTree
 ## 見た目確認用のスクリーンショット(logs/shot_*.png)。ウィンドウありで起動する。
 ## 起動直後 → フィールドの角(カメラが端で止まる)→ 群れを湧かせて寄ってきたところ → 斜めに構えて弐(予告線)→ 一閃の受付中 → 踏み込み直後
-## → 斬り抜けた後(魂が落ちている)→ レベルアップ画面 → 残り時間を飛ばしてクリアの結果表示 の9枚。
+## → 斬り抜けた後(魂が落ちている)→ レベルアップ画面 → 残り時間を飛ばして大鬼 → 突進の予告 → 大鬼を倒した結果表示。
+## 最初にタイトル画面も撮る。
 ## 群れには大群(一列)も混ぜる。
 ## マウスの狙いは実カーソルを動かさないよう facing を直接向ける。
 
@@ -13,6 +14,11 @@ const ALMOST_CLEAR := 0.1
 const AIM := Vector2(1.0, -0.45)
 const CORNER := Vector2(60, 60)
 const CROWD_WAIT := 3.0
+const ARENA_PATH := "res://scenes/stage/arena.tscn"
+## 本物の最高記録に触れないよう、撮影中の記録はここへ書く
+const CAPTURE_RECORDS_PATH := "user://capture_records.cfg"
+const BOSS_WAIT := 2.5
+const BOSS_APPROACH := Vector2(-100, 30)
 
 
 func _initialize() -> void:
@@ -20,7 +26,11 @@ func _initialize() -> void:
 
 
 func _run() -> void:
+	RunRecords.path = CAPTURE_RECORDS_PATH
 	change_scene_to_file(ProjectSettings.get_setting("application/run/main_scene"))
+	await _wait(0.5)
+	await _shot("0_title")
+	change_scene_to_file(ARENA_PATH)
 	await _wait(0.5)
 	await _shot("1_start")
 	var arena := current_scene
@@ -57,9 +67,26 @@ func _run() -> void:
 	await _shot("6_level_up")
 	arena.get_node("LevelUp").choose(0)
 	arena.schedule.elapsed = arena.survival.clear_time - ALMOST_CLEAR
+	await _wait(BOSS_WAIT)
+	await _shot("7_boss")
+	await _wait_boss_windup(arena)
+	await _shot("7b_boss_rush_warning")
+	arena.boss.health.damage(arena.boss.health.hp)
+	arena.boss.fall()
 	await _wait(0.3)
-	await _shot("7_result")
+	await _shot("8_result")
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(CAPTURE_RECORDS_PATH))
 	quit()
+
+
+## 主人公を大鬼の近くへ置き、突進の予告が半分進んだところまで待つ
+func _wait_boss_windup(arena: Node) -> void:
+	var player: Player = arena.get_node("Entities/Player")
+	player.position = arena.boss.position + BOSS_APPROACH
+	for i in roundi(PHYSICS_FPS * BOSS_WAIT):
+		await physics_frame
+		if arena.boss.windup_ratio() >= 0.5:
+			return
 
 
 func _shot(label: String) -> void:
