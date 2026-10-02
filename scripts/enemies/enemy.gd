@@ -6,12 +6,16 @@ signal defeated(enemy: Enemy)
 signal rush_warned
 signal shot_fired(from: Vector2, direction: Vector2)
 
-enum State { WANDER, NOTICE, CHASE, HURT, DOOMED, WINDUP, RUSH, SWEEP, RECOVER, AIM }
+enum State { WANDER, NOTICE, CHASE, HURT, DOOMED, WINDUP, RUSH, SWEEP, JUMP, LAND, RECOVER, AIM }
 
-const ATTACK_STATES := [State.WINDUP, State.RUSH, State.SWEEP, State.RECOVER]
+const ATTACK_STATES := [
+	State.WINDUP, State.RUSH, State.SWEEP, State.JUMP, State.LAND, State.RECOVER
+]
 const FLASH_TIME := 0.08
 ## 矢は体の高さから放つ
 const SHOT_OFFSET := Vector2(0, -10)
+## ratio * (1 - ratio) の最大(0.25)を1にそろえる
+const PARABOLA_PEAK := 4.0
 
 @export var data: EnemyData
 ## add_child の前に立てると気づいた状態(追跡)から始まる。大群に使う
@@ -21,6 +25,8 @@ var state := State.WANDER
 var flash_left := 0.0
 ## 攻撃・矢の向き。予告の始めに決める
 var aim_direction := Vector2.ZERO
+## ジャンプ斬りの着地点。予告の始めに決める
+var jump_target := Vector2.ZERO
 
 var _state_time := 0.0
 var _knockback := Vector2.ZERO
@@ -30,6 +36,8 @@ var _attack_cooldown := 0.0
 var _rush_traveled := 0.0
 var _shot_cooldown := 0.0
 var _sweep: SweepAttack
+var _jump: JumpAttack
+var _jump_from := Vector2.ZERO
 
 @onready var health: Health = $Health
 @onready var hurtbox: Hurtbox = $Hurtbox
@@ -45,6 +53,10 @@ func _ready() -> void:
 		_sweep = SweepAttack.new()
 		add_child(_sweep)
 		_sweep.setup(data.sweep_radius, data.attack_damage)
+	if data.jump_radius > 0.0:
+		_jump = JumpAttack.new()
+		add_child(_jump)
+		_jump.setup(data.jump_radius, data.attack_damage)
 	if alerted:
 		state = State.CHASE
 	else:
@@ -69,8 +81,10 @@ func _physics_process(delta: float) -> void:
 			_windup()
 		State.RUSH:
 			_rush()
-		State.SWEEP:
-			_sweep_attack()
+		State.SWEEP, State.LAND:
+			_strike()
+		State.JUMP:
+			_jump_through()
 		State.RECOVER:
 			_recover()
 		State.AIM:
@@ -78,6 +92,9 @@ func _physics_process(delta: float) -> void:
 	attack_hitbox.active = state == State.RUSH
 	if _sweep:
 		_sweep.active = state == State.SWEEP
+	if _jump:
+		_jump.active = state == State.LAND
+	hurtbox.invincible = state == State.JUMP or state == State.DOOMED
 
 
 func is_doomed() -> bool:
@@ -131,7 +148,7 @@ func _chase() -> void:
 
 
 func _can_attack() -> bool:
-	var has_attack := data.rush_distance > 0.0 or data.sweep_radius > 0.0
+	var has_attack := data.rush_distance > 0.0 or data.sweep_radius > 0.0 or data.jump_radius > 0.0
 	return has_attack and _attack_cooldown <= 0.0 and _player_within(data.attack_range)
 
 
@@ -146,6 +163,9 @@ func _start_windup(player: Node2D) -> void:
 	_rush_traveled = 0.0
 	if _sweep:
 		_sweep.rotation = aim_direction.angle()
+	if _jump:
+		jump_target = player.global_position
+		_jump.global_position = jump_target
 	_enter(State.WINDUP)
 	rush_warned.emit()
 
@@ -162,9 +182,12 @@ func _windup() -> void:
 	if data.rush_distance > 0.0:
 		attack_hitbox.activate()
 		_enter(State.RUSH)
-	else:
+	elif _sweep:
 		_sweep.activate()
 		_enter(State.SWEEP)
+	else:
+		_jump_from = global_position
+		_enter(State.JUMP)
 
 
 func _rush() -> void:
@@ -177,10 +200,27 @@ func _rush() -> void:
 		_enter(State.RECOVER)
 
 
-func _sweep_attack() -> void:
+func _strike() -> void:
 	velocity = Vector2.ZERO
-	if _state_time >= data.sweep_time:
+	if _state_time >= data.strike_time:
 		_enter(State.RECOVER)
+
+
+## 壁・岩を飛び越えるので、物理で動かさず位置を直接進める
+func _jump_through() -> void:
+	var ratio := minf(_state_time / data.jump_time, 1.0)
+	global_position = _jump_from.lerp(jump_target, ratio)
+	if ratio >= 1.0:
+		_jump.activate()
+		_enter(State.LAND)
+
+
+## ジャンプ中の見た目の高さ(放物線)
+func air_height() -> float:
+	if state != State.JUMP:
+		return 0.0
+	var ratio := clampf(_state_time / data.jump_time, 0.0, 1.0)
+	return data.jump_height * PARABOLA_PEAK * ratio * (1.0 - ratio)
 
 
 func _aim() -> void:

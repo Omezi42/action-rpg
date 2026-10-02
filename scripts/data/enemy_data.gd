@@ -34,9 +34,14 @@ extends Resource
 ## 踏み込み(小鬼・赤鬼・大鬼の突進)。rush_distance が0なら踏み込まない
 @export var rush_distance := 0.0
 @export var rush_time := 0.0
-## 薙ぎ払い(青鬼)。sweep_radius が0なら薙ぎ払わない。sweep_time は当たりが出ている時間
+## 薙ぎ払い・着地の一撃の当たりが出ている時間
+@export var strike_time := 0.0
+## 薙ぎ払い(青鬼)。sweep_radius が0なら薙ぎ払わない
 @export var sweep_radius := 0.0
-@export var sweep_time := 0.0
+## ジャンプ斬り(赤鬼)。jump_radius が0なら跳ばない。jump_height は見た目の最高の高さ
+@export var jump_radius := 0.0
+@export var jump_time := 0.0
+@export var jump_height := 0.0
 ## 矢(弓鬼。GameDesign.md 5章)。shot_range が0なら撃たない
 @export var shot_range := 0.0
 @export var shot_windup := 0.0

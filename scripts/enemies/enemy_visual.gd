@@ -32,7 +32,7 @@ func _draw() -> void:
 		body_color = hurt_color
 	draw_set_transform(Vector2.ZERO, 0, Vector2(1, 0.35))
 	draw_circle(Vector2.ZERO, 7, shadow_color)
-	draw_set_transform(Vector2.ZERO)
+	draw_set_transform(Vector2(0, -_enemy.air_height()))
 	var center := Vector2(0, -8)
 	draw_circle(center, 8, body_color)
 	for side in [-1, 1]:

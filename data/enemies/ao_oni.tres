@@ -26,4 +26,4 @@ attack_windup = 1.0
 attack_recover = 1.2
 hold_range = 40.0
 sweep_radius = 56.0
-sweep_time = 0.1
+strike_time = 0.1
