@@ -154,7 +154,8 @@ func _shot_bind(arena: Node, player: Player) -> void:
 	await _shot("5d_bind")
 
 
-## 精鋭鬼(金の縁)を主人公の横に出して撮り、倒して落ちた巻物を撮り、拾って巻物の画面を撮る
+## 精鋭鬼(金の縁)を主人公の横に出して撮り、倒して落ちた巻物を撮り、拾って巻物の画面を撮る。
+## 巻物の画面には奥義(金の枠)が出るよう、奥義の条件の強化を最大にしておく
 func _shot_elite_and_scroll(arena: Node, player: Player) -> void:
 	player.invincible_left = WARNING_GUARD
 	player.hurtbox.invincible = true
@@ -166,11 +167,19 @@ func _shot_elite_and_scroll(arena: Node, player: Player) -> void:
 	elite.fall()
 	await _wait(0.1)
 	await _shot("6c_scroll")
+	_unlock_ougi(arena.progression, arena.growth)
 	player.position = elite_drop_point(arena)
 	await _wait(0.1)
 	await _shot("6d_scroll_menu")
 	var menu := arena.get_node("LevelUp")
 	menu.choose(menu._cards.size() - 1)
+
+
+func _unlock_ougi(progression: Progression, growth: GrowthData) -> void:
+	var ougi_list: Array = growth.ougi
+	for ougi: Resource in ougi_list:
+		for required: Resource in ougi.requires:
+			progression._levels[required] = required.max_level
 
 
 func elite_drop_point(arena: Node) -> Vector2:

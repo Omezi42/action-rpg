@@ -25,7 +25,8 @@
 - `is_striking()`:DASH か RETURN。魂の即取得・無敵・刀の見た目はこれで見る
 - 押したまま斬り返しの納刀が終わったら CHARGE へ
 - RETURN の威力は `PlayerData.return_power`、斬り返しでは `_spawn_followups()`(斬痕・残心)を呼ばない。`return_started` を出す(効果音)
-- 影縫い:DashHitbox の当たりに `bind_time`(`stats.bind_time`)を載せ、Enemy の `_on_hurt` が被弾硬直の長さに使う。奥義 `stats.ougi_kage` なら、`_end_dash` / RETURN の終わりに斬った線の左右 `PlayerData.kage_width` の矩形で敵を探し、`Enemy.bind(time)` を呼ぶ
+- 影縫い:DashHitbox の当たりに `bind_time`(`stats.bind_time`)を載せ、Enemy の `_on_hurt` が被弾硬直の長さに使う。奥義 `stats.ougi_kage` なら、`_end_dash` / RETURN の終わりに、親(Entities)の子の Enemy のうち斬った線の左右 `PlayerData.kage_width` の矩形に入るものへ `Enemy.bind(time)` を呼ぶ
+- 燕返し・極:`stats.ougi_tsubame` なら `return_distance()` は直前の踏み込みで実際に進んだ距離(壁で止まったらそこまで)
 
 ## 強化の反映
 - `Player.stats`(PlayerStats)が強化の倍率・加算を持つ。移動は `move_speed * stats.move_speed_scale`

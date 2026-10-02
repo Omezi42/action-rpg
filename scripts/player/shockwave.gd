@@ -11,12 +11,15 @@ const WIDTH := 2.0
 var _radius := 0.0
 var _life := 0.0
 var _age := 0.0
+## 0より大きければ、この時間の後に同じ衝撃波をもう1回出す(大残心)
+var _echo_delay := 0.0
 var _circle := CircleShape2D.new()
 
 
-func setup(strike_power: int, radius: float, life: float) -> void:
+func setup(strike_power: int, radius: float, life: float, echo_delay := 0.0) -> void:
 	_radius = radius
 	_life = life
+	_echo_delay = echo_delay
 	power = strike_power
 	hit_once_per_activation = true
 	collision_layer = PLAYER_ATTACK_LAYER
@@ -31,8 +34,16 @@ func setup(strike_power: int, radius: float, life: float) -> void:
 
 func _physics_process(delta: float) -> void:
 	_age += delta
+	if _echo_delay > 0.0 and _age >= _echo_delay:
+		_echo_delay = 0.0
+		var echo := Shockwave.new()
+		echo.position = position
+		echo.setup(power, _radius, _life)
+		get_parent().add_child(echo)
 	if _age >= _life:
-		queue_free()
+		deactivate()
+		if _echo_delay <= 0.0:
+			queue_free()
 	queue_redraw()
 
 
@@ -42,5 +53,7 @@ func try_hit(hurtbox: Hurtbox) -> bool:
 
 
 func _draw() -> void:
+	if _age >= _life:
+		return
 	var t := clampf(_age / _life, 0.0, 1.0)
 	draw_arc(BODY_OFFSET, _radius * t, 0.0, TAU, 32, Color(COLOR, COLOR.a * (1.0 - t)), WIDTH)

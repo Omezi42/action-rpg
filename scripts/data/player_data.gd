@@ -14,3 +14,8 @@ extends Resource
 ## 燕返し:威力・斬り返しの時間(GameDesign.md 8章)
 @export var return_power := 0
 @export var return_time := 0.0
+## 奥義:焔痕の威力と残る時間の倍率・大残心の2回目までの時間・影縫い・極の線の左右の幅(GameDesign.md 8章)
+@export var homura_power := 0
+@export var homura_time_scale := 0.0
+@export var daizanshin_delay := 0.0
+@export var kage_width := 0.0

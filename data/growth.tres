@@ -14,6 +14,10 @@
 [ext_resource type="Resource" path="res://data/upgrades/zenkaifuku.tres" id="12_zenkaifuku"]
 [ext_resource type="Resource" path="res://data/upgrades/tsubame.tres" id="13_tsubame"]
 [ext_resource type="Resource" path="res://data/upgrades/kagenui.tres" id="14_kagenui"]
+[ext_resource type="Resource" path="res://data/upgrades/homura.tres" id="15_homura"]
+[ext_resource type="Resource" path="res://data/upgrades/daizanshin.tres" id="16_daizanshin"]
+[ext_resource type="Resource" path="res://data/upgrades/tsubame_kiwami.tres" id="17_tsubame_kiwami"]
+[ext_resource type="Resource" path="res://data/upgrades/kagenui_kiwami.tres" id="18_kagenui_kiwami"]
 
 [resource]
 script = ExtResource("1_growth")
@@ -29,3 +33,4 @@ upgrades = Array[ExtResource("2_upg")]([ExtResource("3_hayanuki"), ExtResource("
 heal = ExtResource("9_kaifuku")
 scroll_pick_count = 2
 full_heal = ExtResource("12_zenkaifuku")
+ougi = Array[ExtResource("2_upg")]([ExtResource("15_homura"), ExtResource("16_daizanshin"), ExtResource("17_tsubame_kiwami"), ExtResource("18_kagenui_kiwami")])

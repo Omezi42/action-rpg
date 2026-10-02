@@ -40,6 +40,8 @@ var _doomed: Array[Node] = []
 var _hitstop_token := 0
 var _aiming_with_mouse := false
 var _returned := false
+## 直前の踏み込みで進んだ距離(燕返し・極)
+var _last_dash_length := 0.0
 
 @onready var health: Health = $Health
 @onready var hurtbox: Hurtbox = $Hurtbox
@@ -96,8 +98,10 @@ func is_striking() -> bool:
 	return state == State.DASH or state == State.RETURN
 
 
-## 燕返しの斬り返しの距離(GameDesign.md 8章)
+## 燕返しの斬り返しの距離(GameDesign.md 8章)。燕返し・極なら元の踏み込みと同じ距離
 func return_distance() -> float:
+	if stats.ougi_tsubame:
+		return _last_dash_length
 	return stats.return_distance
 
 
@@ -203,7 +207,9 @@ func _process_dash(delta: float) -> void:
 
 func _end_dash() -> void:
 	dash_hitbox.deactivate()
+	_last_dash_length = _dash_traveled
 	slashed.emit(_dash_start, global_position, current_strike == iai.issen)
+	_bind_along_line()
 	if current_strike != iai.stages[0]:
 		_spawn_followups()
 	state = State.SHEATHE
@@ -213,7 +219,7 @@ func _end_dash() -> void:
 
 ## 燕返し:壱以上の踏み込みの納刀中。1回の踏み込みにつき1回
 func _can_return() -> bool:
-	return return_distance() > 0.0 and not _returned and current_strike != iai.stages[0]
+	return stats.return_distance > 0.0 and not _returned and current_strike != iai.stages[0]
 
 
 func _start_return() -> void:
@@ -239,6 +245,7 @@ func _process_return(delta: float) -> void:
 	if collision or _dash_traveled >= distance:
 		dash_hitbox.deactivate()
 		slashed.emit(_dash_start, global_position, false)
+		_bind_along_line()
 		state = State.SHEATHE
 		_state_time = 0.0
 		_iai_buffered = false
@@ -248,13 +255,36 @@ func _process_return(delta: float) -> void:
 func _spawn_followups() -> void:
 	if stats.linger_time > 0.0:
 		var slash := LingeringSlash.new()
-		slash.setup(_dash_start, global_position, data.linger_power, stats.linger_time)
+		if stats.ougi_homura:
+			var life := stats.linger_time * data.homura_time_scale
+			slash.setup(_dash_start, global_position, data.homura_power, life)
+		else:
+			slash.setup(_dash_start, global_position, data.linger_power, stats.linger_time)
 		get_parent().add_child(slash)
 	if stats.shockwave_radius > 0.0:
 		var wave := Shockwave.new()
 		wave.position = global_position
-		wave.setup(data.shockwave_power, stats.shockwave_radius, data.shockwave_time)
+		var echo_delay := data.daizanshin_delay if stats.ougi_daizanshin else 0.0
+		wave.setup(data.shockwave_power, stats.shockwave_radius, data.shockwave_time, echo_delay)
 		get_parent().add_child(wave)
+
+
+## 影縫い・極:斬った線の左右 kage_width 以内の敵を、斬られていなくても止める(GameDesign.md 8章)
+func _bind_along_line() -> void:
+	if not stats.ougi_kage or stats.bind_time <= 0.0:
+		return
+	var line := global_position - _dash_start
+	if line == Vector2.ZERO:
+		return
+	var along := line.normalized()
+	for node in get_parent().get_children():
+		var enemy := node as Enemy
+		if enemy == null:
+			continue
+		var offset := enemy.global_position - _dash_start
+		var t := offset.dot(along)
+		if t >= 0.0 and t <= line.length() and absf(offset.cross(along)) <= data.kage_width:
+			enemy.bind(stats.bind_time)
 
 
 ## 納刀中に押された居合は、納刀が終わった瞬間に出す(連打で抜き打ちを出し続けるため)

@@ -14,3 +14,7 @@ shockwave_power = 2
 shockwave_time = 0.15
 return_power = 2
 return_time = 0.12
+homura_power = 2
+homura_time_scale = 2.0
+daizanshin_delay = 0.3
+kage_width = 16.0

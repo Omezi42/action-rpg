@@ -11,6 +11,8 @@ const ZANKON := preload("res://data/upgrades/zankon.tres")
 const ZANSHIN := preload("res://data/upgrades/zanshin.tres")
 const TSUBAME := preload("res://data/upgrades/tsubame.tres")
 const KAGENUI := preload("res://data/upgrades/kagenui.tres")
+const MIKIRI := preload("res://data/upgrades/mikiri.tres")
+const KAGENUI_KIWAMI := preload("res://data/upgrades/kagenui_kiwami.tres")
 const PLAYER_SCENE := preload("res://scenes/player/player.tscn")
 const SOUL_SCENE := preload("res://scenes/pickups/soul_field.tscn")
 const ARENA_SCENE := preload("res://scenes/stage/arena.tscn")
@@ -116,6 +118,14 @@ func _test_take(check: Callable) -> void:
 	check.call(is_equal_approx(player.stats.bind_time, 1.0), "影縫いの1段目は1.0秒")
 	p.take(KAGENUI, player)
 	check.call(is_equal_approx(player.stats.bind_time, 1.4), "影縫いの2段目から+0.4秒")
+	check.call(not KAGENUI_KIWAMI in p.roll_scroll(), "影縫い・極は条件が揃うまで巻物に出ない")
+	p._levels[KAGENUI] = KAGENUI.max_level
+	p._levels[MIKIRI] = MIKIRI.max_level
+	check.call(KAGENUI_KIWAMI in p.roll_scroll(), "影縫い3+見切り5で影縫い・極が巻物に出る")
+	p.take(KAGENUI_KIWAMI, player, true)
+	check.call(player.stats.ougi_kage, "影縫い・極を取ると旗が立つ")
+	var ougi: Array = GROWTH.ougi
+	check.call(ougi.size() == 4, "奥義は4種")
 	player.free()
 
 

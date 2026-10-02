@@ -16,7 +16,7 @@ GameDesign.md 8章。数値は GrowthData(`data/growth.tres`)、強化1種は Up
 - Player が壱以上の踏み込みの終わり(`_end_dash`)に、`stats` が0より大きいものだけ生成して自分の親(Entities)へ足す。コリジョンはコードで作る
 - 威力は `PlayerData.linger_power` / `shockwave_power`、衝撃波の広がる時間は `shockwave_time`
 - 当たっても Player の `_on_dash_landed` は通らないので、ヒットストップと一閃の遅延撃破は起きない
-- 焔痕:LingeringSlash の威力を `PlayerData.homura_power`、残る時間を `homura_time_scale` 倍。大残心:Shockwave が `PlayerData.daizanshin_delay` 後にもう1回広がる
+- 焔痕:LingeringSlash の威力を `PlayerData.homura_power`、残る時間を `homura_time_scale` 倍。大残心:Shockwave が `PlayerData.daizanshin_delay` 後に同じ位置・半径・威力の Shockwave を1つ足す(当たりは新しく数える)
 
 ## Progression(`scripts/growth/progression.gd`、RefCounted)
 - `level` `exp` `pending`(選び待ちのレベルアップ数)と強化ごとの段階を持つ

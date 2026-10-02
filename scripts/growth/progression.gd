@@ -104,5 +104,13 @@ func take(upgrade: UpgradeData, player: Player, from_scroll := false) -> void:
 		UpgradeData.Stat.SHADOW_BIND:
 			var first := level_of(upgrade) == 1 and upgrade.base_amount > 0.0
 			stats.bind_time += upgrade.base_amount if first else upgrade.amount
+		UpgradeData.Stat.OUGI_HOMURA:
+			stats.ougi_homura = true
+		UpgradeData.Stat.OUGI_DAIZANSHIN:
+			stats.ougi_daizanshin = true
+		UpgradeData.Stat.OUGI_TSUBAME:
+			stats.ougi_tsubame = true
+		UpgradeData.Stat.OUGI_KAGE:
+			stats.ougi_kage = true
 		UpgradeData.Stat.FULL_HEAL:
 			player.health.heal(player.health.max_hp)

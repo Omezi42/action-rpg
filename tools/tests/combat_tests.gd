@@ -20,6 +20,10 @@ func run(tree: SceneTree, check: Callable) -> void:
 	await _test_hitokiri(check)
 	await _test_return_slash(check)
 	await _test_return_limits(check)
+	await _test_homura(check)
+	await _test_daizanshin(check)
+	await _test_tsubame_kiwami(check)
+	await _test_kage_kiwami(check)
 	_test_hitokiri_outside_strike(check)
 
 
@@ -186,6 +190,69 @@ func _test_return_limits(check: Callable) -> void:
 	Input.action_press("iai")
 	await _frames(0.02)
 	check.call(player.state == Player.State.SHEATHE, "斬り返しからは返せない")
+	_clear()
+
+
+## 奥義(GameDesign.md 8章)
+func _test_homura(check: Callable) -> void:
+	var setup := _spawn(Vector2(300, 300))
+	var player: Player = setup[0]
+	var enemy: Enemy = setup[1]
+	player.stats.linger_time = 0.5
+	player.stats.ougi_homura = true
+	await _hold_iai(0.3)
+	await _frames(0.15)
+	enemy.position = Vector2(124, 100)
+	await _frames(0.1)
+	check.call(enemy.health.hp == 1, "焔痕は斬痕の威力2 (hp=%d)" % enemy.health.hp)
+	await _frames(0.5)
+	check.call(_count_lingering() == 1, "焔痕は斬痕が2倍の時間残る")
+	_clear()
+
+
+func _test_daizanshin(check: Callable) -> void:
+	var setup := _spawn(Vector2(148, 125))
+	var player: Player = setup[0]
+	var enemy: Enemy = setup[1]
+	player.stats.shockwave_radius = 32.0
+	player.stats.ougi_daizanshin = true
+	await _hold_iai(0.3)
+	await _frames(0.2)
+	check.call(enemy.health.hp == 1, "大残心の1回目")
+	await _frames(0.3)
+	check.call(not is_instance_valid(enemy), "大残心は0.3秒後にもう1回当たる")
+	_clear()
+
+
+func _test_tsubame_kiwami(check: Callable) -> void:
+	var setup := _spawn(Vector2(300, 300))
+	var player: Player = setup[0]
+	player.stats.return_distance = 32.0
+	player.stats.ougi_tsubame = true
+	await _hold_iai(0.3)
+	await _wait_state(player, Player.State.SHEATHE)
+	Input.action_press("iai")
+	await _wait_state(player, Player.State.RETURN)
+	await _wait_state(player, Player.State.SHEATHE)
+	var x := player.global_position.x
+	check.call(absf(x - 100.0) < 1.0, "燕返し・極は踏み込みと同じ距離を返す (x=%.1f)" % x)
+	_clear()
+
+
+func _test_kage_kiwami(check: Callable) -> void:
+	var setup := _spawn(Vector2(140, 113))
+	var player: Player = setup[0]
+	var near: Enemy = setup[1]
+	var far: Enemy = ENEMY_SCENE.instantiate()
+	far.position = Vector2(140, 140)
+	_world.add_child(far)
+	far.set_physics_process(false)
+	player.stats.bind_time = 1.0
+	player.stats.ougi_kage = true
+	await _hold_iai(0.3)
+	await _wait_state(player, Player.State.SHEATHE)
+	check.call(near.bound and near.state == Enemy.State.HURT, "影縫い・極は線の左右16px以内を止める")
+	check.call(not far.bound, "線から離れた敵は止めない")
 	_clear()
 
 

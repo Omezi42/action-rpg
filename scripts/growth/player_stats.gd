@@ -14,3 +14,8 @@ var shockwave_radius := 0.0
 var return_distance := 0.0
 ## 影縫いの時間。0なら止めない
 var bind_time := 0.0
+## 奥義(GameDesign.md 8章)
+var ougi_homura := false
+var ougi_daizanshin := false
+var ougi_tsubame := false
+var ougi_kage := false
