@@ -9,7 +9,7 @@
 | CHARGE | 移動せず向きだけ更新、IaiCharge を進める。マウスで構えたら `cursor_direction()` がカーソルへの向きを返す | 離す → DASH |
 | DASH | 向きへ `distance/duration` で `move_and_collide`。DashHitbox 有効、無敵 | 距離到達 or 壁 → SHEATHE |
 | RETURN | 燕返しの斬り返し。直前の踏み込みの逆向きへ `return_distance()` を `PlayerData.return_time` で。DASH と同じく DashHitbox 有効・無敵 | 距離到達 or 壁 → SHEATHE |
-| SHEATHE | 硬直。押された居合はバッファする。壱以上の DASH の後で `stats.return_distance > 0` なら、止まってから `PlayerData.return_window` 以内の押下で RETURN | `sheathe_time` 経過 → MOVE(バッファがあれば即 CHARGE/抜き打ち) |
+| SHEATHE | 硬直。押された居合はバッファする。壱以上の DASH の後で `stats.return_distance > 0` なら、納刀中の押下で RETURN(1回の踏み込みにつき1回) | `sheathe_time` 経過 → MOVE(バッファがあれば即 CHARGE/抜き打ち) |
 | HURT | ノックバック | `knockback_time` 経過 → MOVE |
 | DEAD | 何もしない | — |
 
@@ -22,6 +22,8 @@
 - 踏み込みの予告線は子の `AimGuide`(`scenes/player/aim_guide.tscn`、`show_behind_parent`)。`charge.release()` の距離で描く
 - 演出は `slashed(from, to, is_issen)` / `hit_landed(at)` を出すだけで、生成は Arena が行う
 - 1回の踏み込みの区切りは `strike_started` / `strike_finished(is_issen)`。DASH に入る瞬間と、SHEATHE の終わり(`_release_doomed()` の後)に出す。RETURN を挟んでも1回として扱う。HURT で中断されたときも `strike_finished` を出す
+- `is_striking()`:DASH か RETURN。魂の即取得・無敵・刀の見た目はこれで見る
+- 押したまま斬り返しの納刀が終わったら CHARGE へ
 - RETURN の威力は `PlayerData.return_power`、斬り返しでは `_spawn_followups()`(斬痕・残心)を呼ばない。`return_started` を出す(効果音)
 - 影縫い:DashHitbox の当たりに `bind_time`(`stats.bind_time`)を載せ、Enemy の `_on_hurt` が被弾硬直の長さに使う。奥義 `stats.ougi_kage` なら、`_end_dash` / RETURN の終わりに斬った線の左右 `PlayerData.kage_width` の矩形で敵を探し、`Enemy.bind(time)` を呼ぶ
 

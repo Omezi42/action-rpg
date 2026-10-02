@@ -99,5 +99,7 @@ func take(upgrade: UpgradeData, player: Player, from_scroll := false) -> void:
 			stats.linger_time += upgrade.amount
 		UpgradeData.Stat.SHOCKWAVE:
 			stats.shockwave_radius += upgrade.amount
+		UpgradeData.Stat.RETURN_SLASH:
+			stats.return_distance += upgrade.amount
 		UpgradeData.Stat.FULL_HEAL:
 			player.health.heal(player.health.max_hp)

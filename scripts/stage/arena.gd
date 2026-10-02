@@ -265,6 +265,7 @@ func _connect_sounds() -> void:
 			Sfx.play(&"issen" if is_top else StringName("stage_%d" % index))
 	)
 	_player.dash_started.connect(Sfx.play.bind(&"dash"))
+	_player.return_started.connect(Sfx.play.bind(&"return"))
 	_player.issen_sheathed.connect(Sfx.play.bind(&"chin"))
 	_player.damaged.connect(Sfx.play.bind(&"hurt"))
 

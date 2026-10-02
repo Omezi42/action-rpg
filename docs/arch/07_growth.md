@@ -3,7 +3,7 @@
 GameDesign.md 8章。数値は GrowthData(`data/growth.tres`)、強化1種は UpgradeData(`data/upgrades/*.tres`)。
 
 ## UpgradeData(`scripts/data/upgrade_data.gd`)
-`label` `description` `stat`(enum Stat:CHARGE_TIME / DASH_DISTANCE / POWER / ISSEN_WINDOW / MOVE_SPEED / MAX_HP / HEAL / LINGER / SHOCKWAVE / RETURN_SLASH / SHADOW_BIND / FULL_HEAL / OUGI_HOMURA / OUGI_DAIZANSHIN / OUGI_TSUBAME / OUGI_KAGE)`amount` `max_level`。
+`label` `description` `stat`(enum Stat:CHARGE_TIME / DASH_DISTANCE / POWER / ISSEN_WINDOW / MOVE_SPEED / MAX_HP / HEAL / LINGER / SHOCKWAVE / FULL_HEAL / RETURN_SLASH / SHADOW_BIND / OUGI_HOMURA / OUGI_DAIZANSHIN / OUGI_TSUBAME / OUGI_KAGE)`amount` `max_level`。
 同じ種類の数値違いは .tres を足すだけ。新しい種類は Stat と `Progression.take()` に1行足す。
 - `kind`(enum Kind:STAT / BEHAVIOR / OUGI)。BEHAVIOR は巻物の候補、OUGI はレベルアップに出ない
 - 奥義は `requires: Array[Resource]`(中身は UpgradeData。すべて `max_level` に達していれば巻物に出る)。`max_level = 1`

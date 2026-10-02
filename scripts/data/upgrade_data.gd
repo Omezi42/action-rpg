@@ -13,6 +13,7 @@ enum Stat {
 	LINGER,
 	SHOCKWAVE,
 	FULL_HEAL,
+	RETURN_SLASH,
 }
 
 ## STAT:数値の強化 / BEHAVIOR:挙動の強化(巻物の候補)/ OUGI:奥義(巻物だけに出る)。GameDesign.md 8章

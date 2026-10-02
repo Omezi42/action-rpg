@@ -18,6 +18,8 @@ func run(tree: SceneTree, check: Callable) -> void:
 	await _test_shockwave(check)
 	await _test_lingering_slash(check)
 	await _test_hitokiri(check)
+	await _test_return_slash(check)
+	await _test_return_limits(check)
 	_test_hitokiri_outside_strike(check)
 
 
@@ -131,6 +133,71 @@ func _test_hitokiri_outside_strike(check: Callable) -> void:
 	counter.add_kill()
 	counter.start()
 	check.call(counter.finish() == 0 and counter.best == 1, "数え直しは0から")
+
+
+## 燕返し:壱で斬った敵を斬り返しでもう一度斬る。斬痕は1本だけ・人斬りの区切りは1回(GameDesign.md 8章)
+func _test_return_slash(check: Callable) -> void:
+	var setup := _spawn(Vector2(130, 100))
+	var player: Player = setup[0]
+	var enemy: Enemy = setup[1]
+	player.stats.return_distance = 64.0
+	player.stats.linger_time = 1.0
+	var finished := [0]
+	player.strike_finished.connect(func(_is_issen: bool) -> void: finished[0] += 1)
+	await _hold_iai(0.3)
+	await _wait_state(player, Player.State.SHEATHE)
+	var stop_x := player.global_position.x
+	Input.action_press("iai")
+	await _wait_state(player, Player.State.SHEATHE)
+	check.call(not is_instance_valid(enemy), "斬り返しで壱の残りHPを斬る")
+	check.call(player.global_position.x < stop_x - 60, "来た方向へ斬り返す")
+	check.call(_count_lingering() == 1, "斬り返しでは斬痕を出さない (n=%d)" % _count_lingering())
+	await _frames(0.3)
+	check.call(finished[0] == 1, "斬り返しを挟んでも1回の踏み込み (n=%d)" % finished[0])
+	check.call(player.state == Player.State.CHARGE, "押したまま納刀が終わると構えに入る")
+	_clear()
+
+
+func _test_return_limits(check: Callable) -> void:
+	var setup := _spawn(Vector2(300, 300))
+	var player: Player = setup[0]
+	player.stats.return_distance = 64.0
+	await _hold_iai(0.05)
+	await _wait_state(player, Player.State.SHEATHE)
+	Input.action_press("iai")
+	await _frames(0.05)
+	check.call(player.state != Player.State.RETURN, "抜き打ちからは返せない")
+	Input.action_release("iai")
+	await _frames(0.3)
+	await _hold_iai(0.3)
+	await _wait_state(player, Player.State.SHEATHE)
+	await _frames(0.3)
+	Input.action_press("iai")
+	await _frames(0.02)
+	check.call(player.state == Player.State.CHARGE, "納刀が終わった後に押すと構えになる")
+	Input.action_release("iai")
+	await _frames(0.3)
+	await _hold_iai(0.3)
+	await _wait_state(player, Player.State.SHEATHE)
+	Input.action_press("iai")
+	await _wait_state(player, Player.State.SHEATHE)
+	Input.action_release("iai")
+	await _frames(0.02)
+	Input.action_press("iai")
+	await _frames(0.02)
+	check.call(player.state == Player.State.SHEATHE, "斬り返しからは返せない")
+	_clear()
+
+
+func _count_lingering() -> int:
+	return _world.get_children().filter(func(n: Node) -> bool: return n is LingeringSlash).size()
+
+
+func _wait_state(player: Player, state: Player.State) -> void:
+	for i in roundi(PHYSICS_FPS):
+		await _tree.physics_frame
+		if player.state == state:
+			return
 
 
 ## プレイヤーを (100,100) に右向きで置き、敵を enemy_pos に置く。敵のAIは止める

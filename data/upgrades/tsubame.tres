@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="UpgradeData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/upgrade_data.gd" id="1_upg"]
+
+[resource]
+script = ExtResource("1_upg")
+label = "燕返し"
+description = "止まってすぐ押すと
+来た方向へ斬り返す
+距離+32px"
+stat = 10
+amount = 32.0
+max_level = 3
+kind = 1

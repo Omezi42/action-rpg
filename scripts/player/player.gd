@@ -13,8 +13,9 @@ signal stage_reached(index: int, is_top: bool)
 signal dash_started
 signal issen_sheathed
 signal damaged
+signal return_started
 
-enum State { MOVE, CHARGE, DASH, SHEATHE, HURT, DEAD }
+enum State { MOVE, CHARGE, DASH, RETURN, SHEATHE, HURT, DEAD }
 
 const STAGE_FLASH_TIME := 0.12
 
@@ -38,6 +39,7 @@ var _dash_traveled := 0.0
 var _doomed: Array[Node] = []
 var _hitstop_token := 0
 var _aiming_with_mouse := false
+var _returned := false
 
 @onready var health: Health = $Health
 @onready var hurtbox: Hurtbox = $Hurtbox
@@ -71,9 +73,14 @@ func _physics_process(delta: float) -> void:
 			_process_charge(delta, iai_pressed)
 		State.DASH:
 			_process_dash(delta)
+		State.RETURN:
+			_process_return(delta)
 		State.SHEATHE:
-			_iai_buffered = _iai_buffered or iai_just_pressed
-			if _state_time >= current_strike.sheathe_time:
+			if iai_just_pressed and _can_return():
+				_start_return()
+			else:
+				_iai_buffered = _iai_buffered or iai_just_pressed
+			if state == State.SHEATHE and _state_time >= current_strike.sheathe_time:
 				_finish_sheathe(iai_pressed)
 		State.HURT:
 			_process_hurt()
@@ -81,7 +88,17 @@ func _physics_process(delta: float) -> void:
 
 
 func is_invincible() -> bool:
-	return state == State.DASH or state == State.DEAD or invincible_left > 0.0
+	return is_striking() or state == State.DEAD or invincible_left > 0.0
+
+
+## 踏み込み・燕返しの斬り返しの最中
+func is_striking() -> bool:
+	return state == State.DASH or state == State.RETURN
+
+
+## 燕返しの斬り返しの距離(GameDesign.md 8章)
+func return_distance() -> float:
+	return stats.return_distance
 
 
 ## レベルアップ画面を閉じたとき:構えを解き、居合ボタンは一度離すまで効かなくする
@@ -162,6 +179,7 @@ func _start_dash(strike: IaiStage) -> void:
 	_state_time = 0.0
 	_dash_start = global_position
 	_dash_traveled = 0.0
+	_returned = false
 	_doomed.clear()
 	velocity = Vector2.ZERO
 	dash_hitbox.power = strike_power(strike)
@@ -192,6 +210,38 @@ func _end_dash() -> void:
 	_iai_buffered = false
 
 
+## 燕返し:壱以上の踏み込みの納刀中。1回の踏み込みにつき1回
+func _can_return() -> bool:
+	return return_distance() > 0.0 and not _returned and current_strike != iai.stages[0]
+
+
+func _start_return() -> void:
+	state = State.RETURN
+	_state_time = 0.0
+	_returned = true
+	_dash_start = global_position
+	_dash_traveled = 0.0
+	facing = -facing
+	dash_hitbox.power = data.return_power
+	dash_hitbox.direction = facing
+	dash_hitbox.activate()
+	return_started.emit()
+
+
+## 斬り返しでは斬痕・残心を出さない(GameDesign.md 8章)
+func _process_return(delta: float) -> void:
+	var distance := return_distance()
+	var step := minf(distance / data.return_time * delta, distance - _dash_traveled)
+	_dash_traveled += step
+	var collision := move_and_collide(facing * step)
+	if collision or _dash_traveled >= distance:
+		dash_hitbox.deactivate()
+		slashed.emit(_dash_start, global_position, false)
+		state = State.SHEATHE
+		_state_time = 0.0
+		_iai_buffered = false
+
+
 ## 斬痕・残心(GameDesign.md 8章)。壱以上の踏み込みの終わりに、取っている強化だけ出す
 func _spawn_followups() -> void:
 	if stats.linger_time > 0.0:
@@ -212,6 +262,9 @@ func _finish_sheathe(iai_pressed: bool) -> void:
 		issen_sheathed.emit()
 	state = State.MOVE
 	strike_finished.emit(current_strike == iai.issen)
+	if _returned and iai_pressed and not _iai_buffered:
+		_start_charge()
+		return
 	if not _iai_buffered:
 		return
 	_start_charge()
@@ -245,7 +298,7 @@ func _on_dash_landed(target: Hurtbox) -> void:
 func _on_hurt(hitbox: Hitbox) -> void:
 	_release_doomed()
 	dash_hitbox.deactivate()
-	if state == State.DASH or state == State.SHEATHE:
+	if is_striking() or state == State.SHEATHE:
 		strike_finished.emit(current_strike == iai.issen)
 	var away := (global_position - hitbox.global_position).normalized()
 	if away == Vector2.ZERO:

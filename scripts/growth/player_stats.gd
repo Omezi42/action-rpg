@@ -10,3 +10,5 @@ var move_speed_scale := 1.0
 ## 斬痕の残る時間・残心の半径。0なら出さない(GameDesign.md 8章)
 var linger_time := 0.0
 var shockwave_radius := 0.0
+## 燕返しの距離。0なら返せない
+var return_distance := 0.0

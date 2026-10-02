@@ -12,3 +12,5 @@ knockback_time = 0.15
 linger_power = 1
 shockwave_power = 2
 shockwave_time = 0.15
+return_power = 2
+return_time = 0.12

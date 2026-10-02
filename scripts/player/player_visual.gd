@@ -36,7 +36,7 @@ func _draw() -> void:
 	draw_rect(Rect2(head.x - 7, head.y - 7, 14, 4), hair_color)
 	_draw_eyes(head, side)
 	var hilt := Vector2(5 if side >= 0 else -5, -8 + squat)
-	if state == Player.State.DASH:
+	if _player.is_striking():
 		var root := Vector2(0, -9)
 		draw_line(root, root + _player.facing * 18, blade_color, 2)
 	else:

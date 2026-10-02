@@ -11,3 +11,6 @@ extends Resource
 @export var linger_power := 0
 @export var shockwave_power := 0
 @export var shockwave_time := 0.0
+## 燕返し:威力・斬り返しの時間(GameDesign.md 8章)
+@export var return_power := 0
+@export var return_time := 0.0

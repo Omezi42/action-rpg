@@ -12,6 +12,7 @@
 [ext_resource type="Resource" path="res://data/upgrades/zankon.tres" id="10_zankon"]
 [ext_resource type="Resource" path="res://data/upgrades/zanshin.tres" id="11_zanshin"]
 [ext_resource type="Resource" path="res://data/upgrades/zenkaifuku.tres" id="12_zenkaifuku"]
+[ext_resource type="Resource" path="res://data/upgrades/tsubame.tres" id="13_tsubame"]
 
 [resource]
 script = ExtResource("1_growth")
@@ -23,7 +24,7 @@ exp_base = 5
 exp_step = 2
 choice_count = 3
 choose_lock_time = 0.3
-upgrades = Array[ExtResource("2_upg")]([ExtResource("3_hayanuki"), ExtResource("4_fukabumi"), ExtResource("5_gouba"), ExtResource("6_mikiri"), ExtResource("7_idaten"), ExtResource("8_ganken"), ExtResource("10_zankon"), ExtResource("11_zanshin")])
+upgrades = Array[ExtResource("2_upg")]([ExtResource("3_hayanuki"), ExtResource("4_fukabumi"), ExtResource("5_gouba"), ExtResource("6_mikiri"), ExtResource("7_idaten"), ExtResource("8_ganken"), ExtResource("10_zankon"), ExtResource("11_zanshin"), ExtResource("13_tsubame")])
 heal = ExtResource("9_kaifuku")
 scroll_pick_count = 2
 full_heal = ExtResource("12_zenkaifuku")

@@ -9,6 +9,7 @@ const GANKEN := preload("res://data/upgrades/ganken.tres")
 const FUKABUMI := preload("res://data/upgrades/fukabumi.tres")
 const ZANKON := preload("res://data/upgrades/zankon.tres")
 const ZANSHIN := preload("res://data/upgrades/zanshin.tres")
+const TSUBAME := preload("res://data/upgrades/tsubame.tres")
 const PLAYER_SCENE := preload("res://scenes/player/player.tscn")
 const SOUL_SCENE := preload("res://scenes/pickups/soul_field.tscn")
 const ARENA_SCENE := preload("res://scenes/stage/arena.tscn")
@@ -56,7 +57,10 @@ func _test_scroll_choices(check: Callable) -> void:
 	var p := Progression.new(GROWTH)
 	var choices := p.roll_scroll()
 	check.call(choices.size() == 3 and choices.back() == GROWTH.full_heal, "巻物は3枚で末尾が全回復")
-	check.call(ZANKON in choices and ZANSHIN in choices, "残りは挙動の強化から")
+	var behaviors := choices.slice(0, 2).filter(
+		func(u: UpgradeData) -> bool: return u.kind == UpgradeData.Kind.BEHAVIOR
+	)
+	check.call(behaviors.size() == 2, "残りは挙動の強化から")
 	var data: GrowthData = GROWTH.duplicate()
 	var ougi := UpgradeData.new()
 	ougi.kind = UpgradeData.Kind.OUGI
@@ -74,6 +78,7 @@ func _test_scroll_choices(check: Callable) -> void:
 	p._levels[ougi] = 1
 	check.call(not ougi in p.roll_scroll(), "取った奥義は出ない")
 	p._levels[ZANSHIN] = ZANSHIN.max_level
+	p._levels[TSUBAME] = TSUBAME.max_level
 	check.call(p.roll_scroll() == [data.full_heal], "候補が無ければ全回復だけ")
 
 
@@ -102,6 +107,9 @@ func _test_take(check: Callable) -> void:
 	player.health.damage(2)
 	p.take(GANKEN, player)
 	check.call(player.health.max_hp == 7 and player.health.hp == 5, "頑健は最大HP+1で1回復")
+	p.take(TSUBAME, player)
+	p.take(TSUBAME, player)
+	check.call(is_equal_approx(player.return_distance(), 64.0), "燕返しは1段32px")
 	player.free()
 
 

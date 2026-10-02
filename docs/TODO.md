@@ -75,8 +75,8 @@
 - [x] 記録に最多人斬り(RunRecords・結果・タイトル)
 - [x] 精鋭鬼(SpawnSchedule.take_elite・Enemy.make_elite・金の縁・見失わない)
 - [x] 巻物(Scroll・Progression.roll_scroll・全回復・レベルアップ画面の巻物表示)
-- [ ] 燕返し(Player の RETURN・return_window・斬痕/残心を出さない)
+- [x] 燕返し(Player の RETURN・納刀中の押下で斬り返す・斬痕/残心を出さない)
 - [ ] 影縫い(bind_time・Enemy.bind・足元の影・大鬼/跳躍中は無効)
 - [ ] 奥義4種(UpgradeData の kind / requires・焔痕・大残心・燕返し・極・影縫い・極・金の枠)
-- [ ] 効果音4種(人斬り・精鋭出現・巻物・返し)。返し以外は済み
+- [x] 効果音4種(人斬り・精鋭出現・巻物・返し)
 - [ ] テストと撮影を合わせる
