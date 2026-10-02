@@ -1,6 +1,6 @@
 # 4. 敵
 
-`scripts/enemies/enemy.gd`(class Enemy)が全敵共通。種類は EnemyData(`data/enemies/*.tres`:kooni / aka_oni / ao_oni / yumi_oni / oo_oni)で分ける。シーンは `kooni.tscn` 1つを使い回し、Arena が出現時に `add_child` の前で `data` を差し替える(`_ready` で読むため)。
+`scripts/enemies/enemy.gd`(class Enemy)が全敵共通。種類は EnemyData(`data/enemies/*.tres`:kooni / aka_oni / ao_oni / yumi_oni / tate_oni / oo_oni)で分ける。シーンは `kooni.tscn` 1つを使い回し、Arena が出現時に `add_child` の前で `data` を差し替える(`_ready` で読むため)。
 
 | 状態 | すること |
 |---|---|
@@ -30,3 +30,4 @@
 - 撃破時に `defeated(enemy)` を出して `queue_free()`(Arena が位置と `data.soul_value` から魂を落とす)。主人公は group `"player"` で探す
 - 影縫い:`bind(time)` は HURT へ入れて `time` だけ止める(ノックバックなし。予告・攻撃は取り消す)。`attack_armor`(大鬼)と JUMP 中は何もしない。止まっている間は `bound` が立ち、EnemyVisual が足元に影を描く(被弾の白にはしない。理由:止まっている時間が長く、白いままだと種類が見分けられないため)
 - 精鋭鬼:Arena が `add_child` の前に `make_elite(hp_scale, visual_scale)` を呼ぶ。`elite = true`・`alerted = true`・`persistent = true`。`_ready` で Health の最大HPを `hp_scale` 倍、Visual と Hurtbox を `visual_scale` 倍にし(攻撃の当たりは変えない)、EnemyVisual が金の縁を描く。`persistent` なら見失い・遠くの消去をしない
+- 盾(盾鬼。GameDesign.md 5章「盾」):EnemyData の `shield_arc`(正面の半角・ラジアン)が0より大きいと盾を持つ。Enemy は `shield_facing` を持ち、CHASE 中は `shield_turn_speed`(ラジアン/秒)で主人公の方へ回し、WANDER 中は歩く向きにそろえる(ほかの状態では変えない)。`_ready` で `hurtbox.guard` に `blocks(hitbox)` を渡す:`hitbox.guardable` かつ `hitbox.direction.dot(shield_facing) <= -cos(shield_arc)` なら弾く。弾いたら `guarded(at)` を出す(Arena が火花と「弾き」の音)。EnemyVisual が盾の向きに厚い弧を描く
