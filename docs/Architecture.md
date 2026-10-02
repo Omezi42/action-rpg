@@ -11,3 +11,4 @@
 | 5 | 試作場・演出・UI | `arch/05_stage_ui.md` |
 | 6 | 検証(check.sh・テスト・撮影) | `arch/06_verification.md` |
 | 7 | 成長(Progression / PlayerStats / SoulField / レベルアップ画面) | `arch/07_growth.md` |
+| 8 | 画面の流れ・ボス・効果音(Title / RunRecords / 大鬼 / Sfx) | `arch/08_flow_boss_sound.md` |
