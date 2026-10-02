@@ -80,3 +80,12 @@
 - [x] 奥義4種(UpgradeData の kind / requires・焔痕・大残心・燕返し・極・影縫い・極・金の枠)
 - [x] 効果音4種(人斬り・精鋭出現・巻物・返し)
 - [x] テストと撮影を合わせる
+
+## M9:挑戦をまたぐ積み上げ(武功・修行)
+- [x] GameDesign / Architecture を更新
+- [ ] TrainingData / TrainingCatalog / TrainingProgress と data/training
+- [ ] Arena:修行の反映と武功の加算・結果画面に「武功 +N」
+- [ ] 引き直し・封じ(Progression・レベルアップ画面・入力)
+- [ ] タイトルの武功表示と修行画面(TrainingMenu)
+- [ ] テストと撮影を合わせる
+- [ ] 試遊して「負けた挑戦にも手応えが残るか」「武功の量と値段の釣り合い」を判断

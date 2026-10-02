@@ -44,3 +44,18 @@ GameDesign.md 8章。数値は GrowthData(`data/growth.tres`)、強化1種は Up
 - 開いてから `choose_lock_time` の間は入力を無視する(ツリー停止中・ヒットストップ中でも進むよう `Time.get_ticks_msec()` で測る)
 - クリック(カード矩形)・1/2/3 キー・move_left/right + iai で選ぶ
 - Arena:`collected` → `add_exp` → pending があれば `paused = true`・ポーズを locked にして開く。`chosen` → `take` → まだ pending があれば次の3枚、無ければ閉じて再開し `player.interrupt_input()`
+
+## 引き直し・封じ(Progression)
+- `rerolls_left` `seals_left`(挑戦の始めに修行から入れる)と、封じた強化の一覧を持つ。`roll_choices()` / `roll_scroll()` は封じた強化を候補から外す
+- `can_seal(upgrade)`:残りがあり、`heal` / `full_heal` でないとき true。`seal(upgrade)` で一覧に足して残りを1減らす
+- `replace_choice(choices, index, is_scroll)`:その位置を、今の画面と同じ選び方の候補(画面に出ていないもの)から1枚と入れ替えた配列を返す。候補が無ければ消す。レベルアップで0枚になったら `[heal]`
+- レベルアップ画面は `open(choices, levels, is_scroll, rerolls, seals, selected)` で、残りがあれば下に「R 引き直し 残りN」「F 封じ 残りN」を出す。入力 `reroll` / `seal` で `reroll_requested` / `seal_requested(index)` を出すだけで、判断は Arena(`_on_reroll` / `_on_seal`)が行い、画面を開き直す(誤操作防止の時間も測り直す)
+
+## 修行(GameDesign.md 8章「修行」)
+- TrainingData(`scripts/data/training_data.gd`、`data/training/*.tres`):`id`(保存の鍵)`label` `description` `effect`(enum Effect:MAX_HP / MOVE_SPEED / REROLL / SEAL)`amount` `costs`(段ごとの値段。段数 = `costs.size()`)
+- TrainingCatalog(`scripts/data/training_catalog.gd`、`data/training.tres`):`items` と武功の式の数値 `kills_per_merit` `merit_per_level` `clear_merit`。`reward(kills, level, cleared)` で1回の武功を返す
+- TrainingProgress(`scripts/growth/training_progress.gd`、RefCounted):`merit` と段階(id → 段)。RunRecords と同じく static の `path`(既定 `user://progress.cfg`)を読み書きし、読めなければ0。`next_cost(item)`(最大なら −1)・`buy(item)`・`refund_all(catalog)`・`total(catalog, effect)`(amount × 段の合計)・`apply(catalog, player, progression)`
+- Arena:`_ready` で読み込んで `apply`(Health の `raise_max`・`PlayerStats.move_speed_scale`・Progression の残り回数)。`_end` で武功を足して保存し、結果画面へ渡す
+- タイトル:武功を出す。入力 `training` で TrainingMenu(`scripts/ui/training_menu.gd`、Control、コードで足す)を開き、閉じるまでタイトル自身の入力を止める。TrainingMenu は上下で選び iai で買い、`reroll` で全部戻し、`pause` で `closed` を出す
+- 入力 `reroll`(R・パッド左)`seal`(F・パッド上)`training`(Tab・パッド上)
+- テストと撮影は `TrainingProgress.path` も別のファイルへ向ける

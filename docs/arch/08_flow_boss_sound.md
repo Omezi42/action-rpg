@@ -1,7 +1,7 @@
 # 8. 画面の流れ・ボス・効果音
 
 ## 画面の流れ(GameDesign.md 9章)
-- メインシーンは `scenes/ui/title.tscn`(`scripts/ui/title.gd`)。居合で `change_scene_to_file(arena)`、pause(Esc)で `quit()`
+- メインシーンは `scenes/ui/title.tscn`(`scripts/ui/title.gd`)。居合で `change_scene_to_file(arena)`、training(Tab)で修行(7章)、pause(Esc)で `quit()`
 - 入力の受付開始は `Time.get_ticks_msec()` で測る(`input_lock_time` は `@export`)
 - `GameOver`(結果)は iai でもう一度(`reload_current_scene()`)、pause でタイトルへ
 
