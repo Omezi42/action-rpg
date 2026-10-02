@@ -10,6 +10,7 @@
 | HURT | `knockback_time` の間ノックバック、`hurt_time` で CHASE |
 | DOOMED | 一閃でHP0。止まって `fall()` を待つ |
 
+- 弓鬼:EnemyData の `shot_range` が0より大きいと、CHASE 中に `shot_range` 以内で止まり `AIM`(`shot_windup`)→ `shot_fired(from, direction)` を出して CHASE へ戻る。`shot_interval` の間は範囲内なら立ち止まる。Arena が `Arrow`(`scripts/enemies/arrow.gd`、Hitbox。layer enemy_attack・mask world)を生成する。矢は `landed`・壁への `body_entered`・射程で消える
 - WANDER 中に主人公から `despawn_range` より離れたら `defeated` を出さずに `queue_free()`(GameDesign.md 5章)
 - `alerted = true` を `add_child` の前に立てると CHASE から始まる(Arena が大群に使う)
 - ContactHitbox は HURT / DOOMED 以外で有効(被弾硬直中は接触ダメージなし)
