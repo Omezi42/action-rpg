@@ -22,8 +22,9 @@
 - 攻撃の種類は EnemyData で決める:`rush_distance > 0` は踏み込み(小鬼・赤鬼・大鬼の突進)、`sweep_radius > 0` は薙ぎ払い(青鬼)、`jump_radius > 0` はジャンプ斬り(赤鬼)、`shot_range > 0` は矢(弓鬼)
 - 攻撃の待ち `attack_interval` は WINDUP に入った瞬間から数える(斬られて取り消されても待ちは消費済み)
 - 接触ダメージは無い。AttackHitbox(layer enemy_attack、`hit_once_per_activation`)は RUSH の間だけ有効で、威力は `attack_damage`
-- SweepAttack(`scripts/enemies/sweep_attack.gd`、Hitbox)は `sweep_radius > 0` のとき Enemy が `_ready` で子に作る。半円の当たりと、WINDUP 中の赤い予告・SWEEP 中の振りを自分で描く
+- SweepAttack(`scripts/enemies/sweep_attack.gd`、Hitbox)は `sweep_radius > 0` のとき Enemy が `_ready` で子に作る。半円の当たりと、WINDUP 中の赤い予告・SWEEP 中の振りを自分で描く。向きは `aim(dir)`
 - JumpAttack(`scripts/enemies/jump_attack.gd`、Hitbox、`top_level`)は `jump_radius > 0` のとき Enemy が `_ready` で子に作る。予告の始めに着地点へ置き、WINDUP / JUMP 中は赤い円・LAND 中は振りを描く
+- 薙ぎ払い・着地の範囲は足元に描き、当たりは `Hitbox.GROUND_TO_BODY` だけ上へずらす(主人公の Hurtbox が体の高さにあるため。見た目どおりに当たる)
 - RushGuide(`scenes/enemies/rush_guide.tscn`)は踏み込みの WINDUP 中に予告線を描く。線の太さ `width` はシーンごと(小鬼のシーン4px・大鬼10px)
 - WINDUP / RUSH / SWEEP / LAND 中に斬られたら HURT へ(攻撃の取り消し)。`attack_armor` が true(大鬼)なら状態を変えず光るだけ
 - 撃破時に `defeated(enemy)` を出して `queue_free()`(Arena が位置と `data.soul_value` から魂を落とす)。主人公は group `"player"` で探す

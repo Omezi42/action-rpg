@@ -20,6 +20,8 @@ func run(tree: SceneTree, check: Callable) -> void:
 	await _test_cut_cancels_attack(check)
 	await _test_sweep(check, Vector2(30, 0), true)
 	await _test_sweep(check, Vector2(-30, 0), false)
+	await _test_sweep(check, Vector2(30, 60), false)
+	await _test_sweep(check, Vector2(30, -48), true)
 	await _test_jump(check, Vector2.ZERO, true)
 	await _test_jump(check, Vector2(0, 40), false)
 

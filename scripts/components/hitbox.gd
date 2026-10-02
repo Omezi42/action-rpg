@@ -4,6 +4,9 @@ extends Area2D
 
 signal landed(hurtbox: Hurtbox)
 
+## 足元に描く範囲攻撃の当たりを、Hurtbox(体の高さ)に合わせるずれ
+const GROUND_TO_BODY := Vector2(0, -10)
+
 @export var power := 1
 ## true なら activate() から次の activate() までに同じ相手へ当たるのは1度だけ
 @export var hit_once_per_activation := false

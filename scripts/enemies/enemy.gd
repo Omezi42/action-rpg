@@ -162,7 +162,7 @@ func _start_windup(player: Node2D) -> void:
 	_attack_cooldown = data.attack_interval
 	_rush_traveled = 0.0
 	if _sweep:
-		_sweep.rotation = aim_direction.angle()
+		_sweep.aim(aim_direction)
 	if _jump:
 		jump_target = player.global_position
 		_jump.global_position = jump_target

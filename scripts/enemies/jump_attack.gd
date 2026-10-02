@@ -6,8 +6,6 @@ extends Hitbox
 const WARN_COLOR := Color(0.9, 0.15, 0.1, 0.45)
 const SWING_COLOR := Color(1, 0.95, 0.85, 0.8)
 const WARN_BACK_ALPHA := 0.35
-## 円は足元に描くが、当たりは主人公の Hurtbox と同じ体の高さに置く
-const BODY_OFFSET := Vector2(0, -10)
 
 var _radius := 0.0
 
@@ -27,7 +25,7 @@ func setup(radius: float, damage: int) -> void:
 	circle.radius = radius
 	var shape := CollisionShape2D.new()
 	shape.shape = circle
-	shape.position = BODY_OFFSET
+	shape.position = GROUND_TO_BODY
 	add_child(shape)
 	deactivate()
 
