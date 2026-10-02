@@ -22,6 +22,8 @@ const HitokiriLabel = preload("res://scripts/effects/hitokiri_label.gd")
 @export var shake_amplitude := 2.0
 @export var shake_time := 0.15
 @export var hitokiri_label_height := 24.0
+## 盾で弾いたときの火花の色
+@export var guard_spark_color := Color("c8e0ff")
 
 var schedule: SpawnSchedule
 var progression: Progression
@@ -142,6 +144,7 @@ func _add_enemy(
 	enemy.defeated.connect(_on_enemy_defeated)
 	enemy.tree_exiting.connect(_on_enemy_exiting)
 	enemy.shot_fired.connect(_on_enemy_shot.bind(enemy.data))
+	enemy.guarded.connect(_on_enemy_guarded)
 	_entities.add_child(enemy)
 	_alive += 1
 	return enemy
@@ -315,4 +318,12 @@ func _on_player_hit_landed(at: Vector2) -> void:
 	Sfx.play(&"hit")
 	var spark := HitSpark.new()
 	spark.position = at
+	_effects.add_child(spark)
+
+
+func _on_enemy_guarded(at: Vector2) -> void:
+	Sfx.play(&"guard")
+	var spark := HitSpark.new()
+	spark.color = guard_spark_color
+	spark.position = at + Hitbox.GROUND_TO_BODY
 	_effects.add_child(spark)

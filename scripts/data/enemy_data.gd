@@ -49,3 +49,7 @@ extends Resource
 @export var shot_speed := 0.0
 @export var shot_distance := 0.0
 @export var shot_damage := 0
+## 盾(盾鬼。GameDesign.md 5章「盾」)。shield_arc は正面の半角(ラジアン)で、0なら盾を持たない
+@export var shield_arc := 0.0
+## 追跡中に主人公の方へ振り向く速さ(ラジアン/秒)
+@export var shield_turn_speed := 0.0

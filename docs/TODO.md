@@ -92,7 +92,7 @@
 
 ## M10:回り込んで斬る(盾鬼)
 - [x] GameDesign / Architecture を更新
-- [ ] 盾の判定(Hitbox.guardable・Hurtbox.guard・EnemyData の盾の項目・Enemy の盾の向き)
-- [ ] 盾鬼のデータ(tate_oni.tres・出現表)・盾の描画・弾きの火花と効果音
-- [ ] テストと撮影を合わせる
+- [x] 盾の判定(Hitbox.guardable・Hurtbox.guard・EnemyData の盾の項目・Enemy の盾の向き)
+- [x] 盾鬼のデータ(tate_oni.tres・出現表)・盾の描画・弾きの火花と効果音
+- [x] テストと撮影を合わせる
 - [ ] 試遊して「回り込むか一閃で押し通すかの判断が面白いか」「盾鬼の数と振り向きの速さ」を判断

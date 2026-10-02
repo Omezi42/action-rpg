@@ -7,6 +7,7 @@
 [ext_resource type="Resource" path="res://data/enemies/ao_oni.tres" id="5_ao"]
 [ext_resource type="Script" path="res://scripts/data/spawn_phase.gd" id="6_phase"]
 [ext_resource type="Resource" path="res://data/enemies/yumi_oni.tres" id="7_yumi"]
+[ext_resource type="Resource" path="res://data/enemies/tate_oni.tres" id="8_tate"]
 
 [sub_resource type="Resource" id="SpawnEntry_kooni"]
 script = ExtResource("2_entry")
@@ -30,6 +31,12 @@ script = ExtResource("2_entry")
 enemy = ExtResource("7_yumi")
 weight = 2
 start_time = 120.0
+
+[sub_resource type="Resource" id="SpawnEntry_tate"]
+script = ExtResource("2_entry")
+enemy = ExtResource("8_tate")
+weight = 2
+start_time = 150.0
 
 [sub_resource type="Resource" id="SpawnPhase_intro"]
 script = ExtResource("6_phase")
@@ -62,7 +69,7 @@ max_enemies = 100
 script = ExtResource("1_surv")
 clear_time = 300.0
 phases = Array[ExtResource("6_phase")]([SubResource("SpawnPhase_intro"), SubResource("SpawnPhase_middle"), SubResource("SpawnPhase_late"), SubResource("SpawnPhase_final")])
-spawns = Array[ExtResource("2_entry")]([SubResource("SpawnEntry_kooni"), SubResource("SpawnEntry_aka"), SubResource("SpawnEntry_ao"), SubResource("SpawnEntry_yumi")])
+spawns = Array[ExtResource("2_entry")]([SubResource("SpawnEntry_kooni"), SubResource("SpawnEntry_aka"), SubResource("SpawnEntry_ao"), SubResource("SpawnEntry_yumi"), SubResource("SpawnEntry_tate")])
 horde_times = PackedFloat32Array(90, 150, 210, 270)
 horde_count = 12
 horde_spacing = 16.0

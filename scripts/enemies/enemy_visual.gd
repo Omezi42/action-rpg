@@ -19,6 +19,10 @@ extends Node2D
 ## 影縫いで止まっている間の足元の影
 @export var bind_color := Color(0.1, 0.0, 0.2, 0.75)
 @export var bind_radius := 11.0
+## 盾鬼の盾:体の正面の厚い弧
+@export var shield_color := Color("d8dce8")
+@export var shield_radius := 11.0
+@export var shield_width := 3.0
 
 @onready var _enemy: Enemy = get_parent()
 
@@ -55,6 +59,10 @@ func _draw() -> void:
 			horn_color
 		)
 		draw_rect(Rect2(center.x + 3 * side - 1, center.y - 1, 2, 2), eye_color)
+	if _enemy.has_shield():
+		var facing := _enemy.shield_facing.angle()
+		var arc := _enemy.data.shield_arc
+		draw_arc(center, shield_radius, facing - arc, facing + arc, 12, shield_color, shield_width)
 	if _enemy.state == Enemy.State.AIM:
 		draw_line(center, center + _enemy.aim_direction * aim_length, aim_color, 1.0)
 	if _enemy.state == Enemy.State.NOTICE:

@@ -5,6 +5,7 @@ extends CharacterBody2D
 signal defeated(enemy: Enemy)
 signal rush_warned
 signal shot_fired(from: Vector2, direction: Vector2)
+signal guarded(at: Vector2)
 
 enum State { WANDER, NOTICE, CHASE, HURT, DOOMED, WINDUP, RUSH, SWEEP, JUMP, LAND, RECOVER, AIM }
 
@@ -33,6 +34,8 @@ var aim_direction := Vector2.ZERO
 var jump_target := Vector2.ZERO
 ## 影縫いで止まっている(GameDesign.md 8章)
 var bound := false
+## 盾の向き(盾鬼)
+var shield_facing := Vector2.RIGHT
 
 var _state_time := 0.0
 var _knockback := Vector2.ZERO
@@ -58,6 +61,9 @@ func _ready() -> void:
 	$Visual.scale *= _visual_scale
 	hurtbox.scale *= _visual_scale
 	hurtbox.hurt.connect(_on_hurt)
+	if has_shield():
+		hurtbox.guard = blocks
+		hurtbox.guarded.connect(func(_hitbox: Hitbox) -> void: guarded.emit(global_position))
 	attack_hitbox.power = data.attack_damage
 	attack_hitbox.deactivate()
 	if data.sweep_radius > 0.0:
@@ -72,6 +78,9 @@ func _ready() -> void:
 		state = State.CHASE
 	else:
 		_face_player()
+	var player := _player()
+	if player:
+		shield_facing = global_position.direction_to(player.global_position)
 
 
 ## add_child の前に呼ぶ。攻撃の当たりの大きさは元の種類のまま
@@ -117,6 +126,25 @@ func _physics_process(delta: float) -> void:
 	hurtbox.invincible = state == State.JUMP or state == State.DOOMED
 
 
+func has_shield() -> bool:
+	return data.shield_arc > 0.0
+
+
+## 盾の正面から入ってくる、弾かれうる当たりなら true(GameDesign.md 5章「盾」)
+func blocks(hitbox: Hitbox) -> bool:
+	if not has_shield() or not hitbox.guardable:
+		return false
+	return hitbox.direction.dot(shield_facing) <= -cos(data.shield_arc)
+
+
+func _turn_shield(target: Vector2, delta: float) -> void:
+	if not has_shield() or target == Vector2.ZERO:
+		return
+	var diff := shield_facing.angle_to(target)
+	var step := data.shield_turn_speed * delta
+	shield_facing = shield_facing.rotated(clampf(diff, -step, step))
+
+
 func is_doomed() -> bool:
 	return state == State.DOOMED
 
@@ -137,6 +165,8 @@ func _wander(delta: float) -> void:
 	if _wander_left <= 0.0:
 		_turn()
 	velocity = _wander_dir * data.chase_speed * data.wander_speed_ratio
+	if has_shield():
+		shield_facing = _wander_dir
 	if move_and_slide():
 		_turn()
 
@@ -152,6 +182,9 @@ func _chase() -> void:
 	if not player or (not persistent and not _player_within(data.lose_range)):
 		_enter(State.WANDER)
 		return
+	_turn_shield(
+		global_position.direction_to(player.global_position), get_physics_process_delta_time()
+	)
 	if _can_attack():
 		_start_windup(player)
 		return

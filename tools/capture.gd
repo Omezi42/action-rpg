@@ -1,7 +1,7 @@
 extends SceneTree
 ## 見た目確認用のスクリーンショット(logs/shot_*.png)。ウィンドウありで起動する。
 ## 起動直後 → フィールドの角(カメラが端で止まる)→ 群れを湧かせて寄ってきたところ → 敵の攻撃の予告 → 赤鬼のジャンプ → 斜めに構えて弐(予告線)→ 一閃の受付中 → 踏み込み直後
-## → 斬り抜けた後(魂が落ちている)→ 人斬りの文字 → レベルアップ画面 → 燕返しの斬り返し中 → 影縫いで止まった敵
+## → 斬り抜けた後(魂が落ちている)→ 人斬りの文字 → レベルアップ画面 → 燕返しの斬り返し中 → 影縫いで止まった敵 → 盾鬼の盾と弾いた火花
 ## → 精鋭鬼 → 巻物 → 巻物の画面 → 残り時間を飛ばして大鬼 → 突進の予告 → 大鬼を倒した結果表示。
 ## 最初にタイトル画面と修行の画面も撮る。レベルアップ画面は引き直し・封じの残りが出ている状態で撮る。
 ## 群れには大群(一列)と全種類(弓鬼を含む)を混ぜ、斬痕・残心を取った状態で斬る。
@@ -26,6 +26,11 @@ const BOSS_APPROACH := Vector2(-100, 30)
 const KOONI := preload("res://data/enemies/kooni.tres")
 const AKA_ONI := preload("res://data/enemies/aka_oni.tres")
 const AO_ONI := preload("res://data/enemies/ao_oni.tres")
+const TATE_ONI := preload("res://data/enemies/tate_oni.tres")
+## 盾鬼の正面へ壱で踏み込み、弾いた火花が出ているあたりで撮る
+const SHIELD_OFFSET := Vector2(56, 0)
+const ICHI_HOLD := 0.35
+const GUARD_SHOT_WAIT := 0.06
 ## 予告を撮る間は被弾させない(この後の構えを止めないため)
 const WARNING_GUARD := 2.0
 const WARNING_WAIT := 0.3
@@ -108,6 +113,7 @@ func _run() -> void:
 	arena.get_node("LevelUp").choose(0)
 	await _shot_return(player)
 	await _shot_bind(arena, player)
+	await _shot_shield(arena, player)
 	await _shot_elite_and_scroll(arena, player)
 	arena.schedule.elapsed = arena.survival.clear_time - ALMOST_CLEAR
 	await _wait(BOSS_WAIT)
@@ -167,6 +173,24 @@ func _shot_bind(arena: Node, player: Player) -> void:
 		enemy.bind(BIND_TIME)
 	await _wait(0.2)
 	await _shot("5d_bind")
+
+
+## 主人公の右に盾鬼を出して盾を撮り、正面から壱で踏み込んで弾かれたところを撮る
+func _shot_shield(arena: Node, player: Player) -> void:
+	await _wait(0.6)
+	player.invincible_left = WARNING_GUARD
+	player.hurtbox.invincible = true
+	var enemy: Enemy = arena._add_enemy(TATE_ONI, player.position + SHIELD_OFFSET, true)
+	enemy.shield_facing = Vector2.LEFT
+	Input.action_press("iai")
+	await _wait(0.05)
+	player.facing = Vector2.RIGHT
+	await _wait(ICHI_HOLD)
+	await _shot("5e_shield")
+	Input.action_release("iai")
+	await _wait(GUARD_SHOT_WAIT)
+	await _shot("5f_guard")
+	await _wait(0.5)
 
 
 ## 精鋭鬼(金の縁)を主人公の横に出して撮り、倒して落ちた巻物を撮り、拾って巻物の画面を撮る。

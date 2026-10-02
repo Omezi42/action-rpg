@@ -6,6 +6,8 @@ const RAYS := 6
 const RADIUS := 10.0
 const COLOR := Color("fff2a8")
 
+var color := COLOR
+
 var _age := 0.0
 
 
@@ -20,4 +22,4 @@ func _draw() -> void:
 	var t := _age / LIFE
 	for i in RAYS:
 		var dir := Vector2.RIGHT.rotated(TAU * i / RAYS)
-		draw_line(dir * RADIUS * t, dir * RADIUS * (0.4 + t), Color(COLOR, 1.0 - t), 2)
+		draw_line(dir * RADIUS * t, dir * RADIUS * (0.4 + t), Color(color, 1.0 - t), 2)

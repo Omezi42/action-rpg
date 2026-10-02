@@ -16,6 +16,8 @@ var direction := Vector2.ZERO
 var delay_death := false
 ## 0より大きければ、当たって生き残った敵の被弾硬直をこの時間にする(影縫い)
 var bind_time := 0.0
+## true なら盾で弾かれうる(一閃以外の踏み込み・燕返し。GameDesign.md 5章「盾」)
+var guardable := false
 
 var _hit_targets: Dictionary = {}
 
