@@ -7,7 +7,7 @@
 
 ## RunRecords(`scripts/stage/run_records.gd`、RefCounted)
 - `ConfigFile` で `RunRecords.path`(static。既定 `user://records.cfg`)を読み書きする。読めなければ全項目0
-- `submit(survived, kills, level, cleared)`:更新した項目名(`best_time` `best_kills` `best_level`)の配列を返し、保存する
+- `submit(survived, kills, level, cleared, hitokiri)`:更新した項目名(`best_time` `best_kills` `best_level` `best_hitokiri`)の配列を返し、保存する
 - テストと撮影は開始時に `RunRecords.path` を別のファイルへ向け、終わりに消す(本物の記録に触れないため)
 
 ## 大鬼(GameDesign.md 5章)
@@ -20,4 +20,4 @@
 ## 効果音(GameDesign.md 10章)
 - autoload `SfxPlayer`(`scripts/audio/sfx.gd`、class_name `Sfx`)。鳴らす側は static の `Sfx.play(name)` を呼び、autoload が無いとき(`--script` のテスト)は何もしない。起動時に `data/sfx.tres`(SfxBank:名前 → SfxData)から AudioStreamWAV を合成し、8個の AudioStreamPlayer を順に使う
 - SfxData(`scripts/data/sfx_data.gd`):`wave`(SQUARE / TRIANGLE / NOISE)`freq_start` `freq_end` `duration` `volume_db`。音の追加は .tres に1行
-- 鳴らすきっかけは信号で受ける。Player の `stage_reached(index, is_top)` `dash_started` `issen_sheathed` `damaged`、大鬼の `rush_warned`(Arena は大鬼にだけつなぐ)・Enemy の `shot_fired`、Arena 側で斬撃・魂・レベルアップ・大鬼出現。UI は決定時に自分で鳴らす
+- 鳴らすきっかけは信号で受ける。Player の `stage_reached(index, is_top)` `dash_started` `issen_sheathed` `damaged`、大鬼の `rush_warned`(Arena は大鬼にだけつなぐ)・Enemy の `shot_fired`、Arena 側で斬撃・魂・レベルアップ・大鬼出現・精鋭出現・巻物・人斬り。Player の `return_started` で返し。UI は決定時に自分で鳴らす

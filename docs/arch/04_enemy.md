@@ -13,7 +13,7 @@
 | JUMP | 予告の始めに決めた着地点 `jump_target` へ `jump_time` で直線に位置を動かす(壁・岩を無視)。見た目の高さは `air_height()`(放物線、最高 `jump_height`)。Hurtbox は無敵 |
 | LAND | JumpAttack(着地点の円)が `strike_time` だけ有効 |
 | RECOVER | `attack_recover` 止まって CHASE |
-| HURT | `knockback_time` の間ノックバック、`hurt_time` で CHASE |
+| HURT | `knockback_time` の間ノックバック、`hurt_time`(影縫いの当たりならその `bind_time`)で CHASE |
 | DOOMED | 一閃でHP0。止まって `fall()` を待つ |
 
 - 弓鬼:EnemyData の `shot_range` が0より大きいと、CHASE 中に `shot_range` 以内で止まり `AIM`(`shot_windup`)→ `shot_fired(from, direction)` を出して CHASE へ戻る。`shot_interval` の間は範囲内なら立ち止まる。Arena が `Arrow`(`scripts/enemies/arrow.gd`、Hitbox。layer enemy_attack・mask world)を生成する。矢は `landed`・壁への `body_entered`・射程で消える
@@ -28,3 +28,5 @@
 - RushGuide(`scenes/enemies/rush_guide.tscn`)は踏み込みの WINDUP 中に予告線を描く。線の太さ `width` はシーンごと(小鬼のシーン4px・大鬼10px)
 - WINDUP / RUSH / SWEEP / LAND 中に斬られたら HURT へ(攻撃の取り消し)。`attack_armor` が true(大鬼)なら状態を変えず光るだけ
 - 撃破時に `defeated(enemy)` を出して `queue_free()`(Arena が位置と `data.soul_value` から魂を落とす)。主人公は group `"player"` で探す
+- 影縫い:`bind(time)` は HURT へ入れて `time` だけ止める(ノックバックなし。予告・攻撃は取り消す)。`attack_armor`(大鬼)と JUMP 中は何もしない。止まっている間は EnemyVisual が足元に影を描く
+- 精鋭鬼:Arena が `add_child` の前に `make_elite(hp_scale, visual_scale)` を呼ぶ。`elite = true`・`alerted = true`・`persistent = true`。`_ready` で Health の最大HPを `hp_scale` 倍、Visual と Hurtbox を `visual_scale` 倍にし(攻撃の当たりは変えない)、EnemyVisual が金の縁を描く。`persistent` なら見失い・遠くの消去をしない

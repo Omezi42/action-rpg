@@ -8,8 +8,8 @@
 | `scripts/components/` | Health / Hitbox / Hurtbox |
 | `scripts/data/` | Resource 定義(PlayerData / IaiStage / IaiData / EnemyData / SurvivalData / SpawnEntry / SpawnPhase / GrowthData / UpgradeData / SfxData / SfxBank) |
 | `data/` | 数値の実体(`player.tres` `iai.tres` `survival.tres` `growth.tres` `enemies/*.tres` `upgrades/*.tres` `sfx.tres`) |
-| `scripts/growth/` | 成長(Progression / PlayerStats / SoulField) |
-| `scripts/effects/` | 斬撃の軌跡・ヒット火花(コード描画、シーン無し) |
+| `scripts/growth/` | 成長(Progression / PlayerStats / SoulField / Scroll) |
+| `scripts/effects/` | 斬撃の軌跡・ヒット火花・人斬りの文字(コード描画、シーン無し) |
 | `scripts/ui/` | タイトル・ハート・結果・ポーズ・HPバー等 |
 | `scripts/audio/` | 効果音の合成と再生(autoload `SfxPlayer`) |
 

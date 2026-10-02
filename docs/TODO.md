@@ -68,3 +68,15 @@
 - [ ] 試遊して「被弾してもその場から抜け出せるか」「予告の長さと間合いが手触りとして合うか」を判断
 - [x] 赤鬼をジャンプ斬りにする(GameDesign / Architecture を更新)
 - [x] 赤鬼のジャンプ斬りを実装(JumpAttack・空中は斬れない・テスト・撮影)
+
+## M8:まとめて斬る手応え・途中の山場・奥義
+- [x] GameDesign / Architecture を更新
+- [ ] 人斬り:HitokiriCounter・Player の strike_started / strike_finished・HitokiriLabel・FollowCamera.shake
+- [ ] 記録に最多人斬り(RunRecords・結果・タイトル)
+- [ ] 精鋭鬼(SpawnSchedule.take_elite・Enemy.make_elite・金の縁・見失わない)
+- [ ] 巻物(Scroll・Progression.roll_scroll・全回復・レベルアップ画面の巻物表示)
+- [ ] 燕返し(Player の RETURN・return_window・斬痕/残心を出さない)
+- [ ] 影縫い(bind_time・Enemy.bind・足元の影・大鬼/跳躍中は無効)
+- [ ] 奥義4種(UpgradeData の kind / requires・焔痕・大残心・燕返し・極・影縫い・極・金の枠)
+- [ ] 効果音4種(人斬り・精鋭出現・巻物・返し)
+- [ ] テストと撮影を合わせる
