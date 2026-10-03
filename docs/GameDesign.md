@@ -13,5 +13,5 @@
 | 7 | 絵の仕様(取り込み形式) | `design/07_art_format.md` |
 | 8 | 成長(魂・レベルアップ・強化) | `design/08_growth.md` |
 | 9 | 画面の流れ・記録 | `design/09_flow.md` |
-| 10 | 効果音 | `design/10_sound.md` |
+| 10 | 効果音・BGM・音量 | `design/10_sound.md` |
 | 99 | 未定事項 | `design/99_undecided.md` |
