@@ -116,7 +116,7 @@ func _run() -> void:
 	await _shot_shield(arena, player)
 	await _shot_elite_and_scroll(arena, player)
 	arena.schedule.elapsed = arena.survival.clear_time - ALMOST_CLEAR
-	await _wait(BOSS_WAIT)
+	await _wait_boss(arena)
 	await _shot("7_boss")
 	await _wait_boss_windup(arena)
 	await _shot("7b_boss_rush_warning")
@@ -228,14 +228,29 @@ func elite_drop_point(arena: Node) -> Vector2:
 	return Vector2.ZERO
 
 
+## 大鬼が出て近づくまで待つ。残り時間を飛ばすと精鋭鬼が出たり魂を拾ったりして
+## 選択画面が開き、ツリーが止まって大鬼が出ないので、開いたら1枚目を選んで閉じる
+func _wait_boss(arena: Node) -> void:
+	for i in roundi(PHYSICS_FPS * BOSS_WAIT):
+		await physics_frame
+		_close_choices(arena)
+
+
 ## 主人公を大鬼の近くへ置き、突進の予告が半分進んだところまで待つ
 func _wait_boss_windup(arena: Node) -> void:
 	var player: Player = arena.get_node("Entities/Player")
 	player.position = arena.boss.position + BOSS_APPROACH
 	for i in roundi(PHYSICS_FPS * BOSS_WAIT):
 		await physics_frame
+		_close_choices(arena)
 		if arena.boss.windup_ratio() >= 0.5:
 			return
+
+
+func _close_choices(arena: Node) -> void:
+	var menu := arena.get_node("LevelUp")
+	if menu.visible:
+		menu.choose(0)
 
 
 func _shot(label: String) -> void:
