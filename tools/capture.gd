@@ -78,6 +78,13 @@ func _run() -> void:
 	await _wait(0.1)
 	await _shot("1b_field_corner")
 	player.position = start
+	var pause: CanvasLayer = arena.get_node("Pause")
+	paused = true
+	pause.visible = true
+	await _wait(0.1)
+	await _shot("1c_pause_volume")
+	pause.visible = false
+	paused = false
 	await _wait(0.1)
 	arena.schedule.elapsed = ALL_KINDS_TIME
 	for i in CROWD:

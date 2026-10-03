@@ -72,6 +72,7 @@ func _ready() -> void:
 	_player.strike_finished.connect(_on_strike_finished)
 	_connect_sounds()
 	_update_status()
+	Bgm.play(&"battle")
 
 
 func _physics_process(delta: float) -> void:
@@ -116,10 +117,12 @@ func spawn_horde() -> void:
 
 func spawn_boss() -> void:
 	boss = _add_enemy(null, schedule.edge_center(_camera.view_rect()), true, boss_scene)
+	boss.defeated.connect(Sfx.play.bind(&"boss_defeat").unbind(1))
 	boss.defeated.connect(_end.bind(true).unbind(1))
 	boss.rush_warned.connect(Sfx.play.bind(&"boss_warn"))
 	_boss_bar.bind(boss.health)
 	Sfx.play(&"boss_appear")
+	Bgm.play(&"boss")
 
 
 func spawn_elite() -> Enemy:

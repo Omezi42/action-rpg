@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="BgmBank" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/bgm_bank.gd" id="1_k4r28"]
+[ext_resource type="Script" path="res://scripts/data/bgm_data.gd" id="2_6n0af"]
+[ext_resource type="AudioStream" path="res://assets/audio/bgm/title.mp3" id="3_u62kr"]
+[ext_resource type="AudioStream" path="res://assets/audio/bgm/battle.ogg" id="4_53c7y"]
+[ext_resource type="AudioStream" path="res://assets/audio/bgm/boss.mp3" id="5_u753d"]
+
+[sub_resource type="Resource" id="Resource_r7m7v"]
+script = ExtResource("2_6n0af")
+stream = ExtResource("3_u62kr")
+volume_db = -10.0
+
+[sub_resource type="Resource" id="Resource_bcv6j"]
+script = ExtResource("2_6n0af")
+stream = ExtResource("4_53c7y")
+volume_db = -10.0
+
+[sub_resource type="Resource" id="Resource_f21q5"]
+script = ExtResource("2_6n0af")
+stream = ExtResource("5_u753d")
+volume_db = -10.0
+
+[resource]
+script = ExtResource("1_k4r28")
+tracks = Dictionary[StringName, ExtResource("2_6n0af")]({
+&"battle": SubResource("Resource_bcv6j"),
+&"boss": SubResource("Resource_f21q5"),
+&"title": SubResource("Resource_r7m7v")
+})
+fade_time = 0.5
+duck_db = -10.0

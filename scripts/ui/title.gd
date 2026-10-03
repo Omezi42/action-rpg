@@ -23,6 +23,8 @@ const SECONDS_PER_MINUTE := 60
 @export var records_top := 168.0
 @export var help_top := 244.0
 @export var merit_top := 222.0
+@export var credit_top := 256.0
+@export var credit_text := "BGM: jobro (CC-BY 3.0) / TAD (CC-BY 4.0)"
 @export var small_size := 10
 @export var dim_text := Color(1, 1, 1, 0.7)
 
@@ -44,7 +46,9 @@ func _ready() -> void:
 	_add_label(
 		"WASD 移動 / 左クリック・J・Space 長押しで溜め、離して居合 / Tab 修行 / Esc 終了", help_top, small_size, dim_text
 	)
+	_add_label(credit_text, credit_top, small_size - 2, dim_text)
 	_show_merit()
+	Bgm.play(&"title")
 
 
 func _process(_delta: float) -> void:

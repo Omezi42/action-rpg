@@ -28,6 +28,8 @@ func open(
 	merit := 0
 ) -> void:
 	_opened_at = Time.get_ticks_msec()
+	Bgm.stop()
+	Sfx.play(&"clear" if cleared else &"game_over")
 	var title := "クリア!" if cleared else "ゲームオーバー"
 	var lines := [
 		title,

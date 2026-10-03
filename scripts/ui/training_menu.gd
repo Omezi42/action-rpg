@@ -63,7 +63,7 @@ func open(training: TrainingCatalog, saved: TrainingProgress) -> void:
 
 func buy(index: int) -> void:
 	if progress.buy(catalog.items[index]):
-		Sfx.play(&"confirm")
+		Sfx.play(&"purchase")
 	_refresh()
 
 
@@ -124,7 +124,10 @@ func _refresh() -> void:
 
 
 func _select(index: int) -> void:
-	_selected = clampi(index, 0, catalog.items.size() - 1)
+	var clamped := clampi(index, 0, catalog.items.size() - 1)
+	if clamped != _selected:
+		Sfx.play(&"cursor")
+	_selected = clamped
 	queue_redraw()
 
 

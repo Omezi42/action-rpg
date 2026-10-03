@@ -71,7 +71,7 @@ func open(
 		card.setup(choices[i], levels[i], i + 1)
 		_cards.append(card)
 	_add_footer(screen, rerolls, seals)
-	_select(selected)
+	_select(selected, false)
 	_opened_at = Time.get_ticks_msec()
 	_last_mouse = _root.get_global_mouse_position()
 	visible = true
@@ -152,7 +152,10 @@ func _card_at(point: Vector2) -> int:
 	return -1
 
 
-func _select(index: int) -> void:
-	_selected = clampi(index, 0, _cards.size() - 1)
+func _select(index: int, with_sound := true) -> void:
+	var clamped := clampi(index, 0, _cards.size() - 1)
+	if with_sound and clamped != _selected:
+		Sfx.play(&"cursor")
+	_selected = clamped
 	for i in _cards.size():
 		_cards[i].selected = i == _selected
