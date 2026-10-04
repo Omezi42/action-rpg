@@ -24,7 +24,7 @@
 - `export_presets.cfg` の「Web」:スレッド無し・GDExtension無し・`tools/` `docs/` `logs/` を除外
 - `bash tools/export_web.sh` → `build/unityroom/index.pck`(アップロードする物)と `build/web/`(手元確認用の一式。`.claude/launch.json` の web-build で配信)。`build/` は git 管理外
 - セーブの置き場所は Web だけ `application/config/custom_user_dir_name.web` で固有名にする。理由:同じドメインの Godot 製ゲームは IndexedDB を共有し、`config/name` の既定の置き場所がぶつかりうるため
-- 紹介用GIF:`tools/capture_promo.gd`(ウィンドウあり)が群れを一閃で斬るコマを `build/promo/frames/` に撮り、`python tools/make_promo_gif.py` が `gameplay.gif`(960×540)と `icon.gif`(サムネイル 288×288)を作る。投稿の文面は `promo/unityroom.md`
+- 紹介用GIF:`tools/capture_promo.gd`(ウィンドウあり)が群れを一閃で斬るコマを `build/promo/frames/` に撮り、`tools/promo_icon.gd`(ウィンドウあり)がサムネイル用の一枚絵アニメ(144×144・コード描画)を `build/promo/icon_frames/` に撮り、`python tools/make_promo_gif.py` が両方を2倍して `gameplay.gif`(960×540)と `icon.gif`(288×288)にする。理由:仮の図形のままのプレイ画面を切り抜いても、一覧の144×144では何のゲームか伝わらないため。投稿の文面は `promo/unityroom.md`
 - Web 版だけ変える動作は `OS.has_feature("web")` で分ける(タイトルの終了)
 - 絵が届くまでは各 `*_visual.gd` が仮の図形を描く。足元が原点
 

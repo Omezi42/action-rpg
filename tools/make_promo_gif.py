@@ -1,7 +1,7 @@
 """tools/capture_promo.gd のコマから紹介用GIFを作る。
 
 build/promo/gameplay.gif : 画面全体 960x540(2倍)。ゲーム紹介・SNS用
-build/promo/icon.gif     : 画面中央 144x144 を2倍した 288x288。unityroom のサムネイル(144x144 で表示される)用
+build/promo/icon.gif     : tools/promo_icon.gd の 144x144 を2倍した 288x288。unityroom のサムネイル(144x144 で表示される)用
 実行: python tools/make_promo_gif.py
 """
 
@@ -11,16 +11,16 @@ from PIL import Image
 
 ROOT = Path(__file__).resolve().parent.parent
 FRAMES = ROOT / "build/promo/frames"
+ICON_FRAMES = ROOT / "build/promo/icon_frames"
 OUT = ROOT / "build/promo"
 FRAME_MSEC = 50
 SCALE = 2
-ICON_CROP = 144
 PALETTE_COLORS = 255
 PALETTE_SAMPLE_STEP = 8
 
 
-def load_frames() -> list[Image.Image]:
-    return [Image.open(p).convert("RGB") for p in sorted(FRAMES.glob("*.png"))]
+def load_frames(folder: Path) -> list[Image.Image]:
+    return [Image.open(p).convert("RGB") for p in sorted(folder.glob("*.png"))]
 
 
 def shared_palette(frames: list[Image.Image]) -> Image.Image:
@@ -46,13 +46,10 @@ def scaled(frame: Image.Image) -> Image.Image:
 
 
 def main() -> None:
-    frames = load_frames()
-    palette = shared_palette(frames)
-    save_gif([scaled(f) for f in frames], palette, OUT / "gameplay.gif")
-    w, h = frames[0].size
-    left, top = (w - ICON_CROP) // 2, (h - ICON_CROP) // 2
-    box = (left, top, left + ICON_CROP, top + ICON_CROP)
-    save_gif([scaled(f.crop(box)) for f in frames], palette, OUT / "icon.gif")
+    for folder, name in [(FRAMES, "gameplay.gif"), (ICON_FRAMES, "icon.gif")]:
+        frames = load_frames(folder)
+        if frames:
+            save_gif([scaled(f) for f in frames], shared_palette(frames), OUT / name)
 
 
 if __name__ == "__main__":

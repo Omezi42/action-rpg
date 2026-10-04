@@ -4,7 +4,7 @@
 - アップロードするゲーム:`build/unityroom/index.pck`(`bash tools/export_web.sh`)
 - サムネイル:`build/promo/icon.gif`(288×288。一覧では144×144で出る)
 - 紹介用GIF:`build/promo/gameplay.gif`(960×540)
-- GIFの作り直し:`Godot --path . --script res://tools/capture_promo.gd` → `python tools/make_promo_gif.py`
+- GIFの作り直し:`Godot --path . --script res://tools/capture_promo.gd`(紹介用)・`res://tools/promo_icon.gd`(サムネイル)→ `python tools/make_promo_gif.py`
 
 ## 登録する項目
 
