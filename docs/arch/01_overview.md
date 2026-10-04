@@ -15,7 +15,7 @@
 | `assets/audio/` | 効果音・BGMの素材(`sfx/` `bgm/`)と出典 `CREDITS.md` |
 | `assets/fonts/` | `pixel_mplus10.res`(`tools/make_font.gd` が `src/` の ttf から作る)とライセンス |
 
-- 画面は 480×270 を `stretch/mode=viewport` + `scale_mode=integer` で拡大(GameDesign.md 6章)
+- 画面は 480×270 を `stretch/mode=viewport` + `scale_mode=integer` で拡大し、Web版だけ `scale_mode.web=fractional`(GameDesign.md 6章)
 - 入力アクション:`move_left/right/up/down` `iai` `pause`(GameDesign.md 2章)
 - 既定のフォントは `gui/theme/custom_font` = `pixel_mplus10.res`。FontFile に `fixed_size=10`・`FIXED_SIZE_SCALE_INTEGER_ONLY`・アンチエイリアス無しを焼き込む(インポート設定には固定サイズが無いため .res で持つ)。`src/` は `.gdignore` で書き出しに含めない
 
