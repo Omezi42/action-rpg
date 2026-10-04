@@ -30,7 +30,7 @@
 
 ## タッチ操作(`scripts/ui/touch_controls.gd`、TouchControls)
 - GameDesign.md 2章。autoload `TouchControlsLayer`(CanvasLayer、`process_mode = ALWAYS`、最前面)。外からは `TouchControls.active()`(autoload が無いテストでは false)
-- `input_devices/pointing/emulate_mouse_from_touch` は切る(指がスティックに触れただけで左クリック=居合にならないため)。スティック・ボタンに当たらないタッチは、自分で左クリックの InputEventMouseMotion / MouseButton に作り直して `Input.parse_input_event` へ流す
+- `input_devices/pointing/emulate_mouse_from_touch` は切る(指がスティックに触れただけで左クリック=居合にならないため)。スティックの無い画面でボタンに当たらないタップは、グループ `touch_context` のうち `touch_tap(at)` を持つノード(Title:始める、TrainingMenu:その項目を買う、LevelUpMenu:そのカードを選ぶ)へ画面の座標で渡す。左クリックに作り直さないのは、デスクトップでは本物のカーソルの位置に上書きされるため
 - 移動・居合・小ボタンは InputEventAction を `Input.parse_input_event` で流す(押した・離したの変わり目だけ)。各画面はキーやパッドと同じアクションとして受け取るので、画面側にタッチ専用の処理は持たない
 - スティックは触れた点を中心に、指の向きを45度に丸めて上下左右のアクションへ分ける。半径・遊び・ボタンの位置と大きさは `@export`
 - 画面ごとの小ボタンとスティックの有無は、グループ `touch_context` のノードが `touch_context() -> Dictionary`(`TouchControls.context(stick, buttons)` で作る。buttons は `[表示名, アクション]` の配列)で返し、TouchControls が毎フレーム集める。返すのは Title・TrainingMenu・PauseMenu(locked でない間はスティックあり)・LevelUpMenu・GameOver

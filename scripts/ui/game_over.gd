@@ -16,6 +16,11 @@ var _opened_at := 0
 
 func _ready() -> void:
 	visible = false
+	add_to_group(TouchControls.GROUP)
+
+
+func touch_context() -> Dictionary:
+	return TouchControls.context(false, [["タイトルへ", &"pause"]] if visible else [])
 
 
 func open(

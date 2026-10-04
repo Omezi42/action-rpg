@@ -4,6 +4,8 @@ extends Control
 signal closed
 
 const MSEC_PER_SEC := 1000.0
+const HELP := "上下で選ぶ / 居合・クリックで買う / R で全部戻す / Esc で戻る"
+const TOUCH_HELP := "項目をタップで買う"
 
 @export var input_lock_time := 0.3
 @export var back_color := Color(0.05, 0.06, 0.1, 0.92)
@@ -49,8 +51,9 @@ func open(training: TrainingCatalog, saved: TrainingProgress) -> void:
 		row.position.x += padding
 		row.size.x -= padding * 2.0
 		_rows.append(row)
+	add_to_group(TouchControls.GROUP)
 	var help := _add_label(
-		"上下で選ぶ / 居合・クリックで買う / R で全部戻す / Esc で戻る",
+		TOUCH_HELP if TouchControls.active() else HELP,
 		Vector2(0, help_top),
 		Vector2(screen.x, text_size * 2.0),
 		text_size
@@ -59,6 +62,18 @@ func open(training: TrainingCatalog, saved: TrainingProgress) -> void:
 	_opened_at = Time.get_ticks_msec()
 	_last_mouse = get_global_mouse_position()
 	_refresh()
+
+
+func touch_context() -> Dictionary:
+	return TouchControls.context(false, [["全部戻す", &"reroll"], ["戻る", &"pause"]])
+
+
+func touch_tap(at: Vector2) -> void:
+	var row := _row_at(at)
+	if row < 0 or Time.get_ticks_msec() - _opened_at < input_lock_time * MSEC_PER_SEC:
+		return
+	_select(row)
+	buy(row)
 
 
 func buy(index: int) -> void:

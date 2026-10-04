@@ -10,6 +10,7 @@ const EnemyAttackTests = preload("res://tools/tests/enemy_attack_tests.gd")
 const TrainingTests = preload("res://tools/tests/training_tests.gd")
 const ShieldTests = preload("res://tools/tests/shield_tests.gd")
 const AudioTests = preload("res://tools/tests/audio_tests.gd")
+const TouchTests = preload("res://tools/tests/touch_tests.gd")
 ## 本物の最高記録に触れないよう、テスト中の記録はここへ書く
 const TEST_RECORDS_PATH := "user://test_records.cfg"
 const TEST_PROGRESS_PATH := "user://test_progress.cfg"
@@ -38,6 +39,7 @@ func _run() -> void:
 	await TrainingTests.new().run(self, _assert_true)
 	await ShieldTests.new().run(self, _assert_true)
 	AudioTests.new().run(self, _assert_true)
+	await TouchTests.new().run(self, _assert_true)
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(TEST_PROGRESS_PATH))
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(TEST_RECORDS_PATH))
 	if _failures == 0:

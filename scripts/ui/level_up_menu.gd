@@ -27,10 +27,13 @@ var _selected := 0
 var _opened_at := 0
 var _last_mouse := Vector2.ZERO
 var _root: Control
+var _rerolls := 0
+var _seals := 0
 
 
 func _ready() -> void:
 	visible = false
+	add_to_group(TouchControls.GROUP)
 	_root = Control.new()
 	_root.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -45,6 +48,8 @@ func open(
 	seals := 0,
 	selected := 0
 ) -> void:
+	_rerolls = rerolls
+	_seals = seals
 	for child in _root.get_children():
 		child.free()
 	_cards.clear()
@@ -75,6 +80,20 @@ func open(
 	_opened_at = Time.get_ticks_msec()
 	_last_mouse = _root.get_global_mouse_position()
 	visible = true
+
+
+func touch_context() -> Dictionary:
+	var buttons: Array = []
+	if visible and _rerolls > 0:
+		buttons.append(["引き直す", &"reroll"])
+	if visible and _seals > 0:
+		buttons.append(["封じる", &"seal"])
+	return TouchControls.context(false, buttons)
+
+
+func touch_tap(at: Vector2) -> void:
+	if visible and not is_locked():
+		choose(_card_at(at))
 
 
 func is_locked() -> bool:

@@ -19,6 +19,7 @@ var _labels: Array[Label] = []
 
 func _ready() -> void:
 	visible = false
+	add_to_group(TouchControls.GROUP)
 	settings = AudioSettings.load_saved()
 	for i in ROWS.size():
 		var label := Label.new()
@@ -37,6 +38,12 @@ func _ready() -> void:
 	hint.size = Vector2(get_viewport().get_visible_rect().size.x, row_height)
 	add_child(hint)
 	_refresh()
+
+
+func touch_context() -> Dictionary:
+	if locked:
+		return TouchControls.context(false)
+	return TouchControls.context(true, [["再開" if visible else "ポーズ", &"pause"]])
 
 
 func _unhandled_input(event: InputEvent) -> void:

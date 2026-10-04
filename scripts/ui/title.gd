@@ -32,6 +32,8 @@ var _opened_at := 0
 var _prompt: Label
 var _merit: Label
 var _training_menu: Control
+var _help: Label
+var _touch_help := false
 
 
 func _ready() -> void:
@@ -43,16 +45,17 @@ func _ready() -> void:
 	_prompt = _add_label("居合ボタンで始める", prompt_top, small_size + 2, Color.WHITE)
 	_add_label(_records_text(RunRecords.load_saved()), records_top, small_size, dim_text)
 	_merit = _add_label("", merit_top, small_size, Color.WHITE)
-	var help := "WASD 移動 / 左クリック・J・Space 長押しで溜め、離して居合\nTab 修行"
-	if can_quit():
-		help += " / Esc 終了"
-	_add_label(help, help_top, small_size, dim_text)
+	_help = _add_label(_help_text(false), help_top, small_size, dim_text)
+	add_to_group(TouchControls.GROUP)
 	_add_label(credit_text, credit_top, small_size - 2, dim_text)
 	_show_merit()
 	Bgm.play(&"title")
 
 
 func _process(_delta: float) -> void:
+	if TouchControls.active() != _touch_help:
+		_touch_help = TouchControls.active()
+		_help.text = _help_text(_touch_help)
 	var blink := int(Time.get_ticks_msec() / (prompt_blink_time * MSEC_PER_SEC)) % 2
 	_prompt.visible = blink == 0
 
@@ -69,15 +72,37 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("training"):
 		open_training()
 	elif event.is_action_pressed("iai"):
-		Sfx.play(&"confirm")
-		get_tree().change_scene_to_file(arena_scene)
+		start()
 	elif event.is_action_pressed("pause") and can_quit():
 		get_tree().quit()
+
+
+func touch_context() -> Dictionary:
+	return TouchControls.context(false, [] if _training_menu else [["修行", &"training"]])
+
+
+func touch_tap(_at: Vector2) -> void:
+	if not _training_menu and Time.get_ticks_msec() - _opened_at >= input_lock_time * MSEC_PER_SEC:
+		start()
+
+
+static func _help_text(touch: bool) -> String:
+	if touch:
+		return "左側で移動 / 居合ボタン長押しで溜め、離して居合\n画面をタップで始める"
+	var help := "WASD 移動 / 左クリック・J・Space 長押しで溜め、離して居合\nTab 修行"
+	if can_quit():
+		help += " / Esc 終了"
+	return help
 
 
 ## ブラウザのゲームは終了できず、quit() すると画面が固まる(GameDesign.md 9章)
 static func can_quit() -> bool:
 	return not OS.has_feature("web")
+
+
+func start() -> void:
+	Sfx.play(&"confirm")
+	get_tree().change_scene_to_file(arena_scene)
 
 
 func open_training() -> void:
