@@ -27,3 +27,11 @@
 - `HUD/BossBar`(`scenes/ui/boss_bar.tscn`):大鬼のHP(8章)
 - `Pause`:`process_mode = ALWAYS`。pause アクションで `get_tree().paused` を切り替える。`locked` の間(結果表示中・レベルアップ中)は無視
 - 溜めゲージは主人公シーンの `ChargeGauge`(頭上、構え中だけ表示)
+
+## タッチ操作(`scripts/ui/touch_controls.gd`、TouchControls)
+- GameDesign.md 2章。autoload `TouchControlsLayer`(CanvasLayer、`process_mode = ALWAYS`、最前面)。外からは `TouchControls.active()`(autoload が無いテストでは false)
+- `input_devices/pointing/emulate_mouse_from_touch` は切る(指がスティックに触れただけで左クリック=居合にならないため)。スティック・ボタンに当たらないタッチは、自分で左クリックの InputEventMouseMotion / MouseButton に作り直して `Input.parse_input_event` へ流す
+- 移動・居合・小ボタンは InputEventAction を `Input.parse_input_event` で流す(押した・離したの変わり目だけ)。各画面はキーやパッドと同じアクションとして受け取るので、画面側にタッチ専用の処理は持たない
+- スティックは触れた点を中心に、指の向きを45度に丸めて上下左右のアクションへ分ける。半径・遊び・ボタンの位置と大きさは `@export`
+- 画面ごとの小ボタンとスティックの有無は、グループ `touch_context` のノードが `touch_context() -> Dictionary`(`TouchControls.context(stick, buttons)` で作る。buttons は `[表示名, アクション]` の配列)で返し、TouchControls が毎フレーム集める。返すのは Title・TrainingMenu・PauseMenu(locked でない間はスティックあり)・LevelUpMenu・GameOver
+- ウィンドウが縦長なら全面を暗くして「画面を横にしてください」を出す
