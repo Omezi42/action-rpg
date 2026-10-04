@@ -21,8 +21,8 @@ const SECONDS_PER_MINUTE := 60
 @export var prompt_top := 132.0
 @export var prompt_blink_time := 0.5
 @export var records_top := 168.0
-@export var help_top := 244.0
-@export var merit_top := 222.0
+@export var help_top := 226.0
+@export var merit_top := 208.0
 @export var credit_top := 256.0
 @export var credit_text := "BGM: jobro (CC-BY 3.0) / TAD (CC-BY 4.0)"
 @export var small_size := 10
@@ -43,7 +43,7 @@ func _ready() -> void:
 	_prompt = _add_label("居合ボタンで始める", prompt_top, small_size + 2, Color.WHITE)
 	_add_label(_records_text(RunRecords.load_saved()), records_top, small_size, dim_text)
 	_merit = _add_label("", merit_top, small_size, Color.WHITE)
-	var help := "WASD 移動 / 左クリック・J・Space 長押しで溜め、離して居合 / Tab 修行"
+	var help := "WASD 移動 / 左クリック・J・Space 長押しで溜め、離して居合\nTab 修行"
 	if can_quit():
 		help += " / Esc 終了"
 	_add_label(help, help_top, small_size, dim_text)
@@ -106,8 +106,8 @@ func _add_label(text: String, top: float, font_size: int, color: Color) -> Label
 	label.add_theme_font_size_override("font_size", font_size)
 	label.add_theme_color_override("font_color", color)
 	label.position = Vector2(0, top)
-	label.size = Vector2(get_viewport_rect().size.x, font_size * 2.0)
 	add_child(label)
+	label.size = Vector2(get_viewport_rect().size.x, font_size * 2.0)
 	return label
 
 
