@@ -6,6 +6,8 @@ extends SceneTree
 const FRAMES_DIR := "res://build/promo/icon_frames"
 const SIZE := Vector2i(144, 144)
 const FRAME_COUNT := 64
+## 一覧では1コマ目が静止画で出るので、暗転明けではなく溜めている場面から始める
+const FIRST_FRAME := 8
 
 
 func _initialize() -> void:
@@ -26,7 +28,7 @@ func _run() -> void:
 	viewport.add_child(art)
 	root.add_child(viewport)
 	for f in FRAME_COUNT:
-		art.frame = f
+		art.frame = (f + FIRST_FRAME) % FRAME_COUNT
 		art.queue_redraw()
 		await RenderingServer.frame_post_draw
 		viewport.get_texture().get_image().save_png(FRAMES_DIR.path_join("%04d.png" % f))
