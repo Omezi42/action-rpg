@@ -10,6 +10,7 @@ const PHYSICS_FPS := 60.0
 const RUSH_START := Vector2(200, 200)
 const PLAYER_OFFSET := Vector2(100, 0)
 const RUSH_TOLERANCE := 8.0
+const FONT_FIXED_SIZE := 10
 
 var _tree: SceneTree
 
@@ -21,6 +22,7 @@ func run(tree: SceneTree, check: Callable) -> void:
 	await _test_archer(check)
 	await _test_arrow(check)
 	_test_game_over_records(check)
+	_test_web_ready(check)
 
 
 func _test_records(check: Callable) -> void:
@@ -135,3 +137,12 @@ func _test_game_over_records(check: Callable) -> void:
 func _frames(seconds: float) -> void:
 	for i in roundi(seconds * PHYSICS_FPS):
 		await _tree.physics_frame
+
+
+func _test_web_ready(check: Callable) -> void:
+	var key := InputEventKey.new()
+	key.physical_keycode = KEY_P
+	check.call(InputMap.event_is_action(key, "pause"), "P でもポーズできる")
+	var font: FontFile = load(ProjectSettings.get_setting("gui/theme/custom_font"))
+	check.call(font.fixed_size == FONT_FIXED_SIZE, "文字は10pxのドット文字で描く")
+	check.call(font.get_supported_chars().contains("居"), "同梱フォントに日本語がある")

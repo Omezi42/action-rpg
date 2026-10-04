@@ -43,9 +43,10 @@ func _ready() -> void:
 	_prompt = _add_label("居合ボタンで始める", prompt_top, small_size + 2, Color.WHITE)
 	_add_label(_records_text(RunRecords.load_saved()), records_top, small_size, dim_text)
 	_merit = _add_label("", merit_top, small_size, Color.WHITE)
-	_add_label(
-		"WASD 移動 / 左クリック・J・Space 長押しで溜め、離して居合 / Tab 修行 / Esc 終了", help_top, small_size, dim_text
-	)
+	var help := "WASD 移動 / 左クリック・J・Space 長押しで溜め、離して居合 / Tab 修行"
+	if can_quit():
+		help += " / Esc 終了"
+	_add_label(help, help_top, small_size, dim_text)
 	_add_label(credit_text, credit_top, small_size - 2, dim_text)
 	_show_merit()
 	Bgm.play(&"title")
@@ -70,8 +71,13 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event.is_action_pressed("iai"):
 		Sfx.play(&"confirm")
 		get_tree().change_scene_to_file(arena_scene)
-	elif event.is_action_pressed("pause"):
+	elif event.is_action_pressed("pause") and can_quit():
 		get_tree().quit()
+
+
+## ブラウザのゲームは終了できず、quit() すると画面が固まる(GameDesign.md 9章)
+static func can_quit() -> bool:
+	return not OS.has_feature("web")
 
 
 func open_training() -> void:
