@@ -112,4 +112,5 @@
 - [x] Web 書き出し(プリセット・tools/export_web.sh・手元のブラウザで起動)
 - [x] 日本語フォントの同梱(PixelMplus10・整数倍)
 - [x] Web 版の終了なし・ポーズにP・セーブの置き場所
+- [x] 投稿の文面(promo/unityroom.md)・サムネイルと紹介用のGIF
 - [ ] unityroom にゲームページを作り、pck・サムネイル・説明文・クレジットを登録する(ユーザー)

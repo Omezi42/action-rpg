@@ -6,6 +6,8 @@ GODOT="${GODOT:-C:/Users/omezi/Documents/Godot_v4.6.2-stable_win64_console.exe}"
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 mkdir -p logs build/web build/unityroom
+# build/ を Godot に取り込ませない(書き出した画像まで import される)
+touch build/.gdignore
 "$GODOT" --headless --path . --export-release "Web" build/web/index.html > logs/export_web.log 2>&1
 "$GODOT" --headless --path . --export-pack "Web" build/unityroom/index.pck >> logs/export_web.log 2>&1
 grep -E "ERROR|SCRIPT ERROR" logs/export_web.log && exit 1
