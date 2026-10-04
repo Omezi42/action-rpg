@@ -29,14 +29,25 @@ func setup(data: UpgradeData, current_level: int, key_number: int) -> void:
 	_add_label("%d" % key_number, body_size, HORIZONTAL_ALIGNMENT_LEFT, 0.0)
 	_add_label(data.label, title_size, HORIZONTAL_ALIGNMENT_CENTER, padding)
 	_add_label(level_text, body_size, HORIZONTAL_ALIGNMENT_CENTER, padding + title_size * 1.6)
-	var body := _add_label(
-		data.description, body_size, HORIZONTAL_ALIGNMENT_CENTER, padding + title_size * 3.0
+	_add_label(
+		data.description,
+		body_size,
+		HORIZONTAL_ALIGNMENT_CENTER,
+		padding + title_size * 3.0,
+		TextServer.AUTOWRAP_WORD_SMART
 	)
-	body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 
 
-func _add_label(text: String, font_size: int, align: HorizontalAlignment, top: float) -> Label:
+## 折り返しはサイズより先に決める。後から決めると、ラベルの幅が最長行の幅まで広がったまま残る
+func _add_label(
+	text: String,
+	font_size: int,
+	align: HorizontalAlignment,
+	top: float,
+	autowrap := TextServer.AUTOWRAP_OFF
+) -> Label:
 	var label := Label.new()
+	label.autowrap_mode = autowrap
 	label.text = text
 	label.horizontal_alignment = align
 	label.add_theme_font_size_override("font_size", font_size)
